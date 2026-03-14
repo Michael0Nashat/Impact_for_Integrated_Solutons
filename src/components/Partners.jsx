@@ -50,9 +50,7 @@ const sampleProjectImages = [
 
 const projectVideos = [
   'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418897/07F5CAC5-FBAC-466C-A3E8-EE36EF2F2AAA_ejisyy.mp4',
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418094/6C6B04C1-9951-40DE-8386-CB790385A7DE_uhuytm.mp4',
   'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418446/IMG_0879_yq5rms.mp4',
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418411/IMG_0877_aigoen.mp4'
 ];
 
 const partnersStyles = `
@@ -82,7 +80,7 @@ const partnersStyles = `
   .brand-item:nth-child(odd) { animation-delay: 0.5s; }
   .brand-item:nth-child(3n) { animation-delay: 1s; }
   .brand-item:nth-child(4n) { animation-delay: 1.5s; }
-  .project-sample-item { flex-shrink: 0; width: 220px; height: 165px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .project-sample-item { flex-shrink: 0; width: 260px; height: 195px; overflow: hidden; transition: transform 0.3s ease; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
   .project-sample-item img { object-fit: cover; width: 100%; height: 100%; }
   .project-sample-item:hover { transform: scale(1.04); }
   .project-video-item { flex-shrink: 0; width: 220px; height: 165px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
@@ -150,7 +148,7 @@ function LazyScrollImage({ src, alt, width, height }) {
   }, []);
 
   return (
-    <div ref={ref} style={{ width, height, background: '#e0e0e0', borderRadius: 'inherit', overflow: 'hidden' }}>
+    <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden' }}>
       {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />}
     </div>
   );
@@ -255,7 +253,48 @@ export default function Partners() {
     <>
       <style>{partnersStyles}</style>
       <section id="partners" style={sectionStyle}>
-        <h2 style={headingStyle}>شركاؤنا</h2>
+
+        <h3 style={{
+          textAlign: 'center',
+          fontSize: isMobile ? '20px' : '28px',
+          marginTop: '50px',
+          marginBottom: '8px',
+          opacity: isVisible ? 1 : 0,
+          transition: 'all 0.6s ease-out 0.4s'
+        }}>
+          أمثلة من مشاريعنا
+        </h3>
+        <div className="scroll-container" style={{ marginTop: '16px' }}>
+          <div className="scroll-row scroll-right" style={{ animationDuration: '240s' }}>
+            {[...sampleProjectImages, ...sampleProjectImages].map((src, i) => (
+              <div key={`sample-${i}`} className="project-sample-item">
+                <LazyScrollImage
+                  src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_webp/')}
+                  alt={`مشروع ${i + 1}`}
+                  width={260}
+                  height={195}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '16px',
+          marginTop: '20px'
+        }}>
+          {projectVideos.map((src, i) => (
+            <div key={`video-${i}`} style={{ width: isMobile ? 'calc(50% - 8px)' : '300px', height: isMobile ? '140px' : '165px' }}>
+              <LazyVideo src={src} />
+            </div>
+          ))}
+        </div>
+
+
+        <h2 style={{ ...headingStyle, marginTop: '80px' }}>شركاؤنا</h2>
 
         <div className="scroll-container">
           <div className="scroll-row scroll-right">
@@ -273,43 +312,7 @@ export default function Partners() {
           </div>
         </div>
 
-          <h3 style={{
-          textAlign: 'center',
-          fontSize: isMobile ? '20px' : '28px',
-          marginTop: '50px',
-          marginBottom: '8px',
-          opacity: isVisible ? 1 : 0,
-          transition: 'all 0.6s ease-out 0.4s'
-        }}>
-          أمثلة من مشاريعنا
-        </h3>
-        <div className="scroll-container" style={{ marginTop: '16px' }}>
-          <div className="scroll-row scroll-right" style={{ animationDuration: '120s' }}>
-            {[...sampleProjectImages, ...sampleProjectImages].map((src, i) => (
-              <div key={`sample-${i}`} className="project-sample-item">
-                <LazyScrollImage
-                  src={src.replace('/upload/', '/upload/w_400,h_300,c_fill,q_auto,f_webp/')}
-                  alt={`مشروع ${i + 1}`}
-                  width={220}
-                  height={165}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-          gap: '16px',
-          marginTop: '20px'
-        }}>
-          {projectVideos.map((src, i) => (
-            <div key={`video-${i}`} style={{ width: '100%', height: isMobile ? '140px' : '165px' }}>
-              <LazyVideo src={src} />
-            </div>
-          ))}
-        </div>
+          
         <h3 style={{
           textAlign: 'center',
           fontSize: isMobile ? '24px' : '32px',

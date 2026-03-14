@@ -206,7 +206,7 @@ const projectsData = {
 export default function ProjectDetail() {
   const { id } = useParams();
   const [isMobile, setIsMobile] = useState(false);
-  const project = projectsData[id];
+  const project = projectsData[Number(id)];
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
