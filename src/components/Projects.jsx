@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 const projectStyles = `
   @keyframes fadeInUp {
@@ -373,14 +374,14 @@ export default function Projects() {
         </div>
 
         <div style={buttonContainerStyle}>
-          <a 
-            href="/projects"
+          <Link 
+            to="/projects"
             style={buttonStyle}
             onMouseEnter={() => setIsButtonHovered(true)}
             onMouseLeave={() => setIsButtonHovered(false)}
           >
             المزيد
-          </a>
+          </Link>
         </div>
       </section>
     </>
