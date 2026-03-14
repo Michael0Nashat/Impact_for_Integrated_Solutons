@@ -161,7 +161,6 @@ function LazyVideo({ src }) {
   const videoRef = useRef(null);
   const [inView, setInView] = useState(false);
 
-  // Reduce quality/size via Cloudinary transformations for faster load
   const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
 
   const poster = src
@@ -172,8 +171,6 @@ function LazyVideo({ src }) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setInView(entry.isIntersecting);
-        if (entry.isIntersecting) videoRef.current?.play().catch(() => {});
-        else videoRef.current?.pause();
       },
       { threshold: 0.2 }
     );
@@ -181,16 +178,26 @@ function LazyVideo({ src }) {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (inView) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [inView]);
+
   return (
     <div ref={ref} className="project-video-item" style={{ width: '100%', height: 'inherit' }}>
       <video
         ref={videoRef}
-        src={inView ? optimizedSrc : undefined}
+        src={optimizedSrc}
         poster={poster}
         muted
         loop
         playsInline
-        preload="none"
+        preload="metadata"
         style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
       />
     </div>
