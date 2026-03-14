@@ -1,9 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const projectStyles = `
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(40px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   @keyframes scrollRight {
     0% { transform: translateX(-50%); }
@@ -103,14 +107,68 @@ const projects = [
   }
 ];
 
+// Cloudinary URL helpers
+const imgThumb = (src) => src.replace('/upload/', '/upload/w_20,h_14,c_fill,q_10,f_webp/');
+const imgFull  = (src) => src.replace('/upload/', '/upload/w_280,h_200,c_fill,q_auto,f_webp/');
+const vidPoster = (src) => src.replace('/video/upload/', '/image/upload/w_280,h_200,c_fill,q_auto,f_webp/').replace(/\.mp4$/, '.jpg');
+
+function LazyImage({ src, alt }) {
+  const ref = useRef(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // use scroll-container parent as root so observer fires inside overflow:hidden
+    const root = el.closest('.scroll-container') || null;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const img = new Image();
+          img.src = imgFull(src);
+          img.onload = () => setLoaded(true);
+          observer.disconnect();
+        }
+      },
+      { root, threshold: 0, rootMargin: '0px 400px 0px 400px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [src]);
+
+  return (
+    <div ref={ref} className="project-image" style={{ background: '#e0e0e0', position: 'relative', overflow: 'hidden' }}>
+      {/* tiny blurred placeholder — loads instantly */}
+      <img
+        src={imgThumb(src)}
+        alt=""
+        aria-hidden="true"
+        width={280}
+        height={200}
+        style={{ objectFit: 'cover', width: '100%', height: '100%', filter: 'blur(8px)', transform: 'scale(1.1)', position: 'absolute', inset: 0 }}
+      />
+      {/* full quality image fades in */}
+      {loaded && (
+        <img
+          src={imgFull(src)}
+          alt={alt}
+          width={280}
+          height={200}
+          style={{ objectFit: 'cover', width: '100%', height: '100%', position: 'absolute', inset: 0, animation: 'fadeIn 0.4s ease' }}
+        />
+      )}
+    </div>
+  );
+}
+
 function LazyVideo({ src }) {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold: 0.1 }
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect(); } },
+      { threshold: 0, rootMargin: '200px' }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -118,17 +176,28 @@ function LazyVideo({ src }) {
 
   return (
     <div ref={ref} className="project-video">
-      {inView && (
+      {inView ? (
         <video
           autoPlay
           loop
           muted
           playsInline
-          preload="none"
+          preload="metadata"
+          poster={vidPoster(src)}
           style={{ objectFit: 'cover', width: '100%', height: '100%' }}
         >
           <source src={src} type="video/mp4" />
         </video>
+      ) : (
+        // show poster immediately before video loads
+        <img
+          src={vidPoster(src)}
+          alt=""
+          aria-hidden="true"
+          width={280}
+          height={200}
+          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        />
       )}
     </div>
   );
@@ -291,17 +360,7 @@ export default function Projects() {
         <div className="scroll-container">
           <div className="scroll-row scroll-right">
             {[...projectImages, ...projectImages].map((img, i) => (
-              <div key={`project-img-${i}`} className="project-image">
-                <img 
-                  src={img.replace('/upload/', '/upload/w_280,h_200,c_fill,q_auto,f_auto/')} 
-                  alt={`مشروع ${i + 1}`}
-                  width={280}
-                  height={200}
-                  loading="lazy"
-                  decoding="async"
-                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                />
-              </div>
+              <LazyImage key={`project-img-${i}`} src={img} alt={`مشروع ${i + 1}`} />
             ))}
           </div>
           {isMounted && (
