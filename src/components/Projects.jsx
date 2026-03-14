@@ -14,24 +14,25 @@ const projectStyles = `
     0% { transform: translateX(-50%); }
     100% { transform: translateX(0); }
   }
-  .scroll-container { overflow: hidden; width: 100%; margin-top: 40px; }
-  .scroll-row { display: flex; width: max-content; gap: 12px; margin-bottom: 12px; }
-  .scroll-right { animation: scrollRight 80s linear infinite; }
-  .video-row-centered { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; width: 100%; padding: 0 5%; box-sizing: border-box; }
-  .video-row-centered .project-video { width: 100%; }
-  .project-image { flex-shrink: 0; width: 200px; height: 140px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-  .project-image:hover { transform: scale(1.05); }
+  .images-grid-container { width: 100%; margin-top: 40px; padding: 0 5%; box-sizing: border-box; }
+  .images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .video-row-centered { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; width: 100%; box-sizing: border-box; }
+  .project-image { width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  .project-image:hover { transform: scale(1.03); }
   .project-image img { object-fit: cover; width: 100%; height: 100%; }
-  .project-video { flex-shrink: 0; width: 200px; height: 140px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-  .project-video:hover { transform: scale(1.05); }
+  .project-video { width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  .project-video:hover { transform: scale(1.03); }
   .project-video video { object-fit: cover; width: 100%; height: 100%; }
+  @media (min-width: 480px) {
+    .images-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .video-row-centered { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  }
   @media (min-width: 769px) {
-    .scroll-row { gap: 20px; margin-bottom: 20px; }
-    .video-row-centered { display: flex; gap: 20px; margin-bottom: 20px; justify-content: center; padding: 0; grid-template-columns: unset; }
-    .video-row-centered .project-video { width: 280px; }
-    .project-image { width: 280px; height: 200px; border-radius: 15px; }
-    .project-video { width: 280px; height: 200px; border-radius: 15px; }
-    .scroll-container { margin-top: 60px; }
+    .images-grid-container { padding: 0; margin-top: 60px; }
+    .images-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+    .video-row-centered { grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .project-image { border-radius: 15px; }
+    .project-video { border-radius: 15px; }
   }
 `;
 
@@ -120,8 +121,6 @@ function LazyImage({ src, alt }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // use scroll-container parent as root so observer fires inside overflow:hidden
-    const root = el.closest('.scroll-container') || null;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -131,7 +130,7 @@ function LazyImage({ src, alt }) {
           observer.disconnect();
         }
       },
-      { root, threshold: 0, rootMargin: '0px 400px 0px 400px' }
+      { threshold: 0, rootMargin: '200px' }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -358,9 +357,9 @@ export default function Projects() {
           </div>
         </div>
 
-        <div className="scroll-container">
-          <div className="scroll-row scroll-right">
-            {[...projectImages, ...projectImages].map((img, i) => (
+        <div className="images-grid-container">
+          <div className="images-grid">
+            {projectImages.map((img, i) => (
               <LazyImage key={`project-img-${i}`} src={img} alt={`مشروع ${i + 1}`} />
             ))}
           </div>
