@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const projectStyles = `
   @keyframes fadeInUp {
@@ -9,16 +9,25 @@ const projectStyles = `
     0% { transform: translateX(-50%); }
     100% { transform: translateX(0); }
   }
-  .scroll-container { overflow: hidden; width: 100%; margin-top: 60px; }
-  .scroll-row { display: flex; width: max-content; gap: 20px; margin-bottom: 20px; }
+  .scroll-container { overflow: hidden; width: 100%; margin-top: 40px; }
+  .scroll-row { display: flex; width: max-content; gap: 12px; margin-bottom: 12px; }
   .scroll-right { animation: scrollRight 80s linear infinite; }
-  .video-row-centered { display: flex; gap: 20px; margin-bottom: 20px; justify-content: center; width: 100%; }
-  .project-image { flex-shrink: 0; width: 280px; height: 200px; overflow: hidden; border-radius: 15px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  .video-row-centered { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; width: 100%; padding: 0 5%; box-sizing: border-box; }
+  .video-row-centered .project-video { width: 100%; }
+  .project-image { flex-shrink: 0; width: 200px; height: 140px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
   .project-image:hover { transform: scale(1.05); }
   .project-image img { object-fit: cover; width: 100%; height: 100%; }
-  .project-video { flex-shrink: 0; width: 280px; height: 200px; overflow: hidden; border-radius: 15px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  .project-video { flex-shrink: 0; width: 200px; height: 140px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
   .project-video:hover { transform: scale(1.05); }
   .project-video video { object-fit: cover; width: 100%; height: 100%; }
+  @media (min-width: 769px) {
+    .scroll-row { gap: 20px; margin-bottom: 20px; }
+    .video-row-centered { display: flex; gap: 20px; margin-bottom: 20px; justify-content: center; padding: 0; grid-template-columns: unset; }
+    .video-row-centered .project-video { width: 280px; }
+    .project-image { width: 280px; height: 200px; border-radius: 15px; }
+    .project-video { width: 280px; height: 200px; border-radius: 15px; }
+    .scroll-container { margin-top: 60px; }
+  }
 `;
 
 const projectImages = [
@@ -94,6 +103,37 @@ const projects = [
   }
 ];
 
+function LazyVideo({ src }) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      { threshold: 0.1 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="project-video">
+      {inView && (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      )}
+    </div>
+  );
+}
+
 export default function Projects() {
   const [hoveredCard, setHoveredCard] = useState(null);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -129,14 +169,16 @@ export default function Projects() {
   }, []);
 
   const sectionStyle = {
-    padding: isMobile ? '0 5%' : '0 8%',
-    marginTop: isMobile ? '50px' : '80px'
+    padding: isMobile ? '0' : '0 8%',
+    marginTop: isMobile ? '50px' : '80px',
+    overflowX: 'hidden'
   };
 
   const headingStyle = {
     textAlign: 'center',
-    fontSize: isMobile ? '30px' : '40px',
-    marginBottom: isMobile ? '40px' : '60px',
+    fontSize: isMobile ? '26px' : '40px',
+    marginBottom: isMobile ? '30px' : '60px',
+    padding: isMobile ? '0 5%' : '0',
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? 'translateY(0)' : 'translateY(-20px)',
     transition: 'all 0.6s ease-out'
@@ -144,8 +186,9 @@ export default function Projects() {
 
   const containerStyle = {
     background: 'white',
-    padding: isMobile ? '30px 20px' : '70px',
-    borderRadius: isMobile ? '25px' : '40px',
+    padding: isMobile ? '20px 15px' : '70px',
+    borderRadius: isMobile ? '20px' : '40px',
+    margin: isMobile ? '0 5%' : '0',
     boxShadow: '0 50px 120px rgba(0, 0, 0, 0.1)',
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
@@ -192,7 +235,8 @@ export default function Projects() {
 
   const buttonContainerStyle = {
     textAlign: 'center',
-    marginTop: '32px'
+    marginTop: '32px',
+    padding: isMobile ? '0 5%' : '0'
   };
 
   const buttonStyle = {
@@ -249,10 +293,12 @@ export default function Projects() {
             {[...projectImages, ...projectImages].map((img, i) => (
               <div key={`project-img-${i}`} className="project-image">
                 <img 
-                  src={img} 
+                  src={img.replace('/upload/', '/upload/w_280,h_200,c_fill,q_auto,f_auto/')} 
                   alt={`مشروع ${i + 1}`}
                   width={280}
                   height={200}
+                  loading="lazy"
+                  decoding="async"
                   style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                 />
               </div>
@@ -261,17 +307,7 @@ export default function Projects() {
           {isMounted && (
             <div className="video-row-centered">
               {projectVideos.map((vid, i) => (
-                <div key={`project-vid-${i}`} className="project-video">
-                  <video 
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline
-                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                  >
-                    <source src={vid} type="video/mp4" />
-                  </video>
-                </div>
+                <LazyVideo key={`project-vid-${i}`} src={vid} />
               ))}
             </div>
           )}
