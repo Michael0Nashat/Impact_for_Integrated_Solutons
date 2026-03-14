@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const sampleProjectImages = [
   'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481623/IMG_0421_holfs0.jpg',
@@ -136,6 +136,61 @@ const brandLogos = [
   'dlink.png'
 ];
 
+function LazyScrollImage({ src, alt, width, height }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { rootMargin: '300px' }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} style={{ width, height, background: '#e0e0e0', borderRadius: 'inherit', overflow: 'hidden' }}>
+      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />}
+    </div>
+  );
+}
+
+function LazyVideo({ src }) {
+  const ref = useRef(null);
+  const videoRef = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) videoRef.current?.play();
+        else { videoRef.current?.pause(); }
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="project-video-item" style={{ width: '100%', height: 'inherit' }}>
+      {inView && (
+        <video
+          ref={videoRef}
+          src={src}
+          muted
+          loop
+          playsInline
+          preload="none"
+          style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function Partners() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -219,12 +274,11 @@ export default function Partners() {
           <div className="scroll-row scroll-right" style={{ animationDuration: '120s' }}>
             {[...sampleProjectImages, ...sampleProjectImages].map((src, i) => (
               <div key={`sample-${i}`} className="project-sample-item">
-                <img
+                <LazyScrollImage
                   src={src.replace('/upload/', '/upload/w_400,h_300,c_fill,q_auto,f_webp/')}
                   alt={`مشروع ${i + 1}`}
-                  width={320}
-                  height={240}
-                  loading="lazy"
+                  width={220}
+                  height={165}
                 />
               </div>
             ))}
@@ -238,14 +292,8 @@ export default function Partners() {
           marginTop: '20px'
         }}>
           {projectVideos.map((src, i) => (
-            <div key={`video-${i}`} className="project-video-item" style={{ width: '100%', height: isMobile ? '140px' : '165px' }}>
-              <video
-                src={src}
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
+            <div key={`video-${i}`} style={{ width: '100%', height: isMobile ? '140px' : '165px' }}>
+              <LazyVideo src={src} />
             </div>
           ))}
         </div>
