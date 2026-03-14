@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f4f4f2;
+  color: #222;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Background Animated Squares */
+.shape {
+  position: fixed;
+  background: rgba(255, 193, 7, 0.15);
+  z-index: -1;
+  border-radius: 10px;
+  animation: moveShape 25s linear infinite;
+}
+
+.shape.lg {
+  width: 500px;
+  height: 500px;
+}
+
+.shape.md {
+  width: 350px;
+  height: 350px;
+}
+
+.shape.sm {
+  width: 200px;
+  height: 200px;
+}
+
+@keyframes moveShape {
+  0% {
+    transform: translateY(0) rotate(15deg);
+  }
+  50% {
+    transform: translateY(-150px) rotate(45deg);
+  }
+  100% {
+    transform: translateY(0) rotate(15deg);
+  }
+}
+
+/* Scroll Animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(80px);
+  transition: all 1s ease;
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: all 1s ease;
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 1s ease;
+}
+
+.reveal.active,
+.reveal-left.active,
+.reveal-right.active {
+  opacity: 1;
+  transform: translate(0, 0);
+}
