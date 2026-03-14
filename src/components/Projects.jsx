@@ -16,80 +16,18 @@ const projectStyles = `
   }
   .images-grid-container { width: 100%; margin-top: 40px; padding: 0 5%; box-sizing: border-box; }
   .images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-  .video-row-centered { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; width: 100%; box-sizing: border-box; }
   .project-image { width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
   .project-image:hover { transform: scale(1.03); }
   .project-image img { object-fit: cover; width: 100%; height: 100%; }
-  .project-video { width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-  .project-video:hover { transform: scale(1.03); }
-  .project-video video { object-fit: cover; width: 100%; height: 100%; }
   @media (min-width: 480px) {
     .images-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .video-row-centered { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   }
   @media (min-width: 769px) {
     .images-grid-container { padding: 0; margin-top: 60px; }
     .images-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-    .video-row-centered { grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
     .project-image { border-radius: 15px; }
-    .project-video { border-radius: 15px; }
   }
 `;
-
-const projectImages = [
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481623/IMG_0421_holfs0.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481617/IMG_0422_nx9y15.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481614/IMG_0436_ihs3ml.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481595/IMG_0433_cff2mn.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481578/IMG_0370_wmgj12.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481552/IMG_0456_lfwwbr.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481497/IMG_1306_hputdm.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481475/ACBD4F43-8BE8-49C8-BEF3-1DA83C8DD56D_okvlko.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481474/WhatsApp_Image_2025-07-22_at_15.00.55_61bf7ca1_cwloka.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481467/IMG_1105_x4nl9t.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481465/3E2BED8F-1649-47CA-A00B-D0C890237A20_sudhf5.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481462/WhatsApp_Image_2025-07-22_at_15.00.53_e963a71d_ryh8iz.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481460/WhatsApp_Image_2025-07-22_at_15.00.54_605b8a75_kmmwiw.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481459/IMG_1318_p9dzgv.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481458/IMG_1327_ebr2nm.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481451/WhatsApp_Image_2025-07-22_at_15.00.54_2b168ceb_tnakp0.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481439/IMG_0902_pirc8g.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481434/IMG_0890_zc8did.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481425/IMG_0901_nlk9nj.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481407/IMG_0883_p750qx.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481407/IMG_1092_zxcsiu.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481407/IMG_1093_eal4ug.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481403/IMG_1079_iokslv.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481398/IMG_0880_qjfibb.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481398/IMG_0937_ekiw2u.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481394/IMG_0936_pzjspv.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481390/IMG_0836_u7ah9u.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481379/IMG_0889_u76clr.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481365/IMG_0879_ed4vu2.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481360/IMG_0826_mtge7z.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481323/IMG_0792_begbjy.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481304/IMG_0701_h99ywh.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481292/IMG_0852_vda3ub.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481288/IMG_0853_wbmcqd.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481283/IMG_0837_bhzac8.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481276/IMG_0850_qrjhru.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481232/IMG_0514_pakddr.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481228/IMG_0537_zjmdjj.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481227/IMG_0587_pmdf0h.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481220/IMG_0518_cz8ahh.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481213/IMG_0506_jkczig.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481210/IMG_0497_owjlja.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481209/IMG_0499_akz56k.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481209/IMG_0479_mapwex.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481205/IMG_0460_vnkdsp.jpg',
-];
-
-const projectVideos = [
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418897/07F5CAC5-FBAC-466C-A3E8-EE36EF2F2AAA_ejisyy.mp4',
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418094/6C6B04C1-9951-40DE-8386-CB790385A7DE_uhuytm.mp4',
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418446/IMG_0879_yq5rms.mp4',
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418411/IMG_0877_aigoen.mp4'
-];
 
 const projects = [
   {
@@ -112,7 +50,6 @@ const projects = [
 // Cloudinary URL helpers
 const imgThumb = (src) => src.replace('/upload/', '/upload/w_20,h_14,c_fill,q_10,f_webp/');
 const imgFull  = (src) => src.replace('/upload/', '/upload/w_280,h_200,c_fill,q_auto,f_webp/');
-const vidPoster = (src) => src.replace('/video/upload/', '/image/upload/w_280,h_200,c_fill,q_auto,f_webp/').replace(/\.mp4$/, '.jpg');
 
 function LazyImage({ src, alt }) {
   const ref = useRef(null);
@@ -155,48 +92,6 @@ function LazyImage({ src, alt }) {
           width={280}
           height={200}
           style={{ objectFit: 'cover', width: '100%', height: '100%', position: 'absolute', inset: 0, animation: 'fadeIn 0.4s ease' }}
-        />
-      )}
-    </div>
-  );
-}
-
-function LazyVideo({ src }) {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect(); } },
-      { threshold: 0, rootMargin: '200px' }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref} className="project-video">
-      {inView ? (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          poster={vidPoster(src)}
-          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-        >
-          <source src={src} type="video/mp4" />
-        </video>
-      ) : (
-        // show poster immediately before video loads
-        <img
-          src={vidPoster(src)}
-          alt=""
-          aria-hidden="true"
-          width={280}
-          height={200}
-          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
         />
       )}
     </div>
@@ -355,21 +250,6 @@ export default function Projects() {
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="images-grid-container">
-          <div className="images-grid">
-            {projectImages.map((img, i) => (
-              <LazyImage key={`project-img-${i}`} src={img} alt={`مشروع ${i + 1}`} />
-            ))}
-          </div>
-          {isMounted && (
-            <div className="video-row-centered">
-              {projectVideos.map((vid, i) => (
-                <LazyVideo key={`project-vid-${i}`} src={vid} />
-              ))}
-            </div>
-          )}
         </div>
 
         <div style={buttonContainerStyle}>
