@@ -99,7 +99,7 @@ export default function About() {
         </div>
         <div style={imageContainerStyle}>
           <img 
-            src="/src/assets/IMG-20260314-WA0029.jpg" 
+            src="/IMG-20260314-WA0029.jpg" 
             alt="About" 
             width={550} 
             height={400}
