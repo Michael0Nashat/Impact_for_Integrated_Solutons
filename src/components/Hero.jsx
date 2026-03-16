@@ -117,7 +117,7 @@ export default function Hero() {
       <section id="hero" style={sectionStyle}>
         <div style={imageContainerStyle}>
           <img 
-            src="https://images.unsplash.com/photo-1551434678-e076c223a692" 
+            src="/IMG_20260316_143125.png" 
             alt="Hero" 
             width={650} 
             height={400}
