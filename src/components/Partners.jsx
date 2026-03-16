@@ -205,6 +205,7 @@ function LazyVideo({ src }) {
 export default function Partners() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
 
   useEffect(() => {
     let resizeTimeout;
@@ -278,6 +279,56 @@ export default function Partners() {
             ))}
           </div>
         </div>
+
+        {/* More button */}
+        <div style={{ textAlign: 'center', marginTop: '24px' }}>
+          {!showGrid && (
+            <button
+              onClick={() => setShowGrid(true)}
+              style={{
+                padding: isMobile ? '12px 28px' : '14px 40px',
+                background: '#ffc107',
+                color: 'black',
+                border: 'none',
+                borderRadius: '30px',
+                fontWeight: 'bold',
+                fontSize: isMobile ? '14px' : '16px',
+                cursor: 'pointer',
+                boxShadow: '0 5px 15px rgba(255,193,7,0.3)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              المزيد
+            </button>
+          )}
+        </div>
+
+        {/* Grid of all sample images */}
+        {showGrid && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+            gap: isMobile ? '8px' : '12px',
+            marginTop: '24px',
+            padding: isMobile ? '0' : '0 2%'
+          }}>
+            {sampleProjectImages.map((src, i) => (
+              <div key={`grid-${i}`} style={{
+                aspectRatio: '4/3',
+                overflow: 'hidden',
+                borderRadius: '12px',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
+              }}>
+                <img
+                  src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_webp/')}
+                  alt={`مشروع ${i + 1}`}
+                  loading="lazy"
+                  style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         <div style={{
           display: 'flex',
