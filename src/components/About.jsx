@@ -7,9 +7,21 @@ const aboutStyles = `
   }
 `;
 
+const DEFAULT_ABOUT = {
+  title: 'من نحن',
+  text: 'تأسست شركة امباكت سنة 2023 بخبرة كبيرة في مجال التيار الخفيف و تأسيس المواقع و التطبيقات و معرفة قوية بالسوق أكتر من 13 سنة، وكمان معانا شهادات من براندات عالمية. هدفنا إننا نساعد العملاء في كل مراحل المشروع من أول التصميم لحد التنفيذ.',
+  image: '/IMG-20260314-WA0029.jpg'
+};
+
+function loadAbout() {
+  try { const v = localStorage.getItem('dash_about'); return v ? JSON.parse(v) : DEFAULT_ABOUT; }
+  catch { return DEFAULT_ABOUT; }
+}
+
 export default function About() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [data] = useState(loadAbout);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -92,14 +104,12 @@ export default function About() {
       <style>{aboutStyles}</style>
       <section id="about" style={sectionStyle}>
         <div style={textContainerStyle}>
-          <h2 style={headingStyle}>من نحن</h2>
-          <p style={paragraphStyle}>
-            تأسست شركة امباكت سنة 2023 بخبرة كبيرة في مجال التيار الخفيف و تأسيس المواقع و التطبيقات و معرفة قوية بالسوق أكتر من 13 سنة، وكمان معانا شهادات من براندات عالمية. هدفنا إننا نساعد العملاء في كل مراحل المشروع من أول التصميم لحد التنفيذ، وبإمكانياتنا بنقدّم كل طاقتنا علشان نوصل لأعلى جودة ونكون دايمًا سند ودعم لعملائنا. نظام أمان تقدر تعتمد عليه 24/7 راقب منشئتك بكل سهولة و انت مطمن من اي مكان باحدث الاجهزة و التكنولوجيا الموجودة في العالم
-          </p>
+          <h2 style={headingStyle}>{data.title}</h2>
+          <p style={paragraphStyle}>{data.text}</p>
         </div>
         <div style={imageContainerStyle}>
           <img 
-            src="/IMG-20260314-WA0029.jpg" 
+            src={data.image}
             alt="About" 
             width={550} 
             height={400}

@@ -1,140 +1,21 @@
 import { useState, useEffect } from 'react';
+import { allProjects } from '../data/defaultProjects';
+
+const STORAGE_KEY = 'dash_projects';
+
+function loadFromStorage() {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY);
+    return v ? JSON.parse(v) : allProjects;
+  } catch { return allProjects; }
+}
 
 const projectStyles = `
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(40px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  @keyframes scrollRight {
-    0% { transform: translateX(-50%); }
-    100% { transform: translateX(0); }
-  }
-  .images-grid-container { width: 100%; margin-top: 40px; padding: 0 5%; box-sizing: border-box; }
-  .images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-  .project-image { width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-  .project-image:hover { transform: scale(1.03); }
-  .project-image img { object-fit: cover; width: 100%; height: 100%; }
-  @media (min-width: 480px) {
-    .images-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  }
-  @media (min-width: 769px) {
-    .images-grid-container { padding: 0; margin-top: 60px; }
-    .images-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-    .project-image { border-radius: 15px; }
-  }
 `;
-
-const projects = [
-  {
-    img: '/dsd.jpg',
-    title: 'وزارة الداخلية',
-    desc: 'نظام كاميرات المراقبة – قسم شرطة أم دومة بسوهاج. نظام إنذار الحريق – قسم شرطة سنباط بالغربية. نظام إنذار الحريق – قسم شرطة حانوت بالغربية. نظام إنذار الحريق – قسم شرطة الوايلي. تنفيذ البنية التحتية للبيانات – دار الضيافة',
-    category: 'حكومي'
-  },
-  {
-    img: '/IMG-20260314-WA0036.jpg',
-    title: 'مستشفى النيل بدراوي المعادي',
-    desc: 'تنفيذ جميع انظمة التيار الخفيف من البنية التحتية لكبلات النحاس و الفايبر تنفيذ اعمال انظمة كاميرات المراقبة و انذار الحريق و الصوتيات و الدش المركزي',
-    category: 'صحي'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334',
-    title: 'مصنع أندريا وجورج للذهب',
-    desc: 'تنفيذ جميع أنظمة التيار الخفيف من مرحلة الأعمال التأسيسية حتى مرحلة التشغيل، وتشمل: أنظمة المراقبة بالكاميرات، التحكم في الدخول، إنذار الحريق، الإذاعة الداخلية، البنية التحتية للنحاس والألياف الضوئية، ونظام السنترال.',
-    category: 'صناعي'
-  }
-];
-
-const allProjects = [
-  {
-    id: 1,
-    img: '/dsd.jpg',
-    title: 'وزارة الداخلية',
-    desc: 'نظام كاميرات المراقبة – قسم شرطة أم دومة بسوهاج. نظام إنذار الحريق – قسم شرطة سنباط بالغربية. نظام إنذار الحريق – قسم شرطة حانوت بالغربية. نظام إنذار الحريق – قسم شرطة الوايلي. تنفيذ البنية التحتية للبيانات – دار الضيافة',
-    category: 'حكومي'
-  },
-  {
-    id: 2,
-    img: '/IMG-20260314-WA0036.jpg',
-    title: 'مستشفى النيل بدراوي المعادي',
-    desc: 'تنفيذ جميع انظمة التيار الخفيف من البنية التحتية لكبلات النحاس و الفايبر تنفيذ اعمال انظمة كاميرات المراقبة و انذار الحريق و الصوتيات و الدش المركزي',
-    category: 'صحي'
-  },
-  {
-    id: 3,
-    img: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334',
-    title: 'مصنع أندريا وجورج للذهب',
-    desc: 'تنفيذ جميع أنظمة التيار الخفيف من مرحلة الأعمال التأسيسية حتى مرحلة التشغيل، وتشمل: أنظمة المراقبة بالكاميرات، التحكم في الدخول، إنذار الحريق، الإذاعة الداخلية، البنية التحتية للنحاس والألياف الضوئية، ونظام السنترال.',
-    category: 'صناعي'
-  },
-  {
-    id: 4,
-    img: '/IMG-20260314-WA0034.jpg',
-    title: 'مجمع تجاري - سيتي سنتر',
-    desc: 'تنفيذ أنظمة التيار الخفيف الشاملة للمباني التجارية تشمل كاميرات المراقبة، أنظمة الصوت، والبنية التحتية للشبكات',
-    category: 'تجاري'
-  },
-  {
-    id: 5,
-    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c',
-    title: 'مقر شركة الاتصالات',
-    desc: 'تركيب أنظمة الأمن والمراقبة المتطورة مع نظام التحكم في الدخول والبنية التحتية للألياف الضوئية',
-    category: 'إداري'
-  },
-  {
-    id: 6,
-    img: '/IMG-20260314-WA0035.jpg',
-    title: 'مصنع الأدوية الحديث',
-    desc: 'حلول متكاملة للأنظمة الذكية في المصانع تشمل أنظمة المراقبة وإنذار الحريق والتحكم الآلي',
-    category: 'صناعي'
-  },
-  {
-    id: 7,
-    img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-    title: 'فندق النيل الدولي',
-    desc: 'تنفيذ أنظمة التيار الخفيف الفندقية الشاملة من كاميرات مراقبة، نظام الدش المركزي، والصوتيات',
-    category: 'فندقي'
-  },
-  {
-    id: 8,
-    img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e',
-    title: 'جامعة المستقبل',
-    desc: 'تركيب أنظمة الأمن والمراقبة للحرم الجامعي مع نظام الإذاعة الداخلية والبنية التحتية للشبكات',
-    category: 'تعليمي'
-  },
-  {
-    id: 9,
-    img: '/IMG-20260314-WA0033.jpg',
-    title: 'مركز التسوق الكبير',
-    desc: 'أنظمة مراقبة متطورة مع نظام إنذار الحريق والصوتيات لمركز تسوق بمساحة 50,000 متر مربع',
-    category: 'تجاري'
-  },
-  {
-    id: 10,
-    img: '/IMG-20260314-WA0032.jpg',
-    title: 'مصنع الإلكترونيات',
-    desc: 'تنفيذ شامل لأنظمة التحكم والمراقبة الصناعية مع أنظمة الأمن المتقدمة',
-    category: 'صناعي'
-  },
-  {
-    id: 11,
-    img: '/IMG-20260314-WA0031.jpg',
-    title: 'مركز البيانات الوطني',
-    desc: 'بنية تحتية متكاملة للألياف الضوئية مع أنظمة أمن وحماية متعددة المستويات',
-    category: 'تقني'
-  },
-  {
-    id: 12,
-    img: '/IMG-20260314-WA0030.jpg',
-    title: 'برج الأعمال الذكي',
-    desc: 'تنفيذ أنظمة المباني الذكية الشاملة من مراقبة، تحكم، وأتمتة كاملة',
-    category: 'إداري'
-  }
-];
 
 export default function Projects() {
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -142,26 +23,30 @@ export default function Projects() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [storedProjects, setStoredProjects] = useState(loadFromStorage);
+
+  // sync when dashboard updates localStorage
+  useEffect(() => {
+    const onStorage = () => setStoredProjects(loadFromStorage());
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  const featured = storedProjects.slice(0, 3);
+  const displayed = showAll ? storedProjects : featured;
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      });
+      entries.forEach(entry => { if (entry.isIntersecting) setIsVisible(true); });
     }, { threshold: 0.1 });
 
     const section = document.getElementById('projects');
     if (section) observer.observe(section);
-    
+
     return () => {
       window.removeEventListener('resize', checkMobile);
       observer.disconnect();
@@ -209,36 +94,8 @@ export default function Projects() {
     transform: hoveredCard === index && !isMobile ? 'translateY(-15px)' : 'translateY(0)',
     boxShadow: hoveredCard === index ? '0 25px 70px rgba(0, 0, 0, 0.15)' : '0 20px 60px rgba(0, 0, 0, 0.08)',
     opacity: isVisible ? 1 : 0,
-    animation: isVisible ? `fadeInUp 0.6s ease-out ${index * 0.15}s both` : 'none'
+    animation: isVisible ? `fadeInUp 0.6s ease-out ${index * 0.1}s both` : 'none'
   });
-
-  const imageStyle = {
-    width: '100%',
-    height: '220px',
-    objectFit: 'cover',
-    transition: 'transform 0.4s ease'
-  };
-
-  const contentStyle = {
-    padding: '24px'
-  };
-
-  const titleStyle = {
-    marginBottom: '12px',
-    transition: 'color 0.3s ease'
-  };
-
-  const descStyle = {
-    fontSize: '14px',
-    color: '#555'
-  };
-
-  const buttonContainerStyle = {
-    textAlign: 'center',
-    marginTop: '32px',
-    marginBottom: '30px',
-    padding: isMobile ? '0 5%' : '0'
-  };
 
   const buttonStyle = {
     display: 'inline-block',
@@ -247,7 +104,8 @@ export default function Projects() {
     color: 'black',
     borderRadius: '30px',
     fontWeight: 'bold',
-    textDecoration: 'none',
+    border: 'none',
+    cursor: 'pointer',
     transition: 'all 0.3s ease',
     transform: isButtonHovered ? 'translateY(-3px) scale(1.05)' : 'translateY(0) scale(1)',
     fontSize: isMobile ? '14px' : '16px',
@@ -261,28 +119,31 @@ export default function Projects() {
         <h2 style={headingStyle}>مشاريعنا</h2>
         <div style={containerStyle}>
           <div style={gridStyle}>
-            {(showAll ? allProjects : projects).map((project, i) => (
-              <div 
-                key={i}
+            {displayed.map((project, i) => (
+              <div
+                key={project.id ?? i}
                 style={getCardStyle(i)}
                 onMouseEnter={() => setHoveredCard(i)}
                 onMouseLeave={() => setHoveredCard(null)}
               >
                 <div style={{ overflow: 'hidden' }}>
-                  <img 
-                    src={project.img} 
-                    alt={project.title} 
-                    width={400} 
+                  <img
+                    src={project.img}
+                    alt={project.title}
+                    width={400}
                     height={220}
                     style={{
-                      ...imageStyle,
+                      width: '100%',
+                      height: '220px',
+                      objectFit: 'cover',
+                      transition: 'transform 0.4s ease',
                       transform: hoveredCard === i ? 'scale(1.1)' : 'scale(1)'
                     }}
                   />
                 </div>
-                <div style={contentStyle}>
-                  <h3 style={titleStyle}>{project.title}</h3>
-                  <p style={descStyle}>{project.desc}</p>
+                <div style={{ padding: '24px' }}>
+                  <h3 style={{ marginBottom: '12px', transition: 'color 0.3s ease' }}>{project.title}</h3>
+                  <p style={{ fontSize: '14px', color: '#555' }}>{project.desc}</p>
                   {project.category && (
                     <span style={{
                       display: 'inline-block',
@@ -302,13 +163,13 @@ export default function Projects() {
           </div>
         </div>
 
-        {!showAll && (
-          <div style={buttonContainerStyle}>
+        {!showAll && storedProjects.length > 3 && (
+          <div style={{ textAlign: 'center', marginTop: '32px', marginBottom: '30px', padding: isMobile ? '0 5%' : '0' }}>
             <button
-              style={{ ...buttonStyle, border: 'none', cursor: 'pointer' }}
+              style={buttonStyle}
+              onClick={() => setShowAll(true)}
               onMouseEnter={() => setIsButtonHovered(true)}
               onMouseLeave={() => setIsButtonHovered(false)}
-              onClick={() => setShowAll(true)}
             >
               المزيد
             </button>

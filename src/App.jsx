@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import AnimatedShapes from './components/AnimatedShapes';
 import ProjectsPage from './projects/page';
 import ProjectDetail from './projects/[id]/page';
+import DashboardPage from './dashboard/DashboardPage';
 
 function Home() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/projects/:id" element={<ProjectDetail />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
     </Routes>
   );
 }

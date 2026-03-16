@@ -7,11 +7,25 @@ const heroStyles = `
   }
 `;
 
+const DEFAULT_HERO = {
+  title: 'نطور حلول برمجية مبتكرة',
+  subtitle: 'نقدم خدمات رقمية متكاملة لتطوير الشركات والمؤسسات بأعلى جودة واحترافية.',
+  btnText: 'ابدأ مشروعك الآن',
+  btnLink: '#contact',
+  image: '/IMG_20260316_143125.png'
+};
+
+function loadHero() {
+  try { const v = localStorage.getItem('dash_hero'); return v ? JSON.parse(v) : DEFAULT_HERO; }
+  catch { return DEFAULT_HERO; }
+}
+
 export default function Hero() {
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [data] = useState(loadHero);
 
   useEffect(() => {
     // Check mobile on mount
@@ -117,7 +131,7 @@ export default function Hero() {
       <section id="hero" style={sectionStyle}>
         <div style={imageContainerStyle}>
           <img 
-            src="/IMG_20260316_143125.png" 
+            src={data.image}
             alt="Hero" 
             width={650} 
             height={400}
@@ -128,18 +142,18 @@ export default function Hero() {
         </div>
         <div style={contentStyle}>
           <h1 style={headingStyle}>
-            نطور <span style={spanStyle}>حلول برمجية</span> مبتكرة
+            {data.title.includes('حلول') ? (
+              <>نطور <span style={spanStyle}>حلول برمجية</span> مبتكرة</>
+            ) : data.title}
           </h1>
-          <p style={paragraphStyle}>
-            نقدم خدمات رقمية متكاملة لتطوير الشركات والمؤسسات بأعلى جودة واحترافية.
-          </p>
+          <p style={paragraphStyle}>{data.subtitle}</p>
           <a 
-            href="#contact" 
+            href={data.btnLink}
             style={buttonStyle}
             onMouseEnter={() => setIsButtonHovered(true)}
             onMouseLeave={() => setIsButtonHovered(false)}
           >
-            ابدأ مشروعك الآن
+            {data.btnText}
           </a>
         </div>
       </section>
