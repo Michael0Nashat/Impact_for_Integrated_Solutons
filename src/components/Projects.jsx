@@ -19,7 +19,7 @@ export default function Projects() {
 
   useEffect(() => {
     const loadProjects = () => {
-      fetch(`${API}/api/projects`)
+      fetch(`${API}/projects`)
         .then(r => r.json())
         .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
         .catch(() => setProjects(allProjects));

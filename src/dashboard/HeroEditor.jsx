@@ -27,7 +27,7 @@ export default function HeroEditor({ hero, onSave, token }) {
     try {
       const fd = new FormData();
       fd.append('image', file);
-      const res = await fetch(`${API}/api/upload`, {
+      const res = await fetch(`${API}/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

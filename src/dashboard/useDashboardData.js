@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { allProjects } from '../data/defaultProjects';
 
-export const API = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+export const API = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace(/\/$/, '');
 
 export const DEFAULT_HERO = {
   title: 'نطور حلول برمجية مبتكرة',
@@ -19,14 +19,14 @@ export const DEFAULT_ABOUT = {
 
 async function getSetting(key, fallback) {
   try {
-    const res = await fetch(`${API}/api/settings/${key}`);
+    const res = await fetch(`${API}/settings/${key}`);
     const data = await res.json();
     return data ?? fallback;
   } catch { return fallback; }
 }
 
 async function putSetting(key, value, token) {
-  await fetch(`${API}/api/settings/${key}`, {
+  await fetch(`${API}/settings/${key}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(value),
@@ -41,7 +41,7 @@ export function useDashboardData(token = '') {
   useEffect(() => {
     getSetting('hero', DEFAULT_HERO).then(setHero);
     getSetting('about', DEFAULT_ABOUT).then(setAbout);
-    fetch(`${API}/api/projects`)
+    fetch(`${API}/projects`)
       .then(r => r.json())
       .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
       .catch(() => setProjects(allProjects));
@@ -59,7 +59,7 @@ export function useDashboardData(token = '') {
 
   const addProject = async (p) => {
     try {
-      const res = await fetch(`${API}/api/projects`, {
+      const res = await fetch(`${API}/projects`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: p.title, description: p.desc, category: p.category, img: p.img }),
@@ -76,7 +76,7 @@ export function useDashboardData(token = '') {
 
   const updateProject = async (id, p) => {
     try {
-      const res = await fetch(`${API}/api/projects/${Number(id)}`, {
+      const res = await fetch(`${API}/projects/${Number(id)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: p.title, description: p.desc, category: p.category, img: p.img }),
@@ -85,7 +85,7 @@ export function useDashboardData(token = '') {
       const updated = await res.json();
       if (!updated || !updated.id) throw new Error('Invalid response');
       // re-fetch full list to stay in sync
-      const listRes = await fetch(`${API}/api/projects`);
+      const listRes = await fetch(`${API}/projects`);
       const list = await listRes.json();
       if (Array.isArray(list)) {
         setProjects(list);
@@ -99,7 +99,7 @@ export function useDashboardData(token = '') {
   };
 
   const deleteProject = async (id) => {
-    await fetch(`${API}/api/projects/${Number(id)}`, {
+    await fetch(`${API}/projects/${Number(id)}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });

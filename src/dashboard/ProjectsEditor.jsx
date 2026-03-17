@@ -32,7 +32,7 @@ export default function ProjectsEditor({ projects, onAdd, onUpdate, onDelete, to
     try {
       const fd = new FormData();
       fd.append('image', file);
-      const res = await fetch(`${API}/api/upload`, {
+      const res = await fetch(`${API}/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

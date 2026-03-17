@@ -12,7 +12,7 @@ export default function ProjectsPage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    fetch(`${API}/api/projects`)
+    fetch(`${API}/projects`)
       .then(r => r.json())
       .then(data => setAllProjects(Array.isArray(data) && data.length ? data : defaultProjects))
       .catch(() => setAllProjects(defaultProjects));

@@ -12,7 +12,7 @@ export default function DashboardLogin({ onLogin }) {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/login`, {
+      const res = await fetch(`${API}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: user, password: pass }),

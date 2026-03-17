@@ -19,7 +19,7 @@ export default function Hero() {
 
   useEffect(() => {
     const loadHero = () => {
-      fetch(`${API}/api/settings/hero`)
+      fetch(`${API}/settings/hero`)
         .then(r => r.json())
         .then(d => { if (d) { setData(d); setImgTs(Date.now()); } })
         .catch(() => {});

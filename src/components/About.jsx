@@ -16,7 +16,7 @@ export default function About() {
 
   useEffect(() => {
     const loadAbout = () => {
-      fetch(`${API}/api/settings/about`)
+      fetch(`${API}/settings/about`)
         .then(r => r.json())
         .then(d => { if (d) { setData(d); setImgTs(Date.now()); } })
         .catch(() => {});
