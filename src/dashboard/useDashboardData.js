@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { allProjects } from '../data/defaultProjects';
 
-export const API = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace(/\/$/, '');
+export const API = 'https://impact-for-integrated-solutons-serv.vercel.app/api';
 
 export const DEFAULT_HERO = {
   title: 'نطور حلول برمجية مبتكرة',
