@@ -1,23 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { s } from './dashStyles';
+import { API } from './useDashboardData';
 
-export default function HeroEditor({ hero, onSave }) {
+export default function HeroEditor({ hero, onSave, token }) {
   const [form, setForm] = useState({ ...hero });
-  const [saved, setSaved] = useState(false);
   const [imgPreview, setImgPreview] = useState(hero.image);
+  const [saved, setSaved] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  // sync form when hero loads from server
+  useEffect(() => {
+    setForm({ ...hero });
+    setImgPreview(hero.image);
+  }, [hero]);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setImgPreview(url);
-    set('image', url);
+    // show local preview immediately
+    setImgPreview(URL.createObjectURL(file));
+    setUploading(true);
+    setError('');
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch(`${API}/api/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      setImgPreview(data.url);
+      set('image', data.url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const handleSave = () => {
-    onSave(form);
+  const handleSave = async () => {
+    await onSave(form);
+    window.dispatchEvent(new Event('hero-updated'));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -36,13 +64,12 @@ export default function HeroEditor({ hero, onSave }) {
           <label style={s.label}>نص الزر</label>
           <input style={s.input} value={form.btnText} onChange={e => set('btnText', e.target.value)} />
 
-          <label style={s.label}>رابط الزر</label>
-          <input style={s.input} value={form.btnLink} onChange={e => set('btnLink', e.target.value)} dir="ltr" />
-
           <label style={s.label}>رفع صورة جديدة</label>
-          <input type="file" accept="image/*" onChange={handleImageUpload} style={s.fileInput} />
+          <input type="file" accept="image/*" onChange={handleImageUpload} style={s.fileInput} disabled={uploading} />
+          {uploading && <p style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري رفع الصورة...</p>}
+          {error && <p style={{ color: '#f87171', fontSize: 13 }}>❌ {error}</p>}
 
-          <button onClick={handleSave} style={s.saveBtn}>
+          <button onClick={handleSave} style={s.saveBtn} disabled={uploading}>
             {saved ? '✅ تم الحفظ' : 'حفظ التغييرات'}
           </button>
         </div>

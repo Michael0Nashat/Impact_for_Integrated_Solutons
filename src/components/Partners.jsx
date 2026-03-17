@@ -67,7 +67,7 @@ const partnersStyles = `
     50% { transform: translateY(-10px) rotate(2deg); }
   }
   .scroll-container { overflow: hidden; width: 100%; margin-top: 60px; }
-  .scroll-row { display: flex; width: max-content; gap: 40px; margin-bottom: 30px; }
+  .scroll-row { display: flex; width: max-content; gap: 40px; margin-bottom: 30px; will-change: transform; }
   .scroll-right { animation: scrollRight 60s linear infinite; }
   .scroll-left { animation: scrollLeft 60s linear infinite; }
   .brand-logo { flex-shrink: 0; width: 120px; height: 120px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
@@ -76,6 +76,7 @@ const partnersStyles = `
   .customer-logo { flex-shrink: 0; width: 120px; height: 120px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .customer-logo:hover { transform: scale(1.1); }
   .brands-container { position: relative; width: 100%; min-height: 500px; padding: 40px 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; }
+  @media (max-width: 768px) { .brands-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px 10px; min-height: unset; } .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } .brand-logo { width: 100% !important; height: 100% !important; } }
   .brand-item { position: relative; animation: float 3s ease-in-out infinite; }
   .brand-item:nth-child(odd) { animation-delay: 0.5s; }
   .brand-item:nth-child(3n) { animation-delay: 1s; }
@@ -162,7 +163,7 @@ function LazyVideo({ src }) {
   const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
 
   const poster = src
-    .replace('/video/upload/', '/image/upload/w_400,h_300,c_fill,q_auto,f_webp/')
+    .replace('/video/upload/', '/image/upload/w_400,h_300,c_fill,q_auto,f_auto/')
     .replace(/\.mp4$/, '.jpg');
 
   useEffect(() => {
@@ -205,7 +206,7 @@ function LazyVideo({ src }) {
 export default function Partners() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [showGrid, setShowGrid] = useState(false);
+
 
   useEffect(() => {
     let resizeTimeout;
@@ -268,67 +269,19 @@ export default function Partners() {
         <div className="scroll-container" style={{ marginTop: '16px' }}>
           <div className="scroll-row scroll-right" style={{ animationDuration: '240s' }}>
             {[...sampleProjectImages, ...sampleProjectImages].map((src, i) => (
-              <div key={`sample-${i}`} className="project-sample-item">
-                <LazyScrollImage
-                  src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_webp/')}
-                  alt={`مشروع ${i + 1}`}
-                  width={260}
-                  height={195}
-                />
-              </div>
-            ))}
+  <div key={`sample-${i}`} className="project-sample-item">
+    <LazyScrollImage
+      src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')}
+      alt={`مشروع ${i + 1}`}
+      width={260}
+      height={195}
+      priority={i < 4} // أول 4 صور يظهروا فورًا
+    />
+  </div>
+))}
           </div>
         </div>
 
-        {/* More button */}
-        <div style={{ textAlign: 'center', marginTop: '24px' }}>
-          {!showGrid && (
-            <button
-              onClick={() => setShowGrid(true)}
-              style={{
-                padding: isMobile ? '12px 28px' : '14px 40px',
-                background: '#ffc107',
-                color: 'black',
-                border: 'none',
-                borderRadius: '30px',
-                fontWeight: 'bold',
-                fontSize: isMobile ? '14px' : '16px',
-                cursor: 'pointer',
-                boxShadow: '0 5px 15px rgba(255,193,7,0.3)',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              المزيد
-            </button>
-          )}
-        </div>
-
-        {/* Grid of all sample images */}
-        {showGrid && (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: isMobile ? '8px' : '12px',
-            marginTop: '24px',
-            padding: isMobile ? '0' : '0 2%'
-          }}>
-            {sampleProjectImages.map((src, i) => (
-              <div key={`grid-${i}`} style={{
-                aspectRatio: '4/3',
-                overflow: 'hidden',
-                borderRadius: '12px',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
-              }}>
-                <img
-                  src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_webp/')}
-                  alt={`مشروع ${i + 1}`}
-                  loading="lazy"
-                  style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
-                />
-              </div>
-            ))}
-          </div>
-        )}
 
         <div style={{
           display: 'flex',

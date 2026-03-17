@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API, DEFAULT_HERO } from '../dashboard/useDashboardData';
 
 const heroStyles = `
   @keyframes fadeInUp {
@@ -7,122 +8,84 @@ const heroStyles = `
   }
 `;
 
-const DEFAULT_HERO = {
-  title: 'نطور حلول برمجية مبتكرة',
-  subtitle: 'نقدم خدمات رقمية متكاملة لتطوير الشركات والمؤسسات بأعلى جودة واحترافية.',
-  btnText: 'ابدأ مشروعك الآن',
-  btnLink: '#contact',
-  image: '/IMG_20260316_143125.png'
-};
-
-function loadHero() {
-  try { const v = localStorage.getItem('dash_hero'); return v ? JSON.parse(v) : DEFAULT_HERO; }
-  catch { return DEFAULT_HERO; }
-}
-
 export default function Hero() {
+  const [data, setData] = useState(DEFAULT_HERO);
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [data] = useState(loadHero);
+
+  const [imgTs, setImgTs] = useState(() => Date.now());
 
   useEffect(() => {
-    // Check mobile on mount
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+    const loadHero = () => {
+      fetch(`${API}/api/settings/hero`)
+        .then(r => r.json())
+        .then(d => { if (d) { setData(d); setImgTs(Date.now()); } })
+        .catch(() => {});
     };
-    
+
+    loadHero();
+
+    // re-fetch when dashboard saves (custom event)
+    window.addEventListener('hero-updated', loadHero);
+
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
-    // Trigger animation
     setTimeout(() => setIsVisible(true), 100);
-    
     return () => {
       window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('hero-updated', loadHero);
     };
   }, []);
 
   const sectionStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: isMobile ? '120px 5% 40px' : '180px 8% 60px',
-    flexWrap: 'wrap',
-    gap: isMobile ? '40px' : '60px'
+    flexWrap: 'wrap', gap: isMobile ? '40px' : '60px',
   };
 
   const imageContainerStyle = {
-    flex: 1,
-    textAlign: isMobile ? 'center' : 'left',
-    order: isMobile ? 2 : 1,
-    minWidth: isMobile ? '100%' : 'auto',
+    flex: 1, textAlign: isMobile ? 'center' : 'left',
+    order: isMobile ? 2 : 1, minWidth: isMobile ? '100%' : 'auto',
     maxWidth: isMobile ? '100%' : '45%',
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? 'translateX(0)' : 'translateX(-50px)',
-    transition: 'all 0.8s ease-out'
+    transition: 'all 0.8s ease-out',
   };
 
   const imageStyle = {
-    width: '100%',
-    maxWidth: isMobile ? '100%' : '650px',
+    width: '100%', maxWidth: isMobile ? '100%' : '650px',
     borderRadius: isMobile ? '20px' : '30px',
-    boxShadow: '0 40px 100px rgba(0, 0, 0, 0.15)',
+    boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
     transition: 'transform 0.3s ease',
-    transform: 'scale(1)'
-  };
-
-  const imageHoverStyle = {
-    ...imageStyle,
-    transform: 'scale(1.02)'
+    transform: isImageHovered ? 'scale(1.02)' : 'scale(1)',
   };
 
   const contentStyle = {
-    flex: 1,
-    textAlign: 'right',
-    order: isMobile ? 1 : 2,
-    minWidth: isMobile ? '100%' : 'auto',
-    maxWidth: isMobile ? '100%' : '45%',
+    flex: 1, textAlign: 'right', order: isMobile ? 1 : 2,
+    minWidth: isMobile ? '100%' : 'auto', maxWidth: isMobile ? '100%' : '45%',
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? 'translateX(0)' : 'translateX(50px)',
-    transition: 'all 0.8s ease-out 0.2s'
+    transition: 'all 0.8s ease-out 0.2s',
   };
 
   const headingStyle = {
-    fontSize: isMobile ? '28px' : '42px',
-    marginBottom: '20px',
+    fontSize: isMobile ? '28px' : '42px', marginBottom: '20px',
     lineHeight: isMobile ? '1.4' : '1.2',
-    animation: isVisible ? 'fadeInUp 0.8s ease-out 0.3s both' : 'none'
-  };
-
-  const spanStyle = {
-    color: '#ffc107',
-    display: 'inline-block',
-    transition: 'transform 0.3s ease'
-  };
-
-  const paragraphStyle = {
-    lineHeight: '2',
-    marginBottom: '32px',
-    color: '#555',
-    fontSize: isMobile ? '15px' : '16px',
-    animation: isVisible ? 'fadeInUp 0.8s ease-out 0.5s both' : 'none'
+    animation: isVisible ? 'fadeInUp 0.8s ease-out 0.3s both' : 'none',
   };
 
   const buttonStyle = {
-    display: 'inline-block',
-    padding: isMobile ? '14px 32px' : '16px 44px',
+    display: 'inline-block', padding: isMobile ? '14px 32px' : '16px 44px',
     backgroundColor: isButtonHovered ? '#e0a800' : '#ffc107',
-    color: 'black',
-    borderRadius: '30px',
-    fontWeight: 'bold',
-    textDecoration: 'none',
-    transition: 'all 0.3s ease',
+    color: 'black', borderRadius: '30px', fontWeight: 'bold',
+    textDecoration: 'none', transition: 'all 0.3s ease',
     fontSize: isMobile ? '14px' : '16px',
     transform: isButtonHovered ? 'translateY(-3px) scale(1.05)' : 'translateY(0) scale(1)',
-    boxShadow: isButtonHovered ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)',
-    animation: isVisible ? 'fadeInUp 0.8s ease-out 0.7s both' : 'none'
+    boxShadow: isButtonHovered ? '0 10px 25px rgba(255,193,7,0.4)' : '0 5px 15px rgba(255,193,7,0.2)',
+    animation: isVisible ? 'fadeInUp 0.8s ease-out 0.7s both' : 'none',
   };
 
   return (
@@ -130,26 +93,20 @@ export default function Hero() {
       <style>{heroStyles}</style>
       <section id="hero" style={sectionStyle}>
         <div style={imageContainerStyle}>
-          <img 
-            src={data.image}
-            alt="Hero" 
-            width={650} 
-            height={400}
-            style={isImageHovered ? imageHoverStyle : imageStyle}
+          <img
+            src={`${data.image}?t=${imgTs}`} alt="Hero" width={650} height={400} style={imageStyle}
+            key={data.image}
             onMouseEnter={() => setIsImageHovered(true)}
             onMouseLeave={() => setIsImageHovered(false)}
           />
         </div>
         <div style={contentStyle}>
-          <h1 style={headingStyle}>
-            {data.title.includes('حلول') ? (
-              <>نطور <span style={spanStyle}>حلول برمجية</span> مبتكرة</>
-            ) : data.title}
-          </h1>
-          <p style={paragraphStyle}>{data.subtitle}</p>
-          <a 
-            href={data.btnLink}
-            style={buttonStyle}
+          <h1 style={headingStyle}>{data.title}</h1>
+          <p style={{ lineHeight: '2', marginBottom: '32px', color: '#555', fontSize: isMobile ? '15px' : '16px', animation: isVisible ? 'fadeInUp 0.8s ease-out 0.5s both' : 'none' }}>
+            {data.subtitle}
+          </p>
+          <a
+            href={data.btnLink} style={buttonStyle}
             onMouseEnter={() => setIsButtonHovered(true)}
             onMouseLeave={() => setIsButtonHovered(false)}
           >

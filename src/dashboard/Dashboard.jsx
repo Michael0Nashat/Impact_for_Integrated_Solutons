@@ -10,9 +10,9 @@ const tabs = [
   { id: 'projects', label: '🗂️ المشاريع' },
 ];
 
-export default function Dashboard({ onLogout }) {
+export default function Dashboard({ onLogout, token }) {
   const [activeTab, setActiveTab] = useState('hero');
-  const { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject } = useDashboardData();
+  const { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject } = useDashboardData(token);
 
   return (
     <div style={styles.layout}>
@@ -47,14 +47,15 @@ export default function Dashboard({ onLogout }) {
           </h1>
         </div>
         <div style={styles.content}>
-          {activeTab === 'hero' && <HeroEditor hero={hero} onSave={saveHero} />}
-          {activeTab === 'about' && <AboutEditor about={about} onSave={saveAbout} />}
+          {activeTab === 'hero' && <HeroEditor hero={hero} onSave={saveHero} token={token} />}
+          {activeTab === 'about' && <AboutEditor about={about} onSave={saveAbout} token={token} />}
           {activeTab === 'projects' && (
             <ProjectsEditor
               projects={projects}
               onAdd={addProject}
               onUpdate={updateProject}
               onDelete={deleteProject}
+              token={token}
             />
           )}
         </div>

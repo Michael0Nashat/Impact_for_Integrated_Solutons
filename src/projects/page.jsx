@@ -3,99 +3,20 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AnimatedShapes from '../components/AnimatedShapes';
-
-const allProjects = [
-  {
-    id: 1,
-    img: 'https://images.unsplash.com/photo-1492724441997-5dc865305da7',
-    title: 'وزارة الداخلية',
-    desc: 'نظام كاميرات المراقبة – قسم شرطة أم دومة بسوهاج. نظام إنذار الحريق – قسم شرطة سنباط بالغربية. نظام إنذار الحريق – قسم شرطة حانوت بالغربية. نظام إنذار الحريق – قسم شرطة الوايلي. تنفيذ البنية التحتية للبيانات – دار الضيافة',
-    category: 'حكومي'
-  },
-  {
-    id: 2,
-    img: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231',
-    title: 'مستشفى النيل بدراوي المعادي',
-    desc: 'تنفيذ جميع انظمة التيار الخفيف من البنية التحتية لكبلات النحاس و الفايبر تنفيذ اعمال انظمة كاميرات المراقبة و انذار الحريق و الصوتيات و الدش المركزي',
-    category: 'صحي'
-  },
-  {
-    id: 3,
-    img: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334',
-    title: 'مصنع أندريا وجورج للذهب',
-    desc: 'تنفيذ جميع أنظمة التيار الخفيف من مرحلة الأعمال التأسيسية حتى مرحلة التشغيل، وتشمل: أنظمة المراقبة بالكاميرات، التحكم في الدخول، إنذار الحريق، الإذاعة الداخلية، البنية التحتية للنحاس والألياف الضوئية، ونظام السنترال.',
-    category: 'صناعي'
-  },
-  {
-    id: 4,
-    img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab',
-    title: 'مجمع تجاري - سيتي سنتر',
-    desc: 'تنفيذ أنظمة التيار الخفيف الشاملة للمباني التجارية تشمل كاميرات المراقبة، أنظمة الصوت، والبنية التحتية للشبكات',
-    category: 'تجاري'
-  },
-  {
-    id: 5,
-    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c',
-    title: 'مقر شركة الاتصالات',
-    desc: 'تركيب أنظمة الأمن والمراقبة المتطورة مع نظام التحكم في الدخول والبنية التحتية للألياف الضوئية',
-    category: 'إداري'
-  },
-  {
-    id: 6,
-    img: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2',
-    title: 'مصنع الأدوية الحديث',
-    desc: 'حلول متكاملة للأنظمة الذكية في المصانع تشمل أنظمة المراقبة وإنذار الحريق والتحكم الآلي',
-    category: 'صناعي'
-  },
-  {
-    id: 7,
-    img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-    title: 'فندق النيل الدولي',
-    desc: 'تنفيذ أنظمة التيار الخفيف الفندقية الشاملة من كاميرات مراقبة، نظام الدش المركزي، والصوتيات',
-    category: 'فندقي'
-  },
-  {
-    id: 8,
-    img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e',
-    title: 'جامعة المستقبل',
-    desc: 'تركيب أنظمة الأمن والمراقبة للحرم الجامعي مع نظام الإذاعة الداخلية والبنية التحتية للشبكات',
-    category: 'تعليمي'
-  },
-  {
-    id: 9,
-    img: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716',
-    title: 'مركز التسوق الكبير',
-    desc: 'أنظمة مراقبة متطورة مع نظام إنذار الحريق والصوتيات لمركز تسوق بمساحة 50,000 متر مربع',
-    category: 'تجاري'
-  },
-  {
-    id: 10,
-    img: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5',
-    title: 'مصنع الإلكترونيات',
-    desc: 'تنفيذ شامل لأنظمة التحكم والمراقبة الصناعية مع أنظمة الأمن المتقدمة',
-    category: 'صناعي'
-  },
-  {
-    id: 11,
-    img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c',
-    title: 'مركز البيانات الوطني',
-    desc: 'بنية تحتية متكاملة للألياف الضوئية مع أنظمة أمن وحماية متعددة المستويات',
-    category: 'تقني'
-  },
-  {
-    id: 12,
-    img: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d',
-    title: 'برج الأعمال الذكي',
-    desc: 'تنفيذ أنظمة المباني الذكية الشاملة من مراقبة، تحكم، وأتمتة كاملة',
-    category: 'إداري'
-  }
-];
+import { API } from '../dashboard/useDashboardData';
+import { allProjects as defaultProjects } from '../data/defaultProjects';
 
 export default function ProjectsPage() {
+  const [allProjects, setAllProjects] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    fetch(`${API}/api/projects`)
+      .then(r => r.json())
+      .then(data => setAllProjects(Array.isArray(data) && data.length ? data : defaultProjects))
+      .catch(() => setAllProjects(defaultProjects));
+
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -169,7 +90,7 @@ export default function ProjectsPage() {
                 </div>
                 <div style={{ padding: '24px' }}>
                   <h3 style={{ marginBottom: '12px', fontSize: '20px', color: '#333' }}>{project.title}</h3>
-                  <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.6' }}>{project.desc}</p>
+                  <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.6' }}>{project.description ?? project.desc ?? ''}</p>
                   <span style={{
                     display: 'inline-block',
                     marginTop: '12px',
