@@ -42,9 +42,17 @@ function authMiddleware(req, res, next) {
 
 /* ── Auth ────────────────────────────────────────────────────────────────── */
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
-  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const success = username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS;
+  try {
+    await pool.query(
+      'INSERT INTO login_logs(username, success, ip) VALUES($1,$2,$3)',
+      [username, success, ip]
+    );
+  } catch (e) { console.error('login log error:', e.message); }
+  if (success) {
     const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '8h' });
     return res.json({ token });
   }
@@ -68,6 +76,16 @@ async function initDB() {
       description TEXT,
       category   TEXT,
       img        TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS login_logs (
+      id         SERIAL PRIMARY KEY,
+      username   TEXT,
+      success    BOOLEAN NOT NULL,
+      ip         TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
   `);
