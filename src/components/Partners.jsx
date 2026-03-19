@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import { API } from '../dashboard/useDashboardData';
+
+const brandLogos = ['1.png','logo_transparent.png','2.png','4.png','premium-line-logo.png','6.png','IMG-20260311-WA0024.jpg','apollo.png','9.png','10.png','11.png','12.png','13.png','Panasonic_Group_logo.png','gerrett.png','16.png','17.png','18.png','19.png','20.png','3.png','21.png','22.png','24.png','dlink.png'];
 
 const sampleProjectImages = [
   'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481623/IMG_0421_holfs0.jpg',
@@ -107,33 +110,7 @@ const customerLogos = [
   '18.png'
 ];
 
-const brandLogos = [
-  '1.png',
-  'logo_transparent.png',
-  '2.png',
-  '4.png',
-  'premium-line-logo.png',
-  '6.png',
-  'IMG-20260311-WA0024.jpg',
-  'apollo.png',
-  '9.png',
-  '10.png',
-  '11.png',
-  '12.png',
-  '13.png',
-  'Panasonic_Group_logo.png',
-  'gerrett.png',
-  '16.png',
-  '17.png',
-  '18.png',
-  '19.png',
-  '20.png',
-  '3.png',
-  '21.png',
-  '22.png',
-  '24.png',
-  'dlink.png'
-];
+
 
 function LazyScrollImage({ src, alt, width, height }) {
   const ref = useRef(null);
@@ -206,7 +183,19 @@ function LazyVideo({ src }) {
 export default function Partners() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [brands, setBrands] = useState([]);
+  const [hiddenBrandLogos, setHiddenBrandLogos] = useState([]);
 
+  useEffect(() => {
+    fetch(`${API}/brands`)
+      .then(r => r.json())
+      .then(data => setBrands(Array.isArray(data) ? data : []))
+      .catch(() => setBrands([]));
+    fetch(`${API}/settings/hiddenBrandLogos`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setHiddenBrandLogos(Array.isArray(data) ? data : []))
+      .catch(() => setHiddenBrandLogos([]));
+  }, []);
 
   useEffect(() => {
     let resizeTimeout;
@@ -315,7 +304,6 @@ export default function Partners() {
             ))}
           </div>
         </div>
-
           
         <h3 style={{
           textAlign: 'center',
@@ -329,30 +317,32 @@ export default function Partners() {
         </h3>
 
         <div className="brands-container">
-          {brandLogos.map((logo, i) => {
-            const size = 100;
-            
-            return (
-              <div 
-                key={`brand-${i}`} 
-                className="brand-item"
-                style={{
-                  width: `${size}px`,
-                  height: `${size}px`
-                }}
-              >
-                <div className="brand-logo" style={{ width: '100%', height: '100%' }}>
-                  <img 
-                    src={`/Brands Logos/${logo}`} 
-                    alt={`Brand ${logo}`}
-                    width={size}
-                    height={size}
-                    style={{ objectFit: 'contain', width: '100%', height: '100%' }}
-                  />
-                </div>
+          {brandLogos.filter(logo => !hiddenBrandLogos.includes(logo)).map((logo, i) => (
+            <div key={`brandlogo-${i}`} className="brand-item" style={{ width: '100px', height: '100px' }}>
+              <div className="brand-logo" style={{ width: '100%', height: '100%' }}>
+                <img
+                  src={`/Brands Logos/${logo}`}
+                  alt={`Brand ${i + 1}`}
+                  width={100}
+                  height={100}
+                  style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                />
               </div>
-            );
-          })}
+            </div>
+          ))}
+          {brands.map((brand, i) => (
+            <div key={`brand-${brand.id}`} className="brand-item" style={{ width: '100px', height: '100px' }}>
+              <div className="brand-logo" style={{ width: '100%', height: '100%' }}>
+                <img
+                  src={brand.images}
+                  alt={`Brand ${i + 1}`}
+                  width={100}
+                  height={100}
+                  style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
 
       </section>

@@ -3,16 +3,18 @@ import { useDashboardData } from './useDashboardData';
 import HeroEditor from './HeroEditor';
 import AboutEditor from './AboutEditor';
 import ProjectsEditor from './ProjectsEditor';
+import BrandsEditor from './BrandsEditor';
 
 const tabs = [
   { id: 'hero', label: '🏠 Hero' },
   { id: 'about', label: '👥 من نحن' },
   { id: 'projects', label: '🗂️ المشاريع' },
+  { id: 'brands', label: '🏷️ علامات تجارية' },
 ];
 
 export default function Dashboard({ onLogout, token }) {
   const [activeTab, setActiveTab] = useState('hero');
-  const { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject } = useDashboardData(token);
+  const { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject, brands, addBrand, deleteBrand, hiddenBrandLogos, hideBrandLogo, restoreBrandLogo } = useDashboardData(token);
 
   return (
     <div style={styles.layout}>
@@ -55,6 +57,17 @@ export default function Dashboard({ onLogout, token }) {
               onAdd={addProject}
               onUpdate={updateProject}
               onDelete={deleteProject}
+              token={token}
+            />
+          )}
+          {activeTab === 'brands' && (
+            <BrandsEditor
+              brands={brands}
+              onAdd={addBrand}
+              onDelete={deleteBrand}
+              hiddenBrandLogos={hiddenBrandLogos}
+              onHideBrandLogo={hideBrandLogo}
+              onRestoreBrandLogo={restoreBrandLogo}
               token={token}
             />
           )}

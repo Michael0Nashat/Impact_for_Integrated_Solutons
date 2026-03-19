@@ -20,6 +20,7 @@ export const DEFAULT_ABOUT = {
 async function getSetting(key, fallback) {
   try {
     const res = await fetch(`${API}/settings/${key}`);
+    if (!res.ok) return fallback;
     const data = await res.json();
     return data ?? fallback;
   } catch { return fallback; }
@@ -37,10 +38,17 @@ export function useDashboardData(token = '') {
   const [hero, setHero] = useState(DEFAULT_HERO);
   const [about, setAbout] = useState(DEFAULT_ABOUT);
   const [projects, setProjects] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [hiddenBrandLogos, setHiddenBrandLogos] = useState([]);
 
   useEffect(() => {
     getSetting('hero', DEFAULT_HERO).then(setHero);
     getSetting('about', DEFAULT_ABOUT).then(setAbout);
+    getSetting('hiddenBrandLogos', []).then(data => setHiddenBrandLogos(Array.isArray(data) ? data : []));
+    fetch(`${API}/brands`)
+      .then(r => r.json())
+      .then(data => setBrands(Array.isArray(data) ? data : []))
+      .catch(() => setBrands([]));
     fetch(`${API}/projects`)
       .then(r => r.json())
       .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
@@ -107,5 +115,40 @@ export function useDashboardData(token = '') {
     window.dispatchEvent(new Event('projects-updated'));
   };
 
-  return { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject };
+  const addBrand = async (dataUrl) => {
+    try {
+      const res = await fetch(`${API}/brands`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ images: dataUrl }),
+      });
+      if (!res.ok) throw new Error('Add brand failed');
+      const created = await res.json();
+      setBrands(prev => [created, ...prev]);
+    } catch (e) { console.error('addBrand error:', e.message); }
+  };
+
+  const deleteBrand = async (id) => {
+    await fetch(`${API}/brands/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setBrands(prev => prev.filter(b => b.id !== id));
+  };
+
+  const hideBrandLogo = async (logo) => {
+    const updated = hiddenBrandLogos.includes(logo) ? hiddenBrandLogos : [...hiddenBrandLogos, logo];
+    setHiddenBrandLogos(updated);
+    try {
+      await putSetting('hiddenBrandLogos', updated, token);
+    } catch (e) { console.error('hideBrandLogo error:', e.message); }
+  };
+
+  const restoreBrandLogo = async (logo) => {
+    const updated = hiddenBrandLogos.filter(l => l !== logo);
+    setHiddenBrandLogos(updated);
+    await putSetting('hiddenBrandLogos', updated, token);
+  };
+
+  return { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject, brands, addBrand, deleteBrand, hiddenBrandLogos, hideBrandLogo, restoreBrandLogo };
 }
