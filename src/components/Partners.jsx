@@ -186,7 +186,7 @@ export default function Partners() {
   const [brands, setBrands] = useState([]);
   const [hiddenBrandLogos, setHiddenBrandLogos] = useState([]);
 
-  useEffect(() => {
+  const fetchBrands = () => {
     fetch(`${API}/brands`)
       .then(r => r.json())
       .then(data => setBrands(Array.isArray(data) ? data : []))
@@ -195,6 +195,12 @@ export default function Partners() {
       .then(r => r.ok ? r.json() : [])
       .then(data => setHiddenBrandLogos(Array.isArray(data) ? data : []))
       .catch(() => setHiddenBrandLogos([]));
+  };
+
+  useEffect(() => {
+    fetchBrands();
+    window.addEventListener('brands-updated', fetchBrands);
+    return () => window.removeEventListener('brands-updated', fetchBrands);
   }, []);
 
   useEffect(() => {

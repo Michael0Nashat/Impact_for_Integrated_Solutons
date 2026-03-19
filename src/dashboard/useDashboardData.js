@@ -125,6 +125,7 @@ export function useDashboardData(token = '') {
       if (!res.ok) throw new Error('Add brand failed');
       const created = await res.json();
       setBrands(prev => [created, ...prev]);
+      window.dispatchEvent(new Event('brands-updated'));
     } catch (e) { console.error('addBrand error:', e.message); }
   };
 
@@ -134,6 +135,7 @@ export function useDashboardData(token = '') {
       headers: { Authorization: `Bearer ${token}` },
     });
     setBrands(prev => prev.filter(b => b.id !== id));
+    window.dispatchEvent(new Event('brands-updated'));
   };
 
   const hideBrandLogo = async (logo) => {
