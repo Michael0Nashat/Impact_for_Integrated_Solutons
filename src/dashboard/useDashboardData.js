@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { allProjects } from '../data/defaultProjects';
 
-export const API = 'https://impact-for-integrated-solutons-serv.vercel.app/api';
+export const API = import.meta.env.VITE_API_URL || 'https://impact-for-integrated-solutons-serv.vercel.app/api';
 
 export const DEFAULT_HERO = {
   title: 'نطور حلول برمجية مبتكرة',
@@ -70,7 +70,7 @@ export function useDashboardData(token = '') {
       const res = await fetch(`${API}/projects`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: p.title, description: p.desc, category: p.category, img: p.img }),
+        body: JSON.stringify({ title: p.title, description: p.desc ?? p.description ?? '', category: p.category, img: p.img }),
       });
       if (!res.ok) throw new Error('Add failed');
       const created = await res.json();
@@ -87,7 +87,7 @@ export function useDashboardData(token = '') {
       const res = await fetch(`${API}/projects/${Number(id)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: p.title, description: p.desc, category: p.category, img: p.img }),
+        body: JSON.stringify({ title: p.title, description: p.desc ?? p.description ?? '', category: p.category, img: p.img }),
       });
       if (!res.ok) throw new Error('Update failed');
       const updated = await res.json();

@@ -264,7 +264,6 @@ export default function Partners() {
       alt={`مشروع ${i + 1}`}
       width={260}
       height={195}
-      priority={i < 4} // أول 4 صور يظهروا فورًا
     />
   </div>
 ))}

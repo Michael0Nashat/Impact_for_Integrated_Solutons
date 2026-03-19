@@ -28,9 +28,6 @@ export default function Projects() {
     loadProjects();
     window.addEventListener('projects-updated', loadProjects);
 
-    // re-fetch every 5s to catch dashboard changes
-    const interval = setInterval(loadProjects, 5000);
-
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -45,7 +42,6 @@ export default function Projects() {
     return () => {
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('projects-updated', loadProjects);
-      clearInterval(interval);
       observer.disconnect();
     };
   }, []);

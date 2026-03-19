@@ -14,7 +14,8 @@ export default function AboutEditor({ about, onSave, token }) {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setImgPreview(URL.createObjectURL(file));
+    const localUrl = URL.createObjectURL(file);
+    setImgPreview(localUrl);
     setUploading(true);
     setError('');
     try {
@@ -27,6 +28,7 @@ export default function AboutEditor({ about, onSave, token }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
+      URL.revokeObjectURL(localUrl);
       setImgPreview(data.url);
       set('image', data.url);
     } catch (err) {

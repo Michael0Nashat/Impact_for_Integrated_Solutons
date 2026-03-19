@@ -13,7 +13,7 @@ export default function HeroEditor({ hero, onSave, token }) {
   useEffect(() => {
     setForm({ ...hero });
     setImgPreview(hero.image);
-  }, [hero]);
+  }, [hero.title, hero.subtitle, hero.btnText, hero.btnLink, hero.image]);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -21,7 +21,8 @@ export default function HeroEditor({ hero, onSave, token }) {
     const file = e.target.files[0];
     if (!file) return;
     // show local preview immediately
-    setImgPreview(URL.createObjectURL(file));
+    const localUrl = URL.createObjectURL(file);
+    setImgPreview(localUrl);
     setUploading(true);
     setError('');
     try {
@@ -34,6 +35,7 @@ export default function HeroEditor({ hero, onSave, token }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
+      URL.revokeObjectURL(localUrl);
       setImgPreview(data.url);
       set('image', data.url);
     } catch (err) {

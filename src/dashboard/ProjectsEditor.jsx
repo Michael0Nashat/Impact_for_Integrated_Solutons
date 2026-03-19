@@ -26,7 +26,8 @@ export default function ProjectsEditor({ projects, onAdd, onUpdate, onDelete, to
   const handleImg = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setImgPreview(URL.createObjectURL(file));
+    const localUrl = URL.createObjectURL(file);
+    setImgPreview(localUrl);
     setUploading(true);
     setUploadError('');
     try {
@@ -39,6 +40,7 @@ export default function ProjectsEditor({ projects, onAdd, onUpdate, onDelete, to
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
+      URL.revokeObjectURL(localUrl);
       setImgPreview(data.url);
       set('img', data.url);
     } catch (err) {

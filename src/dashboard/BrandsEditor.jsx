@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { API } from '../dashboard/useDashboardData';
+import { API } from './useDashboardData';
 
 const brandLogos = ['1.png','logo_transparent.png','2.png','4.png','premium-line-logo.png','6.png','IMG-20260311-WA0024.jpg','apollo.png','9.png','10.png','11.png','12.png','13.png','Panasonic_Group_logo.png','gerrett.png','16.png','17.png','18.png','19.png','20.png','3.png','21.png','22.png','24.png','dlink.png'];
 

@@ -97,27 +97,15 @@ export default function Navbar() {
       <ul style={ulStyle}>
         {links.map((link, index) => (
           <li key={index}>
-            {link.isHome ? (
-              <a 
-                href={link.href}
-                style={getLinkStyle(index)}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => isMobile && setMenuOpen(false)}
-              >
-                {link.text}
-              </a>
-            ) : (
-              <a 
-                href={link.href}
-                style={getLinkStyle(index)}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => isMobile && setMenuOpen(false)}
-              >
-                {link.text}
-              </a>
-            )}
+            <a 
+              href={link.href}
+              style={getLinkStyle(index)}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              onClick={() => isMobile && setMenuOpen(false)}
+            >
+              {link.text}
+            </a>
           </li>
         ))}
       </ul>
