@@ -143,6 +143,7 @@ export function useDashboardData(token = '') {
     setHiddenBrandLogos(updated);
     try {
       await putSetting('hiddenBrandLogos', updated, token);
+      window.dispatchEvent(new Event('brands-updated'));
     } catch (e) { console.error('hideBrandLogo error:', e.message); }
   };
 
