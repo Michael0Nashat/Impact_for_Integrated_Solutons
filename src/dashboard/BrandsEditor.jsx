@@ -19,15 +19,15 @@ export default function BrandsEditor({ brands, onAdd, onDelete, token }) {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('image', preview.file);
-      const res = await fetch(`${API}/upload`, {
+      formData.append('file', preview.file);
+      formData.append('upload_preset', 'impact_brands');
+      const res = await fetch('https://api.cloudinary.com/v1_1/dk9ss8rxl/image/upload', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
       if (!res.ok) throw new Error('Upload failed');
-      const { url } = await res.json();
-      await onAdd(url);
+      const data = await res.json();
+      await onAdd(data.secure_url);
     } catch (e) {
       console.error('BrandsEditor upload error:', e.message);
     }
