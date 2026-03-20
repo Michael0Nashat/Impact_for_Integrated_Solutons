@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { API } from '../dashboard/useDashboardData';
+
+const API = 'https://impact-for-integrated-solutons-serv.vercel.app/api';
 
 const sampleProjectImages = [
   'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481623/IMG_0421_holfs0.jpg',
