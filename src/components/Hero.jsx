@@ -94,7 +94,7 @@ export default function Hero() {
       <section id="hero" style={sectionStyle}>
         <div style={imageContainerStyle}>
           <img
-            src={`${data.image}?t=${imgTs}`} alt="Hero" width={650} height={400} style={imageStyle}
+            src={data.image?.startsWith('data:') ? data.image : `${data.image}?t=${imgTs}`}
             key={data.image}
             onMouseEnter={() => setIsImageHovered(true)}
             onMouseLeave={() => setIsImageHovered(false)}

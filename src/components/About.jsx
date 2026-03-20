@@ -85,7 +85,7 @@ export default function About() {
         </div>
         <div style={imageContainerStyle}>
           <img
-            src={`${data.image}?t=${imgTs}`} alt="About" width={550} height={400}
+            src={data.image?.startsWith('data:') ? data.image : `${data.image}?t=${imgTs}`}
             key={data.image}
             style={imageStyle}
             onMouseEnter={e => { e.target.style.transform = 'scale(1.05)'; e.target.style.boxShadow = '0 50px 120px rgba(0,0,0,0.2)'; }}
