@@ -109,8 +109,6 @@ const customerLogos = [
   '18.png'
 ];
 
-const brandLogos = [];
-
 
 function LazyScrollImage({ src, alt, width, height }) {
   const ref = useRef(null);

@@ -1,3 +1,11 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "functions": {
+    "j.js": {
+      "includeFiles": "public/uploads/**"
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/j.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
