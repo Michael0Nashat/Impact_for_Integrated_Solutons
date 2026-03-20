@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { s } from './dashStyles';
-import { API } from './useDashboardData';
 
 const empty = { title: '', desc: '', category: '', img: '' };
 
@@ -23,29 +22,23 @@ export default function ProjectsEditor({ projects, onAdd, onUpdate, onDelete, to
     setShowModal(true);
   };
 
-  const handleImg = async (e) => {
+  const handleImg = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setImgPreview(URL.createObjectURL(file));
     setUploading(true);
     setUploadError('');
-    try {
-      const fd = new FormData();
-      fd.append('image', file);
-      const res = await fetch(`${API}/upload`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Upload failed');
-      setImgPreview(data.url);
-      set('img', data.url);
-    } catch (err) {
-      setUploadError(err.message);
-    } finally {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result;
+      setImgPreview(base64);
+      set('img', base64);
       setUploading(false);
-    }
+    };
+    reader.onerror = () => {
+      setUploadError('فشل قراءة الصورة');
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async () => {
