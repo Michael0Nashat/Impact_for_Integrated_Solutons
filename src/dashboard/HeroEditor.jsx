@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { s } from './dashStyles';
-import { API } from './useDashboardData';
 
 export default function HeroEditor({ hero, onSave, token }) {
   const [form, setForm] = useState({ ...hero });
   const [imgPreview, setImgPreview] = useState(hero.image);
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
 
   // sync form when hero loads from server
   useEffect(() => {
@@ -17,30 +15,18 @@ export default function HeroEditor({ hero, onSave, token }) {
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    // show local preview immediately
-    setImgPreview(URL.createObjectURL(file));
     setUploading(true);
-    setError('');
-    try {
-      const fd = new FormData();
-      fd.append('image', file);
-      const res = await fetch(`${API}/upload`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Upload failed');
-      setImgPreview(data.url);
-      set('image', data.url);
-    } catch (err) {
-      setError(err.message);
-    } finally {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target.result;
+      setImgPreview(base64);
+      set('image', base64);
       setUploading(false);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async () => {
