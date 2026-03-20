@@ -57,7 +57,7 @@ export default function AboutEditor({ about, onSave, token }) {
           <label style={s.label}>رفع صورة جديدة</label>
           <input type="file" accept="image/*" onChange={handleImageUpload} style={s.fileInput} disabled={uploading} />
           {uploading && <p style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري رفع الصورة...</p>}
-          {error && <p style={{ color: '#f87171', fontSize: 13 }}>❌ {error}</p>}
+
 
           <button onClick={handleSave} style={s.saveBtn} disabled={uploading}>
             {saved ? '✅ تم الحفظ' : 'حفظ التغييرات'}
