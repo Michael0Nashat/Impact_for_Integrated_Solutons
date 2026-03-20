@@ -1,13 +1,9 @@
 import { useState, useRef } from 'react';
 import { API } from './useDashboardData';
 
-const brandLogos = ['1.png','logo_transparent.png','2.png','4.png','premium-line-logo.png','6.png','IMG-20260311-WA0024.jpg','apollo.png','9.png','10.png','11.png','12.png','13.png','Panasonic_Group_logo.png','gerrett.png','16.png','17.png','18.png','19.png','20.png','3.png','21.png','22.png','24.png','dlink.png'];
-
-export default function BrandsEditor({ brands, onAdd, onDelete, hiddenBrandLogos, onHideBrandLogo, token }) {
-  const hidden = Array.isArray(hiddenBrandLogos) ? hiddenBrandLogos : [];
+export default function BrandsEditor({ brands, onAdd, onDelete, token }) {
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
   const fileRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -70,22 +66,6 @@ export default function BrandsEditor({ brands, onAdd, onDelete, hiddenBrandLogos
 
       {/* Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 16 }}>
-        {brandLogos.filter(logo => !hidden.includes(logo)).map((logo, i) => (
-          <div key={`static-${i}`} style={{ background: '#1e293b', borderRadius: 10, padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-            <img
-              src={`/Brands Logos/${logo}`}
-              alt={logo}
-              style={{ width: 90, height: 90, objectFit: 'contain', background: '#fff', borderRadius: 6, padding: 4 }}
-            />
-            <button
-              onClick={async () => { setSaving(true); await onHideBrandLogo(logo); setSaving(false); }}
-              disabled={saving}
-              style={{ padding: '4px 14px', background: saving ? '#555' : '#ef4444', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}
-            >
-              {saving ? '...' : 'حذف'}
-            </button>
-          </div>
-        ))}
         {brands.map(brand => (
           <div key={brand.id} style={{ background: '#1e293b', borderRadius: 10, padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
             <img
@@ -101,7 +81,7 @@ export default function BrandsEditor({ brands, onAdd, onDelete, hiddenBrandLogos
             </button>
           </div>
         ))}
-        {brands.length === 0 && hidden.length === brandLogos.length && (
+        {brands.length === 0 && (
           <p style={{ color: '#64748b', gridColumn: '1/-1' }}>لا توجد علامات تجارية بعد.</p>
         )}
       </div>

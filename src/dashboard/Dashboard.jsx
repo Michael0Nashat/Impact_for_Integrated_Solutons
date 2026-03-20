@@ -65,9 +65,6 @@ export default function Dashboard({ onLogout, token }) {
               brands={brands}
               onAdd={addBrand}
               onDelete={deleteBrand}
-              hiddenBrandLogos={hiddenBrandLogos}
-              onHideBrandLogo={hideBrandLogo}
-              onRestoreBrandLogo={restoreBrandLogo}
               token={token}
             />
           )}
