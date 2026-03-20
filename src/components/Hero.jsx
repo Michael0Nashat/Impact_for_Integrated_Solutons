@@ -56,9 +56,11 @@ export default function Hero() {
   };
 
   const imageStyle = {
-    width: '100%', maxWidth: isMobile ? '100%' : '650px',
-    borderRadius: isMobile ? '20px' : '30px',
-    boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
+    width: '100%', maxWidth: isMobile ? '280px' : '380px',
+    height: isMobile ? '200px' : '280px',
+    objectFit: 'cover',
+    borderRadius: isMobile ? '16px' : '20px',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
     transition: 'transform 0.3s ease',
     transform: isImageHovered ? 'scale(1.02)' : 'scale(1)',
   };
