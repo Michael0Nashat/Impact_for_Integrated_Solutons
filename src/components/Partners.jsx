@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 
-const API = 'https://impact-for-integrated-solutons-serv.vercel.app/api';
-
 const sampleProjectImages = [
   'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481623/IMG_0421_holfs0.jpg',
   'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481617/IMG_0422_nx9y15.jpg',
@@ -109,6 +107,33 @@ const customerLogos = [
   '18.png'
 ];
 
+const brandLogos = [
+  '1.png',
+  'logo_transparent.png',
+  '2.png',
+  '4.png',
+  'premium-line-logo.png',
+  '6.png',
+  'IMG-20260311-WA0024.jpg',
+  'apollo.png',
+  '9.png',
+  '10.png',
+  '11.png',
+  '12.png',
+  '13.png',
+  'Panasonic_Group_logo.png',
+  'gerrett.png',
+  '16.png',
+  '17.png',
+  '18.png',
+  '19.png',
+  '20.png',
+  '3.png',
+  '21.png',
+  '22.png',
+  '24.png',
+  'dlink.png'
+];
 
 function LazyScrollImage({ src, alt, width, height }) {
   const ref = useRef(null);
@@ -181,14 +206,7 @@ function LazyVideo({ src }) {
 export default function Partners() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [brands, setBrands] = useState([]);
 
-  useEffect(() => {
-    fetch(`${API}/brands`)
-      .then(r => r.json())
-      .then(data => setBrands(Array.isArray(data) ? data : []))
-      .catch(() => setBrands([]));
-  }, []);
 
   useEffect(() => {
     let resizeTimeout;
@@ -311,22 +329,24 @@ export default function Partners() {
         </h3>
 
         <div className="brands-container">
-          {brands.map((brand, i) => {
-            const src = brand.images?.startsWith('/uploads')
-              ? `https://impact-for-integrated-solutons-serv.vercel.app${brand.images}`
-              : brand.images;
+          {brandLogos.map((logo, i) => {
+            const size = 100;
+            
             return (
-              <div
-                key={`brand-${brand.id ?? i}`}
+              <div 
+                key={`brand-${i}`} 
                 className="brand-item"
-                style={{ width: '100px', height: '100px' }}
+                style={{
+                  width: `${size}px`,
+                  height: `${size}px`
+                }}
               >
                 <div className="brand-logo" style={{ width: '100%', height: '100%' }}>
-                  <img
-                    src={src}
-                    alt={`Brand ${i + 1}`}
-                    width={100}
-                    height={100}
+                  <img 
+                    src={`/Brands Logos/${logo}`} 
+                    alt={`Brand ${logo}`}
+                    width={size}
+                    height={size}
                     style={{ objectFit: 'contain', width: '100%', height: '100%' }}
                   />
                 </div>

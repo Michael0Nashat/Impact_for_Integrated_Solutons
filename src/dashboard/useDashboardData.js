@@ -37,7 +37,6 @@ export function useDashboardData(token = '') {
   const [hero, setHero] = useState(DEFAULT_HERO);
   const [about, setAbout] = useState(DEFAULT_ABOUT);
   const [projects, setProjects] = useState([]);
-  const [brands, setBrands] = useState([]);
 
   useEffect(() => {
     getSetting('hero', DEFAULT_HERO).then(setHero);
@@ -46,10 +45,6 @@ export function useDashboardData(token = '') {
       .then(r => r.json())
       .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
       .catch(() => setProjects(allProjects));
-    fetch(`${API}/brands`)
-      .then(r => r.json())
-      .then(data => setBrands(Array.isArray(data) ? data : []))
-      .catch(() => setBrands([]));
   }, []);
 
   const saveHero = async (data) => {
@@ -112,39 +107,5 @@ export function useDashboardData(token = '') {
     window.dispatchEvent(new Event('projects-updated'));
   };
 
-  const addBrand = async (imageUrl) => {
-    try {
-      const res = await fetch(`${API}/brands`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ images: imageUrl }),
-      });
-      if (!res.ok) throw new Error('Add brand failed');
-      const created = await res.json();
-      setBrands(prev => [created, ...prev]);
-    } catch (e) { console.error('addBrand error:', e.message); }
-  };
-
-  const updateBrand = async (id, imageUrl) => {
-    try {
-      const res = await fetch(`${API}/brands/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ images: imageUrl }),
-      });
-      if (!res.ok) throw new Error('Update brand failed');
-      const updated = await res.json();
-      setBrands(prev => prev.map(b => b.id === id ? updated : b));
-    } catch (e) { console.error('updateBrand error:', e.message); }
-  };
-
-  const deleteBrand = async (id) => {
-    await fetch(`${API}/brands/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setBrands(prev => prev.filter(b => b.id !== id));
-  };
-
-  return { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject, brands, addBrand, updateBrand, deleteBrand };
+  return { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject };
 }
