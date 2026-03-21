@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { API } from '../dashboard/useDashboardData';
 
 const sampleProjectImages = [
   'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481623/IMG_0421_holfs0.jpg',
@@ -107,8 +108,6 @@ const customerLogos = [
   '18.png'
 ];
 
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/api$/, '');
-
 function LazyScrollImage({ src, alt, width, height }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -206,7 +205,7 @@ export default function Partners() {
     const section = document.getElementById('partners');
     if (section) observer.observe(section);
     
-    fetch(`${API_BASE}/api/brands`)
+    fetch(`${API}/brands`)
       .then(r => r.json())
       .then(data => Array.isArray(data) && setBrands(data))
       .catch(() => {});

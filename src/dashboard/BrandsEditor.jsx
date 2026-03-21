@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { s } from './dashStyles';
-
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/api$/, '');
+import { API } from './useDashboardData';
 
 export default function BrandsEditor({ token }) {
   const [brands, setBrands] = useState([]);
@@ -15,7 +14,7 @@ export default function BrandsEditor({ token }) {
   useEffect(() => { fetchBrands(); }, []);
 
   async function fetchBrands() {
-    const r = await fetch(`${API_BASE}/api/brands`);
+    const r = await fetch(`${API}/brands`);
     const data = await r.json();
     if (Array.isArray(data)) setBrands(data);
   }
@@ -56,7 +55,7 @@ export default function BrandsEditor({ token }) {
     if (!form.img) return setMsg('يرجى رفع صورة');
     setLoading(true);
     try {
-      const url = editId ? `${API_BASE}/api/brands/${editId}` : `${API_BASE}/api/brands`;
+      const url = editId ? `${API}/brands/${editId}` : `${API}/brands`;
       const method = editId ? 'PUT' : 'POST';
       const r = await fetch(url, { method, headers, body: JSON.stringify(form) });
       if (!r.ok) throw new Error(await r.text());
@@ -72,7 +71,7 @@ export default function BrandsEditor({ token }) {
 
   async function deleteBrand(id) {
     if (!confirm('حذف هذه العلامة التجارية؟')) return;
-    await fetch(`${API_BASE}/api/brands/${id}`, { method: 'DELETE', headers });
+    await fetch(`${API}/brands/${id}`, { method: 'DELETE', headers });
     fetchBrands();
   }
 
