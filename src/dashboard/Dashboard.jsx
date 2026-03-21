@@ -3,11 +3,13 @@ import { useDashboardData } from './useDashboardData';
 import HeroEditor from './HeroEditor';
 import AboutEditor from './AboutEditor';
 import ProjectsEditor from './ProjectsEditor';
+import BrandsEditor from './BrandsEditor';
 
 const tabs = [
   { id: 'hero', label: '🏠 Hero' },
   { id: 'about', label: '👥 من نحن' },
   { id: 'projects', label: '🗂️ المشاريع' },
+  { id: 'brands', label: '🏷️ العلامات التجارية' },
 ];
 
 export default function Dashboard({ onLogout, token }) {
@@ -58,6 +60,7 @@ export default function Dashboard({ onLogout, token }) {
               token={token}
             />
           )}
+          {activeTab === 'brands' && <BrandsEditor token={token} />}
         </div>
       </main>
     </div>
