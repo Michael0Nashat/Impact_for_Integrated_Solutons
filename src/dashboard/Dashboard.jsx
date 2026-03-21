@@ -4,12 +4,14 @@ import HeroEditor from './HeroEditor';
 import AboutEditor from './AboutEditor';
 import ProjectsEditor from './ProjectsEditor';
 import BrandsEditor from './BrandsEditor';
+import ProjectSamplesEditor from './ProjectSamplesEditor';
 
 const tabs = [
   { id: 'hero', label: '🏠 Hero' },
   { id: 'about', label: '👥 من نحن' },
   { id: 'projects', label: '🗂️ المشاريع' },
   { id: 'brands', label: '🏷️ العلامات التجارية' },
+  { id: 'project_samples', label: '🖼️ أمثلة من مشاريعنا' },
 ];
 
 export default function Dashboard({ onLogout, token }) {
@@ -61,6 +63,7 @@ export default function Dashboard({ onLogout, token }) {
             />
           )}
           {activeTab === 'brands' && <BrandsEditor token={token} />}
+          {activeTab === 'project_samples' && <ProjectSamplesEditor token={token} />}
         </div>
       </main>
     </div>

@@ -180,6 +180,7 @@ export default function Partners() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [brands, setBrands] = useState([]);
+  const [projectSamples, setProjectSamples] = useState([]);
 
 
   useEffect(() => {
@@ -208,6 +209,11 @@ export default function Partners() {
     fetch(`${API}/brands`)
       .then(r => r.json())
       .then(data => Array.isArray(data) && setBrands(data))
+      .catch(() => {});
+
+    fetch(`${API}/project-samples`)
+      .then(r => r.json())
+      .then(data => Array.isArray(data) && data.length > 0 && setProjectSamples(data.map(d => d.img)))
       .catch(() => {});
 
     return () => {
@@ -247,17 +253,20 @@ export default function Partners() {
         </h3>
         <div className="scroll-container" style={{ marginTop: '16px' }}>
           <div className="scroll-row scroll-right" style={{ animationDuration: '240s' }}>
-            {[...sampleProjectImages, ...sampleProjectImages].map((src, i) => (
-  <div key={`sample-${i}`} className="project-sample-item">
-    <LazyScrollImage
-      src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')}
-      alt={`مشروع ${i + 1}`}
-      width={260}
-      height={195}
-      priority={i < 4} // أول 4 صور يظهروا فورًا
-    />
-  </div>
-))}
+            {(() => {
+              const imgs = projectSamples.length > 0 ? projectSamples : sampleProjectImages;
+              return [...imgs, ...imgs].map((src, i) => (
+                <div key={`sample-${i}`} className="project-sample-item">
+                  <LazyScrollImage
+                    src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')}
+                    alt={`مشروع ${i + 1}`}
+                    width={260}
+                    height={195}
+                    priority={i < 4}
+                  />
+                </div>
+              ));
+            })()}
           </div>
         </div>
 
