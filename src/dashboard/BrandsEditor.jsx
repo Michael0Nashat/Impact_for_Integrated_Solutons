@@ -30,8 +30,34 @@ export default function BrandsEditor({ token }) {
     setForm({ name: '', logo_url: '', sort_order: 0 });
   }
 
+  async function uploadImage(file) {
+    const fd = new FormData();
+    fd.append('image', file);
+    const r = await fetch(`${API_BASE}/api/upload`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Upload failed');
+    return data.url;
+  }
+
+  async function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setLoading(true);
+    try {
+      const url = await uploadImage(file);
+      setForm(f => ({ ...f, img: url }));
+    } catch (err) {
+      setMsg('خطأ في الرفع: ' + err.message);
+    }
+    setLoading(false);
+  }
+
   async function save() {
-    if (!form.img.trim()) return setMsg('رابط الشعار مطلوب');
+    if (!form.img) return setMsg('يرجى رفع صورة');
     setLoading(true);
     try {
       const url = editId ? `${API_BASE}/api/brands/${editId}` : `${API_BASE}/api/brands`;
@@ -60,19 +86,20 @@ export default function BrandsEditor({ token }) {
 
       {/* Form */}
       <div style={{ background: '#1e293b', borderRadius: 12, padding: 20, marginBottom: 28, border: '1px solid #334155' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 12, alignItems: 'end' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
           <div>
             <div style={s.label}>اسم العلامة</div>
             <input style={s.input} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="مثال: Bosch" />
           </div>
           <div>
-            <div style={s.label}>رابط الشعار (URL)</div>
-            <input style={s.input} value={form.img} onChange={e => setForm(f => ({ ...f, img: e.target.value }))} placeholder="https://..." />
-          </div>
-          <div>
             <div style={s.label}>الترتيب</div>
             <input style={{ ...s.input, width: 70 }} type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: +e.target.value }))} />
           </div>
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          <div style={s.label}>الشعار</div>
+          <input type="file" accept="image/*" style={s.fileInput} onChange={handleFileChange} disabled={loading} />
         </div>
 
         {form.img && (
