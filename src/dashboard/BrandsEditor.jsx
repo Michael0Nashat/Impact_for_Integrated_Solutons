@@ -31,16 +31,12 @@ export default function BrandsEditor({ token }) {
   }
 
   async function uploadImage(file) {
-    const fd = new FormData();
-    fd.append('image', file);
-    const r = await fetch(`${API_BASE}/api/upload`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd,
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('فشل قراءة الملف'));
+      reader.readAsDataURL(file);
     });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.error || 'Upload failed');
-    return data.url;
   }
 
   async function handleFileChange(e) {
