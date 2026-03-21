@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { s } from './dashStyles';
 
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/api$/, '');
 
 export default function BrandsEditor({ token }) {
   const [brands, setBrands] = useState([]);
