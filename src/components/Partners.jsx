@@ -181,6 +181,7 @@ export default function Partners() {
   const [isVisible, setIsVisible] = useState(false);
   const [brands, setBrands] = useState([]);
   const [projectSamples, setProjectSamples] = useState([]);
+  const [dbVideos, setDbVideos] = useState([]);
 
 
   useEffect(() => {
@@ -213,7 +214,12 @@ export default function Partners() {
 
     fetch(`${API}/project-samples`)
       .then(r => r.json())
-      .then(data => Array.isArray(data) && data.length > 0 && setProjectSamples(data.map(d => d.img)))
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProjectSamples(data.filter(d => d.img).map(d => d.img));
+          setDbVideos(data.filter(d => d.video).map(d => d.video));
+        }
+      })
       .catch(() => {});
 
     return () => {
@@ -278,7 +284,7 @@ export default function Partners() {
           gap: '16px',
           marginTop: '20px'
         }}>
-          {projectVideos.map((src, i) => (
+        {(dbVideos.length > 0 ? dbVideos : projectVideos).map((src, i) => (
             <div key={`video-${i}`} style={{ width: isMobile ? 'calc(50% - 8px)' : '300px', height: isMobile ? '140px' : '165px' }}>
               <LazyVideo src={src} />
             </div>
