@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const services = [
   { icon: 'https://cdn-icons-png.flaticon.com/512/1006/1006363.png', title: 'تطوير المواقع', desc: 'تصميم وبرمجة مواقع حديثة وسريعة للشركات.' },
@@ -13,6 +14,7 @@ export default function Services() {
   const [visibleBoxes, setVisibleBoxes] = useState([]);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -131,6 +133,7 @@ export default function Services() {
             style={getBoxStyle(i)}
             onMouseEnter={() => setHoveredIndex(i)}
             onMouseLeave={() => setHoveredIndex(null)}
+            onClick={() => navigate(`/services/${i}`)}
           >
             <img 
               src={service.icon} 

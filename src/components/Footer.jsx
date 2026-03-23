@@ -58,7 +58,6 @@ export default function Footer() {
 
   const socialLinks = [
     { href: '#', text: 'Facebook' },
-    { href: '#', text: 'Instagram' },
     { href: '#', text: 'LinkedIn' }
   ];
 
