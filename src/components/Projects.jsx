@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { API } from '../dashboard/useDashboardData';
 import { allProjects } from '../data/defaultProjects';
 
@@ -16,6 +17,7 @@ export default function Projects() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadProjects = () => {
@@ -98,9 +100,10 @@ export default function Projects() {
             {displayed.map((project, i) => (
               <div
                 key={project.id ?? i}
-                style={getCardStyle(i)}
+                style={{ ...getCardStyle(i), cursor: 'pointer' }}
                 onMouseEnter={() => setHoveredCard(i)}
                 onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => navigate(`/projects/${project.id ?? i}`)}
               >
                 <div style={{ overflow: 'hidden' }}>
                   <img
