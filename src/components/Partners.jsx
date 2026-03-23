@@ -161,7 +161,7 @@ function LazyVideo({ src }) {
   }, [inView]);
 
   return (
-    <div ref={ref} className="project-video-item" style={{ width: '100%', height: 'inherit' }}>
+    <div ref={ref} style={{ width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
       <video
         ref={videoRef}
         src={optimizedSrc}
@@ -169,7 +169,10 @@ function LazyVideo({ src }) {
         muted
         loop
         playsInline
+        autoPlay
         preload="metadata"
+        webkit-playsinline="true"
+        x5-playsinline="true"
         style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
       />
     </div>
