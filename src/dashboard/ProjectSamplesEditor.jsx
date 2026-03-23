@@ -4,7 +4,7 @@ import { API } from './useDashboardData';
 
 export default function ProjectSamplesEditor({ token }) {
   const [samples, setSamples] = useState([]);
-  const [form, setForm] = useState({ img: '', video: '' });
+  const [form, setForm] = useState({ img: '' });
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
@@ -21,26 +21,26 @@ export default function ProjectSamplesEditor({ token }) {
 
   function startEdit(item) {
     setEditId(item.id);
-    setForm({ img: item.img || '', video: item.video || '' });
+    setForm({ img: item.img || '' });
   }
 
   function cancelEdit() {
     setEditId(null);
-    setForm({ img: '', video: '' });
+    setForm({ img: '' });
   }
 
-  async function handleFileChange(e, field) {
+  async function handleFileChange(e) {
     const file = e.target.files[0];
     if (!file) return;
     setLoading(true);
     const reader = new FileReader();
-    reader.onload = () => { setForm(f => ({ ...f, [field]: reader.result })); setLoading(false); };
+    reader.onload = () => { setForm(f => ({ ...f, img: reader.result })); setLoading(false); };
     reader.onerror = () => { setMsg('فشل قراءة الملف'); setLoading(false); };
     reader.readAsDataURL(file);
   }
 
   async function save() {
-    if (!form.img && !form.video) return setMsg('يرجى رفع صورة أو فيديو');
+    if (!form.img) return setMsg('يرجى رفع صورة');
     setLoading(true);
     try {
       const url = editId ? `${API}/project-samples/${editId}` : `${API}/project-samples`;
@@ -58,7 +58,7 @@ export default function ProjectSamplesEditor({ token }) {
   }
 
   async function deleteSample(id) {
-    if (!confirm('حذف هذا العنصر؟')) return;
+    if (!confirm('حذف هذه الصورة؟')) return;
     await fetch(`${API}/project-samples/${id}`, { method: 'DELETE', headers });
     fetchSamples();
   }
@@ -69,28 +69,16 @@ export default function ProjectSamplesEditor({ token }) {
 
       {/* Form */}
       <div style={{ background: '#1e293b', borderRadius: 12, padding: 20, marginBottom: 28, border: '1px solid #334155' }}>
-
-        {/* Image upload */}
         <div style={{ marginTop: 12 }}>
           <div style={s.label}>صورة المشروع</div>
-          <input type="file" accept="image/*" style={s.fileInput} onChange={e => handleFileChange(e, 'img')} disabled={loading} />
-          {form.img && (
-            <img src={form.img} alt="preview" style={{ marginTop: 8, height: 100, objectFit: 'cover', borderRadius: 8 }} />
-          )}
+          <input type="file" accept="image/*" style={s.fileInput} onChange={handleFileChange} disabled={loading} />
         </div>
 
-        {/* Video upload */}
-        <div style={{ marginTop: 16 }}>
-          <div style={s.label}>فيديو المشروع (اختياري)</div>
-          <input type="file" accept="video/*" style={s.fileInput} onChange={e => handleFileChange(e, 'video')} disabled={loading} />
-          {form.video && (
-            <video
-              src={form.video}
-              controls
-              style={{ marginTop: 8, width: '100%', maxWidth: 320, borderRadius: 8, background: '#000' }}
-            />
-          )}
-        </div>
+        {form.img && (
+          <div style={{ marginTop: 12 }}>
+            <img src={form.img} alt="preview" style={{ height: 100, objectFit: 'cover', borderRadius: 8 }} />
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
           <button style={s.saveBtn} onClick={save} disabled={loading}>
@@ -110,7 +98,6 @@ export default function ProjectSamplesEditor({ token }) {
             <tr style={{ background: '#1e293b', borderBottom: '2px solid #334155' }}>
               <th style={th}>#</th>
               <th style={th}>الصورة</th>
-              <th style={th}>الفيديو</th>
               <th style={th}>الإجراءات</th>
             </tr>
           </thead>
@@ -119,16 +106,7 @@ export default function ProjectSamplesEditor({ token }) {
               <tr key={item.id} style={{ borderBottom: '1px solid #1e293b', background: idx % 2 === 0 ? '#0f172a' : '#111827' }}>
                 <td style={td}>{item.id}</td>
                 <td style={td}>
-                  {item.img
-                    ? <img src={item.img} alt={`sample-${item.id}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6 }} />
-                    : <span style={{ color: '#475569', fontSize: 12 }}>لا توجد صورة</span>
-                  }
-                </td>
-                <td style={td}>
-                  {item.video
-                    ? <video src={item.video} controls style={{ width: 120, height: 70, borderRadius: 6, background: '#000' }} />
-                    : <span style={{ color: '#475569', fontSize: 12 }}>لا يوجد فيديو</span>
-                  }
+                  <img src={item.img} alt={`sample-${item.id}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6 }} />
                 </td>
                 <td style={td}>
                   <div style={{ display: 'flex', gap: 6 }}>
@@ -141,7 +119,7 @@ export default function ProjectSamplesEditor({ token }) {
           </tbody>
         </table>
         {samples.length === 0 && (
-          <div style={{ color: '#64748b', textAlign: 'center', padding: 40 }}>لا توجد عناصر بعد. أضف أولى!</div>
+          <div style={{ color: '#64748b', textAlign: 'center', padding: 40 }}>لا توجد صور بعد. أضف أولى!</div>
         )}
       </div>
     </div>
