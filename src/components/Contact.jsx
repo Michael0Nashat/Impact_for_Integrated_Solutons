@@ -111,9 +111,11 @@ export default function Contact() {
         <h2 style={headingStyle}>اتصل بنا</h2>
         <div style={containerStyle}>
           <div>
-            <p style={getInfoStyle(0.4)}>📍 القاهرة - مصر</p>
-            <p style={getInfoStyle(0.5)}>📞 01000000000</p>
-            <p style={getInfoStyle(0.6)}>📧 info@impact.com</p>
+            <p style={getInfoStyle(0.4)}>📍 1 مصطفى رفعت, شيراتون</p>
+            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01027742000" style={{color:'inherit',textDecoration:'none'}}>01027742000</a></p>
+            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{color:'inherit',textDecoration:'none'}}>01278370467</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iislutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>mina.elwahsh@iislutions.com.eg</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:K.mohsen@iislutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>K.mohsen@iislutions.com.eg</a></p>
           </div>
           <form onSubmit={handleSubmit}>
             <input 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API, DEFAULT_ABOUT } from '../dashboard/useDashboardData';
+import { API } from '../dashboard/useDashboardData';
 
 const aboutStyles = `
   @keyframes fadeInRight {
@@ -9,7 +9,7 @@ const aboutStyles = `
 `;
 
 export default function About() {
-  const [data, setData] = useState(DEFAULT_ABOUT);
+  const [data, setData] = useState(null);
   const [imgTs, setImgTs] = useState(() => Date.now());
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -70,6 +70,8 @@ export default function About() {
     boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   };
+
+  if (!data) return null;
 
   return (
     <>

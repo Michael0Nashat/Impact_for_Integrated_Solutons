@@ -107,12 +107,6 @@ export default function ServiceDetail() {
       <AnimatedShapes />
       <Navbar />
       <div style={{ direction: 'rtl', padding: '80px 8% 60px', maxWidth: '900px', margin: '0 auto' }}>
-        <Link
-          to="/#services"
-          style={{ color: '#6366f1', textDecoration: 'none', fontSize: '16px', display: 'inline-block', marginBottom: '32px' }}
-        >
-          ← العودة للخدمات
-        </Link>
 
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <img src={service.icon} alt={service.title} width={100} height={100} style={{ marginBottom: '20px' }} />

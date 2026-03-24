@@ -23,7 +23,7 @@ export default function Navbar() {
     top: 0,
     width: '100%',
     backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    padding: isMobile ? '8px 5%' : '10px 8%',
+    padding: isMobile ? '4px 5%' : '5px 8%',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -35,7 +35,7 @@ export default function Navbar() {
   const logoStyle = {
     display: 'flex',
     alignItems: 'center',
-    height: isMobile ? '50px' : '70px'
+    height: isMobile ? '50px' : '60px'
   };
 
   const menuButtonStyle = {
@@ -80,13 +80,11 @@ export default function Navbar() {
   return (
     <nav style={navStyle}>
       <div style={logoStyle}>
-        <img 
-          src="/IMG-20260310-WA0017-removebg-preview.png" 
-          alt="Logo" 
-          width={isMobile ? 50 : 70}
-          height={isMobile ? 50 : 70}
-          style={{ objectFit: 'contain' }}
-        />
+        <span style={{ fontSize: isMobile ? '13px' : '16px', lineHeight: 1.3, fontWeight: 500, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>mpact </span><span style={{ color: '#ffc107' }}>f</span><span style={{ color: '#ffffff' }}>or</span></span>
+          <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>ntegrated</span></span>
+          <span><span style={{ color: '#ffc107' }}>S</span><span style={{ color: '#ffffff' }}>olutions</span></span>
+        </span>
       </div>
       <button 
         style={menuButtonStyle}

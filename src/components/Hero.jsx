@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API, DEFAULT_HERO } from '../dashboard/useDashboardData';
+import { API } from '../dashboard/useDashboardData';
 
 const heroStyles = `
   @keyframes fadeInUp {
@@ -9,7 +9,7 @@ const heroStyles = `
 `;
 
 export default function Hero() {
-  const [data, setData] = useState(DEFAULT_HERO);
+  const [data, setData] = useState(null);
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -87,6 +87,8 @@ export default function Hero() {
     boxShadow: isButtonHovered ? '0 10px 25px rgba(255,193,7,0.4)' : '0 5px 15px rgba(255,193,7,0.2)',
     animation: isVisible ? 'fadeInUp 0.8s ease-out 0.7s both' : 'none',
   };
+
+  if (!data) return null;
 
   return (
     <>
