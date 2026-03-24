@@ -6,18 +6,6 @@ const heroStyles = `
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes floatImage {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-18px); }
-  }
-  @keyframes glowPulse {
-    0%, 100% { box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 30px rgba(255,193,7,0.15); }
-    50% { box-shadow: 0 30px 80px rgba(0,0,0,0.2), 0 0 60px rgba(255,193,7,0.35); }
-  }
-  @keyframes imageEntrance {
-    from { opacity: 0; transform: translateX(-60px) scale(0.9) rotate(-3deg); }
-    to { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
-  }
   @media (max-width: 768px) {
     #hero {
       padding: 100px 5% 40px !important;
