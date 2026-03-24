@@ -94,8 +94,7 @@ export default function Navbar() {
           letterSpacing: '0.3px',
         }}>
           <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>mpact </span><span style={{ color: '#ffc107' }}>f</span><span style={{ color: '#ffffff' }}>or</span></span>
-          <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>ntegrated</span></span>
-          <span><span style={{ color: '#ffc107' }}>S</span><span style={{ color: '#ffffff' }}>olutions</span></span>
+          <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>ntegrated </span><span style={{ color: '#ffc107' }}>S</span><span style={{ color: '#ffffff' }}>olutions</span></span>
         </span>
       </div>
       <button 
