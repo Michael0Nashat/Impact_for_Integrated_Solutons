@@ -6,6 +6,26 @@ const heroStyles = `
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @media (max-width: 768px) {
+    #hero {
+      padding: 100px 5% 40px !important;
+      flex-direction: column !important;
+      gap: 24px !important;
+      min-height: unset !important;
+    }
+    #hero img {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 16px !important;
+    }
+    #hero h1 {
+      font-size: 24px !important;
+      line-height: 1.5 !important;
+    }
+    #hero p {
+      font-size: 14px !important;
+    }
+  }
 `;
 
 export default function Hero() {
@@ -42,13 +62,17 @@ export default function Hero() {
 
   const sectionStyle = {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: isMobile ? '120px 5% 40px' : '180px 8% 60px',
-    flexWrap: 'wrap', gap: isMobile ? '40px' : '60px',
+    padding: isMobile ? '100px 5% 40px' : '180px 8% 60px',
+    flexDirection: isMobile ? 'column' : 'row',
+    gap: isMobile ? '24px' : '60px',
+    width: '100%', boxSizing: 'border-box',
   };
 
   const imageContainerStyle = {
-    flex: 1, textAlign: isMobile ? 'center' : 'left',
-    order: isMobile ? 2 : 1, minWidth: isMobile ? '100%' : 'auto',
+    width: isMobile ? '100%' : 'auto',
+    flex: isMobile ? 'unset' : 1,
+    textAlign: 'center',
+    order: isMobile ? 2 : 1,
     maxWidth: isMobile ? '100%' : '45%',
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? 'translateX(0)' : 'translateX(-50px)',
@@ -56,24 +80,30 @@ export default function Hero() {
   };
 
   const imageStyle = {
-    width: '100%', maxWidth: isMobile ? '100%' : '650px',
-    borderRadius: isMobile ? '20px' : '30px',
-    boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
+    width: '100%',
+    maxWidth: isMobile ? '100%' : '650px',
+    height: 'auto',
+    borderRadius: isMobile ? '16px' : '30px',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
     transition: 'transform 0.3s ease',
     transform: isImageHovered ? 'scale(1.02)' : 'scale(1)',
+    display: 'block',
   };
 
   const contentStyle = {
-    flex: 1, textAlign: 'right', order: isMobile ? 1 : 2,
-    minWidth: isMobile ? '100%' : 'auto', maxWidth: isMobile ? '100%' : '45%',
+    width: isMobile ? '100%' : 'auto',
+    flex: isMobile ? 'unset' : 1,
+    textAlign: 'right',
+    order: isMobile ? 1 : 2,
+    maxWidth: isMobile ? '100%' : '45%',
     opacity: isVisible ? 1 : 0,
     transform: isVisible ? 'translateX(0)' : 'translateX(50px)',
     transition: 'all 0.8s ease-out 0.2s',
   };
 
   const headingStyle = {
-    fontSize: isMobile ? '28px' : '42px', marginBottom: '20px',
-    lineHeight: isMobile ? '1.4' : '1.2',
+    fontSize: isMobile ? '24px' : '42px', marginBottom: '16px',
+    lineHeight: isMobile ? '1.5' : '1.2',
     animation: isVisible ? 'fadeInUp 0.8s ease-out 0.3s both' : 'none',
   };
 
@@ -97,7 +127,7 @@ export default function Hero() {
         <div style={imageContainerStyle}>
           <img
             src={data.image ? (data.image.startsWith('data:') ? data.image : `${data.image}?t=${imgTs}`) : ''}
-            alt="Hero" width={650} height={400} style={imageStyle}
+            alt="Hero" style={imageStyle}
             key={data.image}
             onMouseEnter={() => setIsImageHovered(true)}
             onMouseLeave={() => setIsImageHovered(false)}
