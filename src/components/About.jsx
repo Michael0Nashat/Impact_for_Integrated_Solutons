@@ -29,19 +29,22 @@ export default function About() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('about-updated', loadAbout);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!data) return;
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) setIsVisible(true); }),
       { threshold: 0.2 }
     );
     const section = document.getElementById('about');
     if (section) observer.observe(section);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-      window.removeEventListener('about-updated', loadAbout);
-      observer.disconnect();
-    };
-  }, []);
+    return () => observer.disconnect();
+  }, [data]);
 
   const sectionStyle = {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
