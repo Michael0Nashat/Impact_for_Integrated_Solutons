@@ -27,10 +27,15 @@ export default function Contact() {
           setIsVisible(true);
         }
       });
-    }, { threshold: 0.2 });
+    }, { threshold: 0.1 });
 
     const section = document.getElementById('contact');
-    if (section) observer.observe(section);
+    if (section) {
+      observer.observe(section);
+      // fallback: if already in view on load
+      const rect = section.getBoundingClientRect();
+      if (rect.top < window.innerHeight) setIsVisible(true);
+    }
     
     return () => {
       window.removeEventListener('resize', checkMobile);
@@ -114,8 +119,8 @@ export default function Contact() {
             <p style={getInfoStyle(0.4)}>📍 1 مصطفى رفعت, شيراتون</p>
             <p style={getInfoStyle(0.5)}>📞 <a href="tel:01027742000" style={{color:'inherit',textDecoration:'none'}}>01027742000</a></p>
             <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{color:'inherit',textDecoration:'none'}}>01278370467</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>mina.elwahsh@iislutions.com.eg</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>K.mohsen@iislutions.com.eg</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>mina.elwahsh@iisolutions.com.eg</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>mohsen@iisolutions.com.eg</a></p>
           </div>
           <form onSubmit={handleSubmit}>
             <input 
