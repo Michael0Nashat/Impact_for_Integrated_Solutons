@@ -30,7 +30,6 @@ const heroStyles = `
 
 export default function Hero() {
   const [data, setData] = useState(null);
-  const [isImageHovered, setIsImageHovered] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -53,12 +52,18 @@ export default function Hero() {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    setTimeout(() => setIsVisible(true), 100);
     return () => {
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('hero-updated', loadHero);
     };
   }, []);
+
+  useEffect(() => {
+    if (!data) return;
+    // Hero is always at top of page, use a short delay instead of IntersectionObserver
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, [data]);
 
   const sectionStyle = {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -74,6 +79,9 @@ export default function Hero() {
     textAlign: 'center',
     order: isMobile ? 2 : 1,
     maxWidth: isMobile ? '100%' : '45%',
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(-50px) scale(0.95)',
+    transition: 'all 0.8s ease-out 0.3s',
   };
 
   const imageStyle = {
@@ -81,14 +89,9 @@ export default function Hero() {
     maxWidth: isMobile ? '100%' : '650px',
     height: 'auto',
     borderRadius: isMobile ? '16px' : '30px',
+    boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
     display: 'block',
-    animation: isVisible
-      ? isImageHovered
-        ? 'glowPulse 1.5s ease-in-out infinite'
-        : 'imageEntrance 0.9s ease-out both, floatImage 4s ease-in-out 0.9s infinite, glowPulse 3s ease-in-out 0.9s infinite'
-      : 'none',
-    transform: isImageHovered ? 'scale(1.04)' : 'scale(1)',
-    transition: 'transform 0.4s ease',
   };
 
   const contentStyle = {
@@ -130,8 +133,8 @@ export default function Hero() {
             src={data.image ? (data.image.startsWith('data:') ? data.image : `${data.image}?t=${imgTs}`) : ''}
             alt="Hero" style={imageStyle}
             key={data.image}
-            onMouseEnter={() => setIsImageHovered(true)}
-            onMouseLeave={() => setIsImageHovered(false)}
+            onMouseEnter={e => { e.target.style.transform = 'scale(1.05)'; e.target.style.boxShadow = '0 50px 120px rgba(0,0,0,0.2)'; }}
+            onMouseLeave={e => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 40px 100px rgba(0,0,0,0.15)'; }}
           />
         </div>
         <div style={contentStyle}>
