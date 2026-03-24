@@ -22,20 +22,22 @@ export default function Navbar() {
     position: 'fixed',
     top: 0,
     width: '100%',
-    backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    padding: isMobile ? '4px 5%' : '5px 8%',
+    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    padding: isMobile ? '8px 5%' : '5px 8%',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     zIndex: 999,
     flexWrap: 'wrap',
-    boxShadow: '0 2px 10px rgba(255, 255, 255, 0.1)'
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+    minHeight: isMobile ? '60px' : '70px',
   };
 
   const logoStyle = {
     display: 'flex',
     alignItems: 'center',
-    height: isMobile ? '50px' : '60px'
+    height: isMobile ? '44px' : '60px',
+    flexShrink: 0,
   };
 
   const menuButtonStyle = {
@@ -80,7 +82,17 @@ export default function Navbar() {
   return (
     <nav style={navStyle}>
       <div style={logoStyle}>
-        <span style={{ fontSize: isMobile ? '13px' : '16px', lineHeight: 1.3, fontWeight: 500, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <span style={{ 
+          fontSize: isMobile ? '12px' : '16px', 
+          lineHeight: 1.4, 
+          fontWeight: 600, 
+          textAlign: 'center', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
+          letterSpacing: '0.3px',
+        }}>
           <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>mpact </span><span style={{ color: '#ffc107' }}>f</span><span style={{ color: '#ffffff' }}>or</span></span>
           <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>ntegrated</span></span>
           <span><span style={{ color: '#ffc107' }}>S</span><span style={{ color: '#ffffff' }}>olutions</span></span>
