@@ -6,6 +6,18 @@ const heroStyles = `
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes floatImage {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-18px); }
+  }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 30px rgba(255,193,7,0.15); }
+    50% { box-shadow: 0 30px 80px rgba(0,0,0,0.2), 0 0 60px rgba(255,193,7,0.35); }
+  }
+  @keyframes imageEntrance {
+    from { opacity: 0; transform: translateX(-60px) scale(0.9) rotate(-3deg); }
+    to { opacity: 1; transform: translateX(0) scale(1) rotate(0deg); }
+  }
   @media (max-width: 768px) {
     #hero {
       padding: 100px 5% 40px !important;
@@ -74,9 +86,6 @@ export default function Hero() {
     textAlign: 'center',
     order: isMobile ? 2 : 1,
     maxWidth: isMobile ? '100%' : '45%',
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible ? 'translateX(0)' : 'translateX(-50px)',
-    transition: 'all 0.8s ease-out',
   };
 
   const imageStyle = {
@@ -84,10 +93,14 @@ export default function Hero() {
     maxWidth: isMobile ? '100%' : '650px',
     height: 'auto',
     borderRadius: isMobile ? '16px' : '30px',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-    transition: 'transform 0.3s ease',
-    transform: isImageHovered ? 'scale(1.02)' : 'scale(1)',
     display: 'block',
+    animation: isVisible
+      ? isImageHovered
+        ? 'glowPulse 1.5s ease-in-out infinite'
+        : 'imageEntrance 0.9s ease-out both, floatImage 4s ease-in-out 0.9s infinite, glowPulse 3s ease-in-out 0.9s infinite'
+      : 'none',
+    transform: isImageHovered ? 'scale(1.04)' : 'scale(1)',
+    transition: 'transform 0.4s ease',
   };
 
   const contentStyle = {
