@@ -52,7 +52,7 @@ export default function Projects() {
     };
   }, []);
 
-  const displayed = showAll ? projects : projects.slice(0, 3);
+  const displayed = showAll ? projects : projects.slice(0, 6);
 
   const getCardStyle = (i) => ({
     background: '#f9f9f9', borderRadius: isMobile ? '20px' : '25px',
@@ -134,7 +134,7 @@ export default function Projects() {
           </div>
         </div>
 
-        {!showAll && projects.length > 3 && (
+        {!showAll && projects.length > 6 && (
           <div style={{ textAlign: 'center', marginTop: '32px', marginBottom: '30px', padding: isMobile ? '0 5%' : '0' }}>
             <button
               style={buttonStyle}
