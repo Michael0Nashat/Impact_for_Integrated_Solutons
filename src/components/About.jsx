@@ -1,25 +1,52 @@
 import { useEffect, useState } from 'react';
-import { API } from '../dashboard/useDashboardData';
+import { API, DEFAULT_ABOUT } from '../dashboard/useDashboardData';
 
 const aboutStyles = `
   @keyframes fadeInRight {
     from { opacity: 0; transform: translateX(30px); }
     to { opacity: 1; transform: translateX(0); }
   }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 `;
 
 export default function About() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(DEFAULT_ABOUT);
+  const [isLoading, setIsLoading] = useState(true);
   const [imgTs, setImgTs] = useState(() => Date.now());
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const loadAbout = () => {
-      fetch(`${API}/settings/about`)
-        .then(r => r.json())
-        .then(d => { if (d) { setData(d); setImgTs(Date.now()); } })
-        .catch(() => {});
+    const loadAbout = async () => {
+      try {
+        // Try to load from localStorage first for instant display
+        const cached = localStorage.getItem('about_data');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          setData(parsed);
+          setIsLoading(false);
+          setImgTs(Date.now());
+        }
+        
+        // Fetch fresh data in background
+        const response = await fetch(`${API}/settings/about`);
+        const d = await response.json();
+        if (d) {
+          setData(d);
+          localStorage.setItem('about_data', JSON.stringify(d));
+          setImgTs(Date.now());
+        }
+      } catch (error) {
+        console.error('Error loading about:', error);
+        // Use cached data if available on error
+        const cached = localStorage.getItem('about_data');
+        if (cached) setData(JSON.parse(cached));
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadAbout();
@@ -39,7 +66,7 @@ export default function About() {
     if (!data) return;
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) setIsVisible(true); }),
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
     const section = document.getElementById('about');
     if (section) observer.observe(section);
@@ -74,7 +101,27 @@ export default function About() {
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   };
 
-  if (!data) return null;
+  // Skeleton loader styles
+  const skeletonStyle = {
+    background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+    backgroundSize: '200% 100%',
+    animation: 'shimmer 1.5s infinite',
+    borderRadius: '8px',
+  };
+
+  if (isLoading && !data) {
+    return (
+      <section id="about" style={{ ...sectionStyle, minHeight: '400px', padding: isMobile ? '80px 5%' : '80px 8%' }}>
+        <div style={{ ...textContainerStyle, ...skeletonStyle }}>
+          <div style={{ height: '36px', width: '60%', marginBottom: '20px' }} />
+          <div style={{ height: '18px', width: '95%', marginBottom: '10px' }} />
+          <div style={{ height: '18px', width: '90%', marginBottom: '10px' }} />
+          <div style={{ height: '18px', width: '85%' }} />
+        </div>
+        <div style={{ ...imageContainerStyle, ...skeletonStyle, height: '400px' }} />
+      </section>
+    );
+  }
 
   return (
     <>
