@@ -132,6 +132,7 @@ function LazyVideo({ src }) {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const [inView, setInView] = useState(false);
+  const [error, setError] = useState(false);
 
   const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
 
@@ -152,13 +153,24 @@ function LazyVideo({ src }) {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || error) return;
     if (inView) {
-      video.play().catch(() => {});
+      video.play().catch((e) => {
+        console.warn('Video autoplay failed:', e);
+      });
     } else {
       video.pause();
     }
-  }, [inView]);
+  }, [inView, error]);
+
+  const handleError = () => {
+    console.warn('Video failed to load:', src);
+    setError(true);
+  };
+
+  if (error) {
+    return null;
+  }
 
   return (
     <div ref={ref} style={{ width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
@@ -173,6 +185,8 @@ function LazyVideo({ src }) {
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
+        onError={handleError}
+        onLoadedMetadata={() => setError(false)}
         style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
       />
     </div>
@@ -210,20 +224,28 @@ export default function Partners() {
     const section = document.getElementById('partners');
     if (section) observer.observe(section);
     
+    // Fetch brands with error handling
     fetch(`${API}/brands`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error('Failed to fetch brands');
+        return r.json();
+      })
       .then(data => Array.isArray(data) && setBrands(data))
-      .catch(() => {});
+      .catch((err) => console.warn('Error fetching brands:', err.message));
 
+    // Fetch project samples with error handling
     fetch(`${API}/project-samples`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error('Failed to fetch project samples');
+        return r.json();
+      })
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           setProjectSamples(data.filter(d => d.img).map(d => d.img));
           setProjectVideos(data.filter(d => d.video).map(d => d.video));
         }
       })
-      .catch(() => {});
+      .catch((err) => console.warn('Error fetching project samples:', err.message));
 
     return () => {
       window.removeEventListener('resize', checkMobile);
@@ -287,7 +309,7 @@ export default function Partners() {
           gap: '16px',
           marginTop: '20px'
         }}>
-          {(projectVideos.length > 0 ? projectVideos : projectVideos).map((src, i) => (
+          {projectVideos.length > 0 && projectVideos.map((src, i) => (
             <div key={`video-${i}`} style={{ width: isMobile ? 'calc(50% - 8px)' : '300px', height: isMobile ? '140px' : '165px' }}>
               <LazyVideo src={src} />
             </div>
