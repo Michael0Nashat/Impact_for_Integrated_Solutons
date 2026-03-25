@@ -134,11 +134,19 @@ function LazyVideo({ src }) {
   const [inView, setInView] = useState(false);
   const [error, setError] = useState(false);
 
-  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
+  // Optimize Cloudinary video URL for streaming
+  const optimizedSrc = src.includes('cloudinary.com') 
+    ? src.replace('/upload/', '/upload/w_640,h_480,c_fill,q_50,vc_auto/')
+    : src;
 
-  const poster = src
-    .replace('/video/upload/', '/image/upload/w_400,h_300,c_fill,q_auto,f_auto/')
-    .replace(/\.mp4$/, '.jpg');
+  // Generate poster from Cloudinary video
+  const poster = src.includes('cloudinary.com')
+    ? src
+        .replace('/video/upload/', '/image/upload/w_640,h_480,c_fill,q_auto,f_auto/')
+        .replace(/\.mp4$/, '.jpg')
+    : src
+        .replace('/video/upload/', '/image/upload/w_400,h_300,c_fill,q_auto,f_auto/')
+        .replace(/\.mp4$/, '.jpg');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -289,7 +297,10 @@ export default function Partners() {
               return [...imgs, ...imgs].map((src, i) => (
                 <div key={`sample-${i}`} className="project-sample-item">
                   <LazyScrollImage
-                    src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')}
+                    src={src.includes('cloudinary.com') 
+                      ? src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')
+                      : src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')
+                    }
                     alt={`مشروع ${i + 1}`}
                     width={260}
                     height={195}

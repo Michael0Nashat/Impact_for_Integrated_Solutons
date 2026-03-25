@@ -33,17 +33,27 @@ export default function ProjectSamplesEditor({ token }) {
     const file = e.target.files[0];
     if (!file) return;
     setLoading(true);
-    const reader = new FileReader();
-    reader.onload = () => { 
-      setForm(f => ({ ...f, [type]: reader.result })); 
-      setLoading(false); 
-    };
-    reader.onerror = () => { setMsg('فشل قراءة الملف'); setLoading(false); };
-    if (type === 'video') {
-      reader.readAsDataURL(file);
-    } else {
-      reader.readAsDataURL(file);
+    
+    // Upload to Cloudinary first
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await fetch(`${API}/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+      
+      if (!response.ok) throw new Error('Upload failed');
+      
+      const data = await response.json();
+      setForm(f => ({ ...f, [type]: data.url }));
+      setMsg(`تم تحميل ${type === 'video' ? 'الفيديو' : 'الصورة'} بنجاح`);
+    } catch (error) {
+      setMsg('فشل التحميل: ' + error.message);
     }
+    setLoading(false);
   }
 
   async function save() {
