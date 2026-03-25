@@ -117,9 +117,17 @@ export default function Projects() {
                 </div>
                 <div style={{ padding: '24px' }}>
                   <h3 style={{ marginBottom: '12px' }}>{project.title}</h3>
-                  <p style={{ fontSize: '14px', color: '#555' }}>
-                    {getDesc(project).slice(0, 100)}{getDesc(project).length > 100 ? '...' : ''}
-                  </p>
+                  <p style={{
+  display: '-webkit-box',
+  WebkitLineClamp: 4,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+  fontSize: isMobile ? '15px' : '16px',
+  color: '#222',
+  lineHeight: '1.7'
+}}>
+  {getDesc(project)}
+</p>
                   {project.category && (
                     <span style={{
                       display: 'inline-block', marginTop: '12px', padding: '6px 16px',
