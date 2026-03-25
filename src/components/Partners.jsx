@@ -132,21 +132,12 @@ function LazyVideo({ src }) {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const [inView, setInView] = useState(false);
-  const [error, setError] = useState(false);
 
-  // Optimize Cloudinary video URL for streaming
-  const optimizedSrc = src.includes('cloudinary.com') 
-    ? src.replace('/upload/', '/upload/w_640,h_480,c_fill,q_50,vc_auto/')
-    : src;
+  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
 
-  // Generate poster from Cloudinary video
-  const poster = src.includes('cloudinary.com')
-    ? src
-        .replace('/video/upload/', '/image/upload/w_640,h_480,c_fill,q_auto,f_auto/')
-        .replace(/\.mp4$/, '.jpg')
-    : src
-        .replace('/video/upload/', '/image/upload/w_400,h_300,c_fill,q_auto,f_auto/')
-        .replace(/\.mp4$/, '.jpg');
+  const poster = src
+    .replace('/video/upload/', '/image/upload/w_400,h_300,c_fill,q_auto,f_auto/')
+    .replace(/\.mp4$/, '.jpg');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -161,24 +152,13 @@ function LazyVideo({ src }) {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || error) return;
+    if (!video) return;
     if (inView) {
-      video.play().catch((e) => {
-        console.warn('Video autoplay failed:', e);
-      });
+      video.play().catch(() => {});
     } else {
       video.pause();
     }
-  }, [inView, error]);
-
-  const handleError = () => {
-    console.warn('Video failed to load:', src);
-    setError(true);
-  };
-
-  if (error) {
-    return null;
-  }
+  }, [inView]);
 
   return (
     <div ref={ref} style={{ width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
@@ -193,8 +173,6 @@ function LazyVideo({ src }) {
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
-        onError={handleError}
-        onLoadedMetadata={() => setError(false)}
         style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
       />
     </div>
@@ -206,7 +184,6 @@ export default function Partners() {
   const [isVisible, setIsVisible] = useState(false);
   const [brands, setBrands] = useState([]);
   const [projectSamples, setProjectSamples] = useState([]);
-  const [projectVideos, setProjectVideos] = useState([]);
 
 
   useEffect(() => {
@@ -232,28 +209,15 @@ export default function Partners() {
     const section = document.getElementById('partners');
     if (section) observer.observe(section);
     
-    // Fetch brands with error handling
     fetch(`${API}/brands`)
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to fetch brands');
-        return r.json();
-      })
+      .then(r => r.json())
       .then(data => Array.isArray(data) && setBrands(data))
-      .catch((err) => console.warn('Error fetching brands:', err.message));
+      .catch(() => {});
 
-    // Fetch project samples with error handling
     fetch(`${API}/project-samples`)
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to fetch project samples');
-        return r.json();
-      })
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setProjectSamples(data.filter(d => d.img).map(d => d.img));
-          setProjectVideos(data.filter(d => d.video).map(d => d.video));
-        }
-      })
-      .catch((err) => console.warn('Error fetching project samples:', err.message));
+      .then(r => r.json())
+      .then(data => Array.isArray(data) && data.length > 0 && setProjectSamples(data.map(d => d.img)))
+      .catch(() => {});
 
     return () => {
       window.removeEventListener('resize', checkMobile);
@@ -297,10 +261,7 @@ export default function Partners() {
               return [...imgs, ...imgs].map((src, i) => (
                 <div key={`sample-${i}`} className="project-sample-item">
                   <LazyScrollImage
-                    src={src.includes('cloudinary.com') 
-                      ? src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')
-                      : src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')
-                    }
+                    src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')}
                     alt={`مشروع ${i + 1}`}
                     width={260}
                     height={195}
@@ -320,7 +281,7 @@ export default function Partners() {
           gap: '16px',
           marginTop: '20px'
         }}>
-          {projectVideos.length > 0 && projectVideos.map((src, i) => (
+          {projectVideos.map((src, i) => (
             <div key={`video-${i}`} style={{ width: isMobile ? 'calc(50% - 8px)' : '300px', height: isMobile ? '140px' : '165px' }}>
               <LazyVideo src={src} />
             </div>

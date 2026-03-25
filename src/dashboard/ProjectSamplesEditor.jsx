@@ -4,7 +4,7 @@ import { API } from './useDashboardData';
 
 export default function ProjectSamplesEditor({ token }) {
   const [samples, setSamples] = useState([]);
-  const [form, setForm] = useState({ img: '', video: '' });
+  const [form, setForm] = useState({ img: '' });
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
@@ -21,43 +21,26 @@ export default function ProjectSamplesEditor({ token }) {
 
   function startEdit(item) {
     setEditId(item.id);
-    setForm({ img: item.img || '', video: item.video || '' });
+    setForm({ img: item.img || '' });
   }
 
   function cancelEdit() {
     setEditId(null);
-    setForm({ img: '', video: '' });
+    setForm({ img: '' });
   }
 
-  async function handleFileChange(e, type) {
+  async function handleFileChange(e) {
     const file = e.target.files[0];
     if (!file) return;
     setLoading(true);
-    
-    // Upload to Cloudinary first
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    try {
-      const response = await fetch(`${API}/upload`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
-      });
-      
-      if (!response.ok) throw new Error('Upload failed');
-      
-      const data = await response.json();
-      setForm(f => ({ ...f, [type]: data.url }));
-      setMsg(`تم تحميل ${type === 'video' ? 'الفيديو' : 'الصورة'} بنجاح`);
-    } catch (error) {
-      setMsg('فشل التحميل: ' + error.message);
-    }
-    setLoading(false);
+    const reader = new FileReader();
+    reader.onload = () => { setForm(f => ({ ...f, img: reader.result })); setLoading(false); };
+    reader.onerror = () => { setMsg('فشل قراءة الملف'); setLoading(false); };
+    reader.readAsDataURL(file);
   }
 
   async function save() {
-    if (!form.img && !form.video) return setMsg('يرجى رفع صورة أو فيديو');
+    if (!form.img) return setMsg('يرجى رفع صورة');
     setLoading(true);
     try {
       const url = editId ? `${API}/project-samples/${editId}` : `${API}/project-samples`;
@@ -88,23 +71,12 @@ export default function ProjectSamplesEditor({ token }) {
       <div style={{ background: '#1e293b', borderRadius: 12, padding: 20, marginBottom: 28, border: '1px solid #334155' }}>
         <div style={{ marginTop: 12 }}>
           <div style={s.label}>صورة المشروع</div>
-          <input type="file" accept="image/*" style={s.fileInput} onChange={(e) => handleFileChange(e, 'img')} disabled={loading} />
+          <input type="file" accept="image/*" style={s.fileInput} onChange={handleFileChange} disabled={loading} />
         </div>
 
         {form.img && (
           <div style={{ marginTop: 12 }}>
             <img src={form.img} alt="preview" style={{ height: 100, objectFit: 'cover', borderRadius: 8 }} />
-          </div>
-        )}
-
-        <div style={{ marginTop: 16 }}>
-          <div style={s.label}>فيديو المشروع</div>
-          <input type="file" accept="video/*" style={s.fileInput} onChange={(e) => handleFileChange(e, 'video')} disabled={loading} />
-        </div>
-
-        {form.video && (
-          <div style={{ marginTop: 12 }}>
-            <video src={form.video} controls style={{ height: 100, borderRadius: 8 }} />
           </div>
         )}
 
@@ -134,12 +106,7 @@ export default function ProjectSamplesEditor({ token }) {
               <tr key={item.id} style={{ borderBottom: '1px solid #1e293b', background: idx % 2 === 0 ? '#0f172a' : '#111827' }}>
                 <td style={td}>{item.id}</td>
                 <td style={td}>
-                  {item.img && (
-                    <img src={item.img} alt={`sample-${item.id}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6 }} />
-                  )}
-                  {item.video && (
-                    <video src={item.video} controls style={{ width: 80, height: 60, borderRadius: 6, marginTop: item.img ? '8px' : '0' }} />
-                  )}
+                  <img src={item.img} alt={`sample-${item.id}`} style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 6 }} />
                 </td>
                 <td style={td}>
                   <div style={{ display: 'flex', gap: 6 }}>
