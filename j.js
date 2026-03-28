@@ -65,6 +65,7 @@ async function ensureTables() {
     -- Migration to add columns if they don't exist
     ALTER TABLE projects ADD COLUMN IF NOT EXISTS status TEXT;
     ALTER TABLE projects ADD COLUMN IF NOT EXISTS work_type TEXT;
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS systems JSONB DEFAULT '[]';
   `);
 }
 
@@ -151,22 +152,22 @@ app.get('/api/projects', async (_req, res) => {
 });
 
 app.post('/api/projects', authMiddleware, async (req, res) => {
-  const { title, description, category, img, status, work_type } = req.body;
+  const { title, description, category, img, status, work_type, systems } = req.body;
   try {
     const { rows } = await pool.query(
-      'INSERT INTO projects(title,description,category,img,status,work_type) VALUES($1,$2,$3,$4,$5,$6) RETURNING *',
-      [title, description, category, img, status, work_type]
+      'INSERT INTO projects(title,description,category,img,status,work_type,systems) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *',
+      [title, description, category, img, status, work_type, JSON.stringify(systems || [])]
     );
     res.json(rows[0]);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.put('/api/projects/:id', authMiddleware, async (req, res) => {
-  const { title, description, category, img, status, work_type } = req.body;
+  const { title, description, category, img, status, work_type, systems } = req.body;
   try {
     const { rows } = await pool.query(
-      `UPDATE projects SET title=$1,description=$2,category=$3,img=$4,status=$5,work_type=$6 WHERE id=$7 RETURNING *`,
-      [title, description, category, img, status, work_type, req.params.id]
+      `UPDATE projects SET title=$1,description=$2,category=$3,img=$4,status=$5,work_type=$6,systems=$7 WHERE id=$8 RETURNING *`,
+      [title, description, category, img, status, work_type, JSON.stringify(systems || []), req.params.id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Project not found' });
     res.json(rows[0]);

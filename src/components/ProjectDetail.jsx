@@ -95,7 +95,9 @@ export default function ProjectDetail() {
   }
 
   const desc = project.description ?? project.desc ?? '';
-  const systems = systemsByCategory[project.category] ?? dynSystems;
+  const systems = (project.systems && project.systems.length > 0) 
+    ? project.systems 
+    : (systemsByCategory[project.category] ?? dynSystems);
 
   return (
     <>

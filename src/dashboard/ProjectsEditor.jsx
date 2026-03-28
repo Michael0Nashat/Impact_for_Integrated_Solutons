@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { s } from './dashStyles';
 
-const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '' };
+const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '', systems: [] };
 
 export default function ProjectsEditor({ 
   projects, onAdd, onUpdate, onDelete, 
@@ -26,7 +26,8 @@ export default function ProjectsEditor({
       category: p.category ?? '',
       img: p.img ?? '',
       status: p.status ?? '',
-      work_type: p.work_type ?? ''
+      work_type: p.work_type ?? '',
+      systems: Array.isArray(p.systems) ? p.systems : []
     });
     setImgPreview(p.img ?? '');
     setEditing(Number(p.id));
@@ -103,6 +104,31 @@ export default function ProjectsEditor({
 
             <label style={s.label}>نوع العمل</label>
             <input style={s.input} value={form.work_type} onChange={e => set('work_type', e.target.value)} />
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={s.label}>الأنظمة المنفذة</label>
+              <div style={{ 
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
+                gap: 8, background: '#1e293b', padding: 12, borderRadius: 10, border: '1px solid #334155' 
+              }}>
+                {defaultSystems.map(sys => (
+                  <label key={sys.id} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#f1f5f9', fontSize: 13, cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={form.systems?.includes(sys.name)} 
+                      onChange={e => {
+                        const next = e.target.checked 
+                          ? [...(form.systems || []), sys.name]
+                          : (form.systems || []).filter(x => x !== sys.name);
+                        set('systems', next);
+                      }} 
+                    />
+                    {sys.name}
+                  </label>
+                ))}
+                {defaultSystems.length === 0 && <p style={{ color: '#94a3b8', fontSize: 12, gridColumn: '1/-1', margin: 0 }}>لا توجد أنظمة افتراضية مضافة. يمكنك إضافتها من الأسفل.</p>}
+              </div>
+            </div>
 
             <input type="file" accept="image/*" onChange={handleImg} style={s.fileInput} disabled={uploading} />
             {uploading && <p style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري رفع الصورة...</p>}

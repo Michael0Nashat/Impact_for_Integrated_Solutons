@@ -81,7 +81,8 @@ export function useDashboardData(token = '') {
           category: p.category, 
           img: p.img,
           status: p.status,
-          work_type: p.work_type
+          work_type: p.work_type,
+          systems: p.systems || []
         }),
       });
       if (!res.ok) throw new Error('Add failed');
@@ -105,7 +106,8 @@ export function useDashboardData(token = '') {
           category: p.category, 
           img: p.img,
           status: p.status,
-          work_type: p.work_type
+          work_type: p.work_type,
+          systems: p.systems || []
         }),
       });
       if (!res.ok) throw new Error('Update failed');
