@@ -105,11 +105,6 @@ export default function ProjectDetail() {
       <Navbar />
       <div style={{ direction: 'rtl', padding: '80px 8% 60px', maxWidth: '1000px', margin: '0 auto' }}>
 
-        {/* back */}
-        <Link to="/#projects" style={{ color: '#6366f1', textDecoration: 'none', fontSize: '15px', display: 'inline-block', marginBottom: '28px' }}>
-          ← العودة للمشاريع
-        </Link>
-
         {/* hero image */}
         <div style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', marginBottom: '32px', position: 'relative' }}>
           <img src={project.img} alt={project.title} style={{ width: '100%', height: '420px', objectFit: 'cover', display: 'block' }} />
