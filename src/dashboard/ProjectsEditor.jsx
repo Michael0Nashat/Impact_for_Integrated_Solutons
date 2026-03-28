@@ -126,7 +126,50 @@ export default function ProjectsEditor({
                     {sys.name}
                   </label>
                 ))}
-                {defaultSystems.length === 0 && <p style={{ color: '#94a3b8', fontSize: 12, gridColumn: '1/-1', margin: 0 }}>لا توجد أنظمة افتراضية مضافة. يمكنك إضافتها من الأسفل.</p>}
+                {(form.systems || []).filter(s => !defaultSystems.find(ds => ds.name === s)).map(sys => (
+                  <label key={sys} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#10b981', fontSize: 13, cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={true} 
+                      onChange={() => {
+                        const next = (form.systems || []).filter(x => x !== sys);
+                        set('systems', next);
+                      }} 
+                    />
+                    {sys} (إضافي)
+                  </label>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <input 
+                  style={{ ...s.input, marginBottom: 0, flex: 1, fontSize: 12, padding: '6px 10px' }} 
+                  placeholder="أضف نظاماً مخصصاً لهذا المشروع"
+                  id="customSystemInput"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const val = e.target.value.trim();
+                      if (val && !form.systems?.includes(val)) {
+                        set('systems', [...(form.systems || []), val]);
+                        e.target.value = '';
+                      }
+                    }
+                  }}
+                />
+                <button 
+                  style={{ ...s.addBtn, margin: 0, padding: '0 12px', fontSize: 12 }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('customSystemInput');
+                    const val = input.value.trim();
+                    if (val && !form.systems?.includes(val)) {
+                      set('systems', [...(form.systems || []), val]);
+                      input.value = '';
+                    }
+                  }}
+                >
+                  إضافة
+                </button>
               </div>
             </div>
 
