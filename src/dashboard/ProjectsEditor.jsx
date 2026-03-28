@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { s } from './dashStyles';
 
-const empty = { title: '', desc: '', category: '', img: '', status: 'مكتمل ✅', work_type: 'تيار خفيف وأنظمة ذكية' };
+const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '' };
 
 export default function ProjectsEditor({ 
   projects, onAdd, onUpdate, onDelete, 
-  defaultSystems = [], addDefaultSystem, deleteDefaultSystem,
-  highlights = [], addHighlight, deleteHighlight,
   token 
 }) {
   const [showModal, setShowModal] = useState(false);
@@ -16,20 +14,17 @@ export default function ProjectsEditor({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
-  const [newSystem, setNewSystem] = useState('');
-  const [newHighlight, setNewHighlight] = useState('');
-
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const openAdd = () => { setForm(empty); setImgPreview(''); setEditing(null); setUploadError(''); setShowModal(true); };
   const openEdit = (p) => {
-    setForm({ 
-      title: p.title, 
-      desc: p.description ?? p.desc ?? '', 
-      category: p.category ?? '', 
+    setForm({
+      title: p.title,
+      desc: p.description ?? p.desc ?? '',
+      category: p.category ?? '',
       img: p.img ?? '',
-      status: p.status ?? 'مكتمل ✅',
-      work_type: p.work_type ?? 'تيار خفيف وأنظمة ذكية'
+      status: p.status ?? '',
+      work_type: p.work_type ?? ''
     });
     setImgPreview(p.img ?? '');
     setEditing(Number(p.id));
@@ -87,54 +82,6 @@ export default function ProjectsEditor({
         ))}
       </div>
 
-      <div style={{ marginTop: 40, borderTop: '1px solid #334155', paddingTop: 24 }}>
-        <h2 style={s.sectionTitle}>🛠️ إدارة الأنظمة الافتراضية</h2>
-        <div style={{ display: 'flex', gap: 10, marginBottom: 15 }}>
-          <input 
-            style={s.input} 
-            placeholder="اسم نظام جديد" 
-            value={newSystem} 
-            onChange={e => setNewSystem(e.target.value)} 
-          />
-          <button style={s.addBtn} onClick={() => { addDefaultSystem(newSystem); setNewSystem(''); }}>إضافة</button>
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          {defaultSystems.map(sys => (
-            <div key={sys.id} style={{ ...s.badge, display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px' }}>
-              {sys.name}
-              <span 
-                style={{ cursor: 'pointer', color: '#ff4444', fontWeight: 'bold' }} 
-                onClick={() => deleteDefaultSystem(sys.id)}
-              >×</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ marginTop: 40, borderTop: '1px solid #334155', paddingTop: 24 }}>
-        <h2 style={s.sectionTitle}>✨ إدارة مميزات العمل (Highlights)</h2>
-        <div style={{ display: 'flex', gap: 10, marginBottom: 15 }}>
-          <input 
-            style={s.input} 
-            placeholder="نص ميزة جديدة" 
-            value={newHighlight} 
-            onChange={e => setNewHighlight(e.target.value)} 
-          />
-          <button style={s.addBtn} onClick={() => { addHighlight(newHighlight); setNewHighlight(''); }}>إضافة</button>
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          {highlights.map(h => (
-            <div key={h.id} style={{ ...s.badge, display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', background: '#3b82f6' }}>
-              {h.label}
-              <span 
-                style={{ cursor: 'pointer', color: '#ff4444', fontWeight: 'bold' }} 
-                onClick={() => deleteHighlight(h.id)}
-              >×</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {showModal && (
         <div style={s.modal} onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <div style={s.modalBox}>
@@ -154,7 +101,7 @@ export default function ProjectsEditor({
 
             <label style={s.label}>نوع العمل</label>
             <input style={s.input} value={form.work_type} onChange={e => set('work_type', e.target.value)} />
-            
+
             <input type="file" accept="image/*" onChange={handleImg} style={s.fileInput} disabled={uploading} />
             {uploading && <p style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري رفع الصورة...</p>}
             {uploadError && <p style={{ color: '#f87171', fontSize: 13 }}>❌ {uploadError}</p>}

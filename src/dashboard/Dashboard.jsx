@@ -64,12 +64,6 @@ export default function Dashboard({ onLogout, token }) {
               onAdd={addProject}
               onUpdate={updateProject}
               onDelete={deleteProject}
-              defaultSystems={defaultSystems}
-              addDefaultSystem={addDefaultSystem}
-              deleteDefaultSystem={deleteDefaultSystem}
-              highlights={highlights}
-              addHighlight={addHighlight}
-              deleteHighlight={deleteHighlight}
               token={token}
             />
           )}
