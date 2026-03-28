@@ -103,22 +103,21 @@ export default function ProjectDetail() {
     <>
       <AnimatedShapes />
       <Navbar />
-      <div style={{ direction: 'rtl', padding: '80px 8% 60px', maxWidth: '1000px', margin: '0 auto' }}>
+      <div className="project-detail-wrapper">
+
 
         {/* hero image */}
-        <div style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', marginBottom: '32px', position: 'relative' }}>
-          <img src={project.img} alt={project.title} style={{ width: '100%', height: '420px', objectFit: 'cover', display: 'block' }} />
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            background: 'linear-gradient(transparent, rgba(0,0,0,0.65))',
-            padding: '40px 32px 28px',
-          }}>
+        <div className="project-detail-hero">
+          <img src={project.img} alt={project.title} />
+          <div className="project-detail-hero-overlay">
+
             {project.category && (
               <span style={{ background: '#ffc107', color: '#000', padding: '5px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold', marginBottom: '10px', display: 'inline-block' }}>
                 {project.category}
               </span>
             )}
-            <h1 style={{ color: '#fff', fontSize: '34px', margin: '8px 0 0' }}>{project.title}</h1>
+            <h1 className="project-detail-hero-title">{project.title}</h1>
+
           </div>
         </div>
 
@@ -141,7 +140,8 @@ export default function ProjectDetail() {
         {/* systems */}
         <div style={cardBox}>
           <h2 style={{ fontSize: '20px', marginBottom: '20px', color: '#222' }}>الأنظمة المنفذة</h2>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+
             {systems.map((sys, i) => (
               <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', background: '#f5f5f5', borderRadius: '12px', fontSize: '14px', color: '#333' }}>
                 <span style={{ color: '#6366f1', fontSize: '16px', flexShrink: 0 }}>✓</span>
@@ -152,7 +152,8 @@ export default function ProjectDetail() {
         </div>
 
         {/* info + cta */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div className="project-detail-info-cta">
+
           <div style={cardBox}>
             <h2 style={{ fontSize: '20px', marginBottom: '20px', color: '#222' }}>معلومات المشروع</h2>
             {[
