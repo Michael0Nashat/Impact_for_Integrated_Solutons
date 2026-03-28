@@ -27,7 +27,8 @@ const systemsByCategory = {
   'تقني':  ['الألياف الضوئية', 'أنظمة الأمن متعددة المستويات', 'التحكم في الدخول', 'المراقبة المتقدمة'],
 };
 
-const defaultSystemsList = ['أنظمة التيار الخفيف', 'كاميرات المراقبة', 'إنذار الحريق', 'البنية التحتية للشبكات'];
+// Removed defaultSystemsList as per user request to use dynamic table data
+
 
 const defaultHighlights = [
   { icon: '🏗️', label: 'تنفيذ احترافي' },
@@ -57,8 +58,8 @@ export default function ProjectDetail() {
     // Fetch systems
     fetch(`${API}/default-systems`)
       .then(r => r.json())
-      .then(data => setDynSystems(Array.isArray(data) && data.length ? data.map(s => s.name) : defaultSystemsList))
-      .catch(() => setDynSystems(defaultSystemsList));
+      .then(data => setDynSystems(Array.isArray(data) ? data.map(s => s.name) : []))
+      .catch(() => setDynSystems([]));
 
     // Fetch highlights
     fetch(`${API}/highlights`)

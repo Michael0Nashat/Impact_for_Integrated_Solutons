@@ -65,6 +65,9 @@ export default function Dashboard({ onLogout, token }) {
               onUpdate={updateProject}
               onDelete={deleteProject}
               token={token}
+              defaultSystems={defaultSystems}
+              addDefaultSystem={addDefaultSystem}
+              deleteDefaultSystem={deleteDefaultSystem}
             />
           )}
           {activeTab === 'brands' && <BrandsEditor token={token} />}

@@ -5,7 +5,8 @@ const empty = { title: '', desc: '', category: '', img: '', status: '', work_typ
 
 export default function ProjectsEditor({ 
   projects, onAdd, onUpdate, onDelete, 
-  token 
+  token,
+  defaultSystems = [], addDefaultSystem, deleteDefaultSystem
 }) {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -13,6 +14,7 @@ export default function ProjectsEditor({
   const [imgPreview, setImgPreview] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [newSystem, setNewSystem] = useState('');
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -118,6 +120,65 @@ export default function ProjectsEditor({
           </div>
         </div>
       )}
+
+      {/* ─── Default Systems Section ─── */}
+      <div style={{ marginTop: 60, paddingTop: 40, borderTop: '1px solid #334155' }}>
+        <h2 style={s.sectionTitle}>⚙️ الأنظمة الافتراضية</h2>
+        <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 20 }}>هذه الأنظمة تظهر تلقائياً للمشاريع التي لا تنتمي لتصنيف محدد.</p>
+        
+        <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+          <input 
+            style={{ ...s.input, flex: 1, marginBottom: 0 }} 
+            placeholder="أضف نظاماً جديداً (مثال: أنظمة التيار الخفيف)"
+            value={newSystem}
+            onChange={e => setNewSystem(e.target.value)}
+          />
+          <button 
+            style={{ ...s.addBtn, margin: 0, padding: '0 24px' }}
+            onClick={() => { if (newSystem.trim()) { addDefaultSystem(newSystem); setNewSystem(''); } }}
+          >
+            إضافة
+          </button>
+        </div>
+
+        <div style={{ 
+          background: '#1e293b', 
+          borderRadius: 12, 
+          overflow: 'hidden', 
+          border: '1px solid #334155' 
+        }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right' }}>
+            <thead style={{ background: '#334155', color: '#fff' }}>
+              <tr>
+                <th style={{ padding: '12px 16px', fontSize: 14 }}>الاسم</th>
+                <th style={{ padding: '12px 16px', fontSize: 14, width: 80 }}>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {defaultSystems.length === 0 ? (
+                <tr>
+                  <td colSpan="2" style={{ padding: 20, textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>لا توجد أنظمة مضافة حالياً.</td>
+                </tr>
+              ) : (
+                defaultSystems.map(sys => (
+                  <tr key={sys.id} style={{ borderBottom: '1px solid #334155' }}>
+                    <td style={{ padding: '12px 16px', color: '#f1f5f9', fontSize: 14 }}>{sys.name}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <button 
+                        onClick={() => deleteDefaultSystem(sys.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 18 }}
+                        title="حذف"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

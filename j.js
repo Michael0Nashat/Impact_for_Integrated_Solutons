@@ -42,10 +42,6 @@ async function ensureTables() {
       id   SERIAL PRIMARY KEY,
       name TEXT NOT NULL
     );
-    CREATE TABLE IF NOT EXISTS highlights (
-      id    SERIAL PRIMARY KEY,
-      label TEXT NOT NULL
-    );
     CREATE TABLE IF NOT EXISTS login_logs (
       id         SERIAL PRIMARY KEY,
       username   TEXT,
@@ -300,46 +296,6 @@ app.delete('/api/default-systems/:id', authMiddleware, async (req, res) => {
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
-
-/* ── Highlights ── */
-
-app.get('/api/highlights', async (_req, res) => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM highlights ORDER BY id ASC');
-    res.json(rows);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.post('/api/highlights', authMiddleware, async (req, res) => {
-  const { label } = req.body;
-  try {
-    const { rows } = await pool.query(
-      'INSERT INTO highlights(label) VALUES($1) RETURNING *',
-      [label]
-    );
-    res.json(rows[0]);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.put('/api/highlights/:id', authMiddleware, async (req, res) => {
-  const { label } = req.body;
-  try {
-    const { rows } = await pool.query(
-      'UPDATE highlights SET label=$1 WHERE id=$2 RETURNING *',
-      [label, req.params.id]
-    );
-    if (!rows[0]) return res.status(404).json({ error: 'Not found' });
-    res.json(rows[0]);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-app.delete('/api/highlights/:id', authMiddleware, async (req, res) => {
-  try {
-    await pool.query('DELETE FROM highlights WHERE id=$1', [req.params.id]);
-    res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
 /* ── Serverless export ── */
 let initPromise = null;
 export default async function handler(req, res) {
