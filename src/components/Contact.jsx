@@ -17,7 +17,7 @@ export default function Contact() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
@@ -36,7 +36,7 @@ export default function Contact() {
       const rect = section.getBoundingClientRect();
       if (rect.top < window.innerHeight) setIsVisible(true);
     }
-    
+
     return () => {
       window.removeEventListener('resize', checkMobile);
       observer.disconnect();
@@ -117,37 +117,37 @@ export default function Contact() {
         <div style={containerStyle}>
           <div>
             <p style={getInfoStyle(0.4)}>📍 1 مصطفى رفعت, شيراتون</p>
-            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01027742000" style={{color:'inherit',textDecoration:'none'}}>01027742000</a></p>
-            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{color:'inherit',textDecoration:'none'}}>01278370467</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>mina.elwahsh@iisolutions.com.eg</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{color:'inherit',textDecoration:'none'}}>mohsen@iisolutions.com.eg</a></p>
+            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01027742000" style={{ color: 'inherit', textDecoration: 'none' }}>01027742000</a></p>
+            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{ color: 'inherit', textDecoration: 'none' }}>01278370467</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>mina.elwahsh@iisolutions.com.eg</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>mohsen@iisolutions.com.eg</a></p>
           </div>
           <form onSubmit={handleSubmit}>
-            <input 
-              type="text" 
-              placeholder="الاسم" 
+            <input
+              type="text"
+              placeholder="الاسم"
               style={getInputStyle('name')}
               onFocus={() => setFocusedInput('name')}
               onBlur={() => setFocusedInput(null)}
               required
             />
-            <input 
-              type="email" 
-              placeholder="البريد الإلكتروني" 
+            <input
+              type="email"
+              placeholder="البريد الإلكتروني"
               style={getInputStyle('email')}
               onFocus={() => setFocusedInput('email')}
               onBlur={() => setFocusedInput(null)}
               required
             />
-            <textarea 
-              rows="5" 
-              placeholder="رسالتك" 
+            <textarea
+              rows="5"
+              placeholder="رسالتك"
               style={getInputStyle('message')}
               onFocus={() => setFocusedInput('message')}
               onBlur={() => setFocusedInput(null)}
               required
             />
-            <button 
+            <button
               type="submit"
               style={buttonStyle}
               onMouseEnter={() => setIsButtonHovered(true)}
