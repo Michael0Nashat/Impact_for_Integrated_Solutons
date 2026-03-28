@@ -24,7 +24,7 @@ export default function Services() {
       id: 'web-mobile',
       title: 'تصميم المواقع وتطبيقات الموبايل',
       services: [
-        { title: 'تصميم الموبايل ابلكيشن', subtitle: 'تطبيقات توصلك للعميل بسرعة وبأعلى كفاءة ممكنة', color: 'blue', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800', tags: ['Mobile Apps', 'UXUI'] },
+        { title: 'تصميم الموبايل ابلكيشن', subtitle: 'تطبيقات توصلك للعميل بسرعة وبأعلى كفاءة ممكنة', color: 'blue', img: '/IMG-20260329-WA0017.jpg', tags: ['Mobile Apps', 'UXUI'] },
         { title: 'تصميم المواقع', subtitle: 'مواقع مبهرة بتجربة استخدام سهلة جداً ومناسبة للشركات', color: 'red', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800', tags: ['Wed Design', 'Responsive'] },
         { title: 'مواقع تجارة إلكترونية', subtitle: 'PWA باستخدام WooCommerce مع واجهة React متطورة', color: 'green', img: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800', tags: ['E-commerce', 'React'] },
         { title: 'تطوير المحتوى', subtitle: 'قصص جذابة للناس ومتوافقة مع محركات البحث', color: 'yellow', img: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800', tags: ['Content制作', 'SEO Writing'] },
@@ -61,7 +61,6 @@ export default function Services() {
           marginBottom: '20px'
         }}>
           مجالات العمل
-          
         </h2>
         <p style={{
           fontSize: '1.2rem',
