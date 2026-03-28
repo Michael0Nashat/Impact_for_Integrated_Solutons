@@ -1,152 +1,118 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const services = [
-  { icon: 'https://cdn-icons-png.flaticon.com/512/1006/1006363.png', title: 'تطوير المواقع', desc: 'تصميم وبرمجة مواقع حديثة وسريعة للشركات.' },
-  { icon: 'https://cdn-icons-png.flaticon.com/512/888/888879.png', title: 'تطبيقات الموبايل', desc: 'برمجة تطبيقات Android و iOS باحترافية.' },
-  { icon: 'https://cdn-icons-png.flaticon.com/512/2721/2721297.png', title: 'أنظمة ERP', desc: 'أنظمة إدارة الشركات والمخازن والمبيعات.' },
-  { icon: 'https://cdn-icons-png.flaticon.com/512/4248/4248443.png', title: 'التسويق الإلكتروني', desc: 'إدارة الحملات الإعلانية والسوشيال ميديا.' },
-  { icon: 'https://cdn-icons-png.flaticon.com/512/1055/1055687.png', title: 'تصميم UI/UX', desc: 'تصميم واجهات احترافية سهلة الاستخدام.' },
-  { icon: 'https://cdn-icons-png.flaticon.com/512/1087/1087815.png', title: 'تحليل البيانات', desc: 'تحليل بيانات الشركات واتخاذ قرارات ذكية.' }
-];
+import { useMemo } from 'react';
 
 export default function Services() {
-  const [visibleBoxes, setVisibleBoxes] = useState([]);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkMobile();
-    
-    let resizeTimer;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(checkMobile, 150);
-    };
-    
-    window.addEventListener('resize', handleResize);
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const index = parseInt(entry.target.dataset.index);
-          setVisibleBoxes(prev => {
-            if (prev.includes(index)) return prev;
-            return [...prev, index];
-          });
-        }
-      });
-    }, { threshold: 0.1 });
-
-    const boxes = document.querySelectorAll('.service-box');
-    boxes.forEach(box => observer.observe(box));
-    
-    return () => {
-      clearTimeout(resizeTimer);
-      window.removeEventListener('resize', handleResize);
-      observer.disconnect();
-    };
-  }, []);
-
-  const sectionStyle = useMemo(() => ({
-    padding: isMobile ? '0 5%' : '0 8%',
-    marginTop: isMobile ? '50px' : '80px'
-  }), [isMobile]);
-
-  const headingStyle = useMemo(() => ({
-    textAlign: 'center',
-    fontSize: isMobile ? '30px' : '40px',
-    marginBottom: isMobile ? '40px' : '60px',
-    opacity: visibleBoxes.length > 0 ? 1 : 0,
-    transform: visibleBoxes.length > 0 ? 'translateY(0)' : 'translateY(-20px)',
-    transition: 'all 0.6s ease-out'
-  }), [isMobile, visibleBoxes.length]);
-
-  const gridStyle = useMemo(() => ({
-    display: 'grid',
-    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: isMobile ? '24px' : '32px',
-    maxWidth: '1200px',
-    margin: '0 auto',
-    alignItems: 'stretch'
-  }), [isMobile]);
-
-  const getBoxStyle = useCallback((index) => ({
-    background: hoveredIndex === index 
-      ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 255, 0.9))'
-      : 'rgba(255, 255, 255, 0.5)',
-    backdropFilter: 'blur(10px)',
-    borderRadius: isMobile ? '12px' : '20px',
-    padding: isMobile ? '24px' : '32px',
-    textAlign: 'center',
-    boxShadow: hoveredIndex === index 
-      ? '0 20px 40px rgba(0, 0, 0, 0.2)' 
-      : '0 10px 25px rgba(0, 0, 0, 0.1)',
-    border: hoveredIndex === index ? '2px solid rgba(100, 100, 255, 0.3)' : '2px solid transparent',
-    transition: 'all 0.3s ease',
-    opacity: visibleBoxes.includes(index) ? 1 : 0,
-    transform: visibleBoxes.includes(index) 
-      ? (hoveredIndex === index && !isMobile ? 'translateY(-15px) scale(1.05)' : 'translateY(0)')
-      : 'translateY(80px)',
-    transitionDelay: `${index * 0.1}s`,
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    minHeight: isMobile ? 'auto' : '280px',
-    willChange: hoveredIndex === index ? 'transform, box-shadow' : 'auto'
-  }), [hoveredIndex, isMobile, visibleBoxes]);
-
-  const iconStyle = useCallback((index) => ({
-    marginBottom: '16px',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    transition: 'transform 0.4s ease',
-    transform: hoveredIndex === index ? 'rotate(10deg) scale(1.15)' : 'rotate(0) scale(1)',
-    filter: hoveredIndex === index ? 'brightness(1.1)' : 'brightness(1)',
-    willChange: hoveredIndex === index ? 'transform' : 'auto'
-  }), [hoveredIndex]);
-
-  const titleStyle = useMemo(() => ({
-    marginBottom: '12px'
-  }), []);
-
-  const descStyle = useMemo(() => ({
-    color: '#333',
-    fontSize: '14px'
-  }), []);
+  const categories = useMemo(() => [
+    {
+      id: 'light-current',
+      title: 'أنظمة التيار الخفيف',
+      services: [
+        { title: 'كاميرات مراقبة', subtitle: 'مراقبة كاملة من أي مكان في العالم وتتبع للحركة', color: 'blue', img: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=800', tags: ['CCTV', 'Security'] },
+        { title: 'اكسس كنترول', subtitle: 'نظام سمارت لفتح الابواب ببصمة الوجه وخاصية ال NFC', color: 'red', img: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=800', tags: ['Access Control', 'Smart'] },
+        { title: 'انذار الحريق', subtitle: 'تنبيه سريع وفوري لأي حريق وسرعة التخلص منه', color: 'green', img: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&q=80&w=800', tags: ['Fire Alarm', 'Safety'] },
+        { title: 'الصوتيات', subtitle: 'رفاهية وجودة عالية مع انظمة صوت مبتكرة ونقاء صوت عالي', color: 'yellow', img: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&q=80&w=800', tags: ['Audio', 'Sound Systems'] },
+        { title: 'انذار سرقة', subtitle: 'تأمين كامل للمباني عبر التواصل التلقائي بالمكالمات والرسائل', color: 'orange', img: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=800', tags: ['Anti-Theft', 'Alarm'] },
+        { title: 'انتركم', subtitle: 'رؤية والتحدث وفتح الباب عن بعد من الموبايل بجودة عالية', color: 'brown', img: 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=800', tags: ['Intercom', 'Smart Access'] },
+        { title: 'سنترالات تليفون', subtitle: 'سهولة في توصيل المكالمات الداخلية للمكاتب والشركات', color: 'grey', img: 'https://images.unsplash.com/photo-1549923155-46624430f2c7?auto=format&fit=crop&q=80&w=800', tags: ['Telephony', 'VOIP'] },
+        { title: 'دش مركزي', subtitle: 'توصيل القنوات لكل التلفزيونات بجودة عالية وتكلفة أقل', color: 'blue', img: 'https://images.unsplash.com/photo-1461151351821-79734f7b190f?auto=format&fit=crop&q=80&w=800', tags: ['Satellite', 'Cable TV'] },
+        { title: 'حواجز وبوابات وباركينج', subtitle: 'انظمة ذكية للجراجات والانتظار وتنظيم ركنات السيارات', color: 'red', img: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&q=80&w=800', tags: ['Parking Systems', 'Gates'] },
+        { title: 'كواشف المعادن', subtitle: 'كشف المعادن غير الظاهرة بدقة وكفاءة عالية جداً', color: 'green', img: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800', tags: ['Metal Detection', 'Safety'] },
+        { title: 'كابلات انترنت وفايبر', subtitle: 'توصيل وتشغيل الكابلات بجميع فئاتها لضمان أعلى سرعة', color: 'yellow', img: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=800', tags: ['Networking', 'Fiber'] },
+        { title: 'اجهزة شبكات', subtitle: 'تنظيم الشبكة لضمان أداء ثابت وسرعة أعلى في نقل البيانات', color: 'orange', img: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc48?auto=format&fit=crop&q=80&w=800', tags: ['Networks', 'Hardware'] },
+      ]
+    },
+    {
+      id: 'web-mobile',
+      title: 'تصميم المواقع وتطبيقات الموبايل',
+      services: [
+        { title: 'تصميم الموبايل ابلكيشن', subtitle: 'تطبيقات توصلك للعميل بسرعة وبأعلى كفاءة ممكنة', color: 'blue', img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800', tags: ['Mobile Apps', 'UXUI'] },
+        { title: 'تصميم المواقع', subtitle: 'مواقع مبهرة بتجربة استخدام سهلة جداً ومناسبة للشركات', color: 'red', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800', tags: ['Wed Design', 'Responsive'] },
+        { title: 'مواقع تجارة إلكترونية', subtitle: 'PWA باستخدام WooCommerce مع واجهة React متطورة', color: 'green', img: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800', tags: ['E-commerce', 'React'] },
+        { title: 'تطوير المحتوى', subtitle: 'قصص جذابة للناس ومتوافقة مع محركات البحث', color: 'yellow', img: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800', tags: ['Content制作', 'SEO Writing'] },
+        { title: 'تحسين محركات البحث (SEO)', subtitle: 'زوّد ظهورك على الإنترنت بخبرتنا الممتدة', color: 'orange', img: 'https://images.unsplash.com/photo-1562577309-4932fdd64cd1?auto=format&fit=crop&q=80&w=800', tags: ['SEO', 'Google Rank'] },
+        { title: 'التسويق عبر البريد الإلكتروني', subtitle: 'تواصل مع جمهورك من خلال حملات إيميل قوية وفعالة', color: 'brown', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800', tags: ['Email', 'Marketing'] },
+        { title: 'الصيانة والدعم الفني', subtitle: 'خلّي شغلك ماشي بسلاسة من خلال خدماتنا الاحترافية', color: 'grey', img: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&q=80&w=800', tags: ['Support', 'Maintenance'] },
+      ]
+    },
+    {
+      id: 'digital-marketing',
+      title: 'التسويق الإلكتروني',
+      services: [
+        {
+          title: 'خليك دايمًا قدام المنافسين',
+          subtitle: 'التسويق الإلكتروني مش بس إعلان… ده نمو حقيقي لبيزنسك',
+          color: 'blue',
+          img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
+          tags: ['Growth', 'Success'],
+          customDesc: 'زوّد مبيعاتك ووصل لجمهورك الصح بخطط تسويق مدروسة وحملات بتجيب نتيجة فعلًا. من أول الفكرة لحد النجاح، إحنا بنبني لك حضور قوي على الإنترنت يخلي عملاءك يختاروك. استهدف صح وكبّر شغلك، بنوصلك للعميل المناسب في الوقت المناسب.'
+        },
+      ]
+    }
+  ], []);
 
   return (
-    <section id="services" style={sectionStyle}>
-      <h2 style={headingStyle}>مجالات العمل</h2>
-      <div style={gridStyle}>
-        {services.map((service, i) => (
-          <div 
-            key={i}
-            data-index={i}
-            className="service-box"
-            style={getBoxStyle(i)}
-            onMouseEnter={() => setHoveredIndex(i)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            onClick={() => navigate(`/services/${i}`)}
-          >
-            <img 
-              src={service.icon} 
-              alt={service.title} 
-              width={80} 
-              height={80} 
-              style={iconStyle(i)}
-            />
-            <h3 style={titleStyle}>{service.title}</h3>
-            <p style={descStyle}>{service.desc}</p>
+    <section id="services" style={{ padding: '60px 0', direction: 'rtl' }}>
+      {categories.map((category) => (
+        <div key={category.id} className="category-section" style={{ marginBottom: '80px' }}>
+          <h2 className="section-title">
+            {category.title}
+          </h2>
+
+          {category.id === 'light-current' && (
+            <div className="category-hero">
+              <img src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=1200" alt={category.title} />
+              <div className="category-hero-overlay">
+                <div className="category-hero-title">{category.title}</div>
+                <div className="category-hero-subtitle">حلول أمنية وبنية تحتية متكاملة للمنشآت الحديثة</div>
+              </div>
+            </div>
+          )}
+
+          <div className={category.id === 'light-current' ? 'compact-grid' : 'projcard-container'}>
+            {category.services.map((service, idx) => (
+              category.id === 'light-current' ? (
+                <div
+                  key={idx}
+                  className="compact-card"
+                  style={{
+                    '--card-color': `var(--projcard-${service.color}-color, ${service.color === 'blue' ? '#0088FF' :
+                        service.color === 'red' ? '#D62F1F' :
+                          service.color === 'green' ? '#40BD00' :
+                            service.color === 'yellow' ? '#F5AF41' :
+                              service.color === 'orange' ? '#FF5722' :
+                                service.color === 'brown' ? '#C49863' : '#424242'
+                      })`
+                  }}
+                >
+                  <div className="compact-title">{service.title}</div>
+                  <div className="compact-subtitle">{service.subtitle}</div>
+                </div>
+              ) : (
+                <div
+                  key={idx}
+                  className={`projcard projcard-${service.color}`}
+                >
+                  <div className="projcard-innerbox">
+                    <img className="projcard-img" src={service.img} alt={service.title} />
+                    <div className="projcard-textbox">
+                      <div className="projcard-title">{service.title}</div>
+                      <div className="projcard-subtitle">{service.subtitle}</div>
+                      <div className="projcard-bar"></div>
+                      <div className="projcard-description">
+                        {service.customDesc || service.subtitle}
+                      </div>
+                      <div className="projcard-tagbox">
+                        {service.tags.map((tag, tIdx) => (
+                          <span key={tIdx} className="projcard-tag">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </section>
   );
 }
