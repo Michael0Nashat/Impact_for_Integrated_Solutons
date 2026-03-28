@@ -61,15 +61,7 @@ export default function Services() {
           marginBottom: '20px'
         }}>
           مجالات العمل
-          <span style={{
-            position: 'absolute',
-            bottom: '-12px',
-            right: '0',
-            width: '60px',
-            height: '4px',
-            background: 'linear-gradient(90deg, #0088FF, #00C6FF)',
-            borderRadius: '10px'
-          }}></span>
+          
         </h2>
         <p style={{
           fontSize: '1.2rem',
