@@ -29,7 +29,7 @@ export default function Services() {
         { title: 'مواقع تجارة إلكترونية', subtitle: 'PWA باستخدام WooCommerce مع واجهة React متطورة', color: 'green', img: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800', tags: ['E-commerce', 'React'] },
         { title: 'تطوير المحتوى', subtitle: 'قصص جذابة للناس ومتوافقة مع محركات البحث', color: 'yellow', img: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800', tags: ['Content制作', 'SEO Writing'] },
         { title: 'تحسين محركات البحث (SEO)', subtitle: 'زوّد ظهورك على الإنترنت بخبرتنا الممتدة', color: 'orange', img: 'https://images.unsplash.com/photo-1562577309-4932fdd64cd1?auto=format&fit=crop&q=80&w=800', tags: ['SEO', 'Google Rank'] },
-        { title: 'التسويق عبر البريد الإلكتروني', subtitle: 'تواصل مع جمهورك من خلال حملات إيميل قوية وفعالة', color: 'brown', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800', tags: ['Email', 'Marketing'] },
+        { title: 'البريد الإلكتروني', subtitle: 'تواصل مع جمهورك من خلال حملات إيميل قوية وفعالة', color: 'brown', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800', tags: ['Email', 'Marketing'] },
         { title: 'الصيانة والدعم الفني', subtitle: 'خلّي شغلك ماشي بسلاسة من خلال خدماتنا الاحترافية', color: 'grey', img: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&q=80&w=800', tags: ['Support', 'Maintenance'] },
       ]
     },
@@ -50,7 +50,37 @@ export default function Services() {
   ], []);
 
   return (
-    <section id="services" style={{ padding: '60px 0', direction: 'rtl' }}>
+    <section id="services" style={{ padding: '80px 0', direction: 'rtl' }}>
+      <div className="container" style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <h2 style={{ 
+          fontSize: '2.8rem', 
+          fontWeight: '900', 
+          color: '#1a1a1a',
+          position: 'relative',
+          display: 'inline-block',
+          marginBottom: '20px'
+        }}>
+          مجالات العمل
+          <span style={{
+            position: 'absolute',
+            bottom: '-12px',
+            right: '0',
+            width: '60px',
+            height: '4px',
+            background: 'linear-gradient(90deg, #0088FF, #00C6FF)',
+            borderRadius: '10px'
+          }}></span>
+        </h2>
+        <p style={{
+          fontSize: '1.2rem',
+          color: '#666',
+          maxWidth: '700px',
+          margin: '0 auto',
+          lineHeight: '1.6'
+        }}>
+          نحن نقدم باقة متكاملة من الخدمات التقنية والأمنية بمواصفات عالمية
+        </p>
+      </div>
       {categories.map((category) => (
         <div key={category.id} className="category-section" style={{ marginBottom: '80px' }}>
           <h2 className="section-title">
