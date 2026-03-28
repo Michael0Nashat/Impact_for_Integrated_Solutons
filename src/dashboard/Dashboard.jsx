@@ -16,7 +16,12 @@ const tabs = [
 
 export default function Dashboard({ onLogout, token }) {
   const [activeTab, setActiveTab] = useState('hero');
-  const { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject } = useDashboardData(token);
+  const { 
+    hero, saveHero, about, saveAbout, 
+    projects, addProject, updateProject, deleteProject,
+    defaultSystems, addDefaultSystem, deleteDefaultSystem,
+    highlights, addHighlight, deleteHighlight
+  } = useDashboardData(token);
 
   return (
     <div style={styles.layout}>
@@ -59,6 +64,12 @@ export default function Dashboard({ onLogout, token }) {
               onAdd={addProject}
               onUpdate={updateProject}
               onDelete={deleteProject}
+              defaultSystems={defaultSystems}
+              addDefaultSystem={addDefaultSystem}
+              deleteDefaultSystem={deleteDefaultSystem}
+              highlights={highlights}
+              addHighlight={addHighlight}
+              deleteHighlight={deleteHighlight}
               token={token}
             />
           )}

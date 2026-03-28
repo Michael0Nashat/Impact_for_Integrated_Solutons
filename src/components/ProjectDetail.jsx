@@ -27,9 +27,9 @@ const systemsByCategory = {
   'تقني':  ['الألياف الضوئية', 'أنظمة الأمن متعددة المستويات', 'التحكم في الدخول', 'المراقبة المتقدمة'],
 };
 
-const defaultSystems = ['أنظمة التيار الخفيف', 'كاميرات المراقبة', 'إنذار الحريق', 'البنية التحتية للشبكات'];
+const defaultSystemsList = ['أنظمة التيار الخفيف', 'كاميرات المراقبة', 'إنذار الحريق', 'البنية التحتية للشبكات'];
 
-const highlights = [
+const defaultHighlights = [
   { icon: '🏗️', label: 'تنفيذ احترافي' },
   { icon: '🔒', label: 'أمان عالي المستوى' },
   { icon: '🛠️', label: 'صيانة ودعم مستمر' },
@@ -39,8 +39,11 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dynSystems, setDynSystems] = useState([]);
+  const [dynHighlights, setDynHighlights] = useState([]);
 
   useEffect(() => {
+    // Fetch project
     fetch(`${API}/projects`)
       .then(r => r.json())
       .then(data => {
@@ -49,7 +52,19 @@ export default function ProjectDetail() {
       })
       .catch(() => {
         setProject(allProjects.find(p => String(p.id) === String(id)) ?? null);
-      })
+      });
+
+    // Fetch systems
+    fetch(`${API}/default-systems`)
+      .then(r => r.json())
+      .then(data => setDynSystems(Array.isArray(data) && data.length ? data.map(s => s.name) : defaultSystemsList))
+      .catch(() => setDynSystems(defaultSystemsList));
+
+    // Fetch highlights
+    fetch(`${API}/highlights`)
+      .then(r => r.json())
+      .then(data => setDynHighlights(Array.isArray(data) && data.length ? data.map(h => ({ icon: '✨', label: h.label })) : defaultHighlights))
+      .catch(() => setDynHighlights(defaultHighlights))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -79,7 +94,7 @@ export default function ProjectDetail() {
   }
 
   const desc = project.description ?? project.desc ?? '';
-  const systems = systemsByCategory[project.category] ?? defaultSystems;
+  const systems = systemsByCategory[project.category] ?? dynSystems;
 
   return (
     <>
@@ -111,7 +126,7 @@ export default function ProjectDetail() {
 
         {/* highlights row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-          {highlights.map((h, i) => (
+          {dynHighlights.map((h, i) => (
             <div key={i} style={{ ...cardBox, marginBottom: 0, textAlign: 'center', padding: '20px' }}>
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>{h.icon}</div>
               <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#333' }}>{h.label}</div>
@@ -145,8 +160,8 @@ export default function ProjectDetail() {
             {[
               { label: 'رقم المشروع', value: `#${project.id}` },
               { label: 'التصنيف', value: project.category ?? '—' },
-              { label: 'حالة المشروع', value: 'مكتمل ✅' },
-              { label: 'نوع العمل', value: 'تيار خفيف وأنظمة ذكية' },
+              { label: 'حالة المشروع', value: project.status ?? 'مكتمل ✅' },
+              { label: 'نوع العمل', value: project.work_type ?? 'تيار خفيف وأنظمة ذكية' },
             ].map((row, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < 3 ? '1px solid #eee' : 'none', fontSize: '14px' }}>
                 <span style={{ color: '#888' }}>{row.label}</span>

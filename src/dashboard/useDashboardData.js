@@ -37,14 +37,27 @@ export function useDashboardData(token = '') {
   const [hero, setHero] = useState(DEFAULT_HERO);
   const [about, setAbout] = useState(DEFAULT_ABOUT);
   const [projects, setProjects] = useState([]);
+  const [defaultSystems, setDefaultSystems] = useState([]);
+  const [highlights, setHighlights] = useState([]);
 
   useEffect(() => {
     getSetting('hero', DEFAULT_HERO).then(setHero);
     getSetting('about', DEFAULT_ABOUT).then(setAbout);
+    
     fetch(`${API}/projects`)
       .then(r => r.json())
       .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
       .catch(() => setProjects(allProjects));
+
+    fetch(`${API}/default-systems`)
+      .then(r => r.json())
+      .then(data => setDefaultSystems(Array.isArray(data) ? data : []))
+      .catch(() => setDefaultSystems([]));
+
+    fetch(`${API}/highlights`)
+      .then(r => r.json())
+      .then(data => setHighlights(Array.isArray(data) ? data : []))
+      .catch(() => setHighlights([]));
   }, []);
 
   const saveHero = async (data) => {
@@ -62,7 +75,14 @@ export function useDashboardData(token = '') {
       const res = await fetch(`${API}/projects`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: p.title, description: p.desc, category: p.category, img: p.img }),
+        body: JSON.stringify({ 
+          title: p.title, 
+          description: p.desc, 
+          category: p.category, 
+          img: p.img,
+          status: p.status,
+          work_type: p.work_type
+        }),
       });
       if (!res.ok) throw new Error('Add failed');
       const created = await res.json();
@@ -79,12 +99,18 @@ export function useDashboardData(token = '') {
       const res = await fetch(`${API}/projects/${Number(id)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: p.title, description: p.desc, category: p.category, img: p.img }),
+        body: JSON.stringify({ 
+          title: p.title, 
+          description: p.desc, 
+          category: p.category, 
+          img: p.img,
+          status: p.status,
+          work_type: p.work_type
+        }),
       });
       if (!res.ok) throw new Error('Update failed');
       const updated = await res.json();
       if (!updated || !updated.id) throw new Error('Invalid response');
-      // re-fetch full list to stay in sync
       const listRes = await fetch(`${API}/projects`);
       const list = await listRes.json();
       if (Array.isArray(list)) {
@@ -107,5 +133,48 @@ export function useDashboardData(token = '') {
     window.dispatchEvent(new Event('projects-updated'));
   };
 
-  return { hero, saveHero, about, saveAbout, projects, addProject, updateProject, deleteProject };
+  // Default Systems CRUD
+  const addDefaultSystem = async (name) => {
+    const res = await fetch(`${API}/default-systems`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ name }),
+    });
+    const created = await res.json();
+    setDefaultSystems(prev => [...prev, created]);
+  };
+
+  const deleteDefaultSystem = async (id) => {
+    await fetch(`${API}/default-systems/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setDefaultSystems(prev => prev.filter(x => x.id !== id));
+  };
+
+  // Highlights CRUD
+  const addHighlight = async (label) => {
+    const res = await fetch(`${API}/highlights`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ label }),
+    });
+    const created = await res.json();
+    setHighlights(prev => [...prev, created]);
+  };
+
+  const deleteHighlight = async (id) => {
+    await fetch(`${API}/highlights/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setHighlights(prev => prev.filter(x => x.id !== id));
+  };
+
+  return { 
+    hero, saveHero, about, saveAbout, 
+    projects, addProject, updateProject, deleteProject,
+    defaultSystems, addDefaultSystem, deleteDefaultSystem,
+    highlights, addHighlight, deleteHighlight
+  };
 }
