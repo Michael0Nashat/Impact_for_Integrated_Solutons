@@ -71,10 +71,10 @@ const partnersStyles = `
   .scroll-row { display: flex; width: max-content; gap: 40px; margin-bottom: 30px; will-change: transform; }
   .scroll-right { animation: scrollRight 60s linear infinite; }
   .scroll-left { animation: scrollLeft 60s linear infinite; }
-  .brand-logo { flex-shrink: 0; width: 120px; height: 120px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
+  .brand-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .brand-logo img { object-fit: contain; }
   .brand-logo:hover { transform: scale(1.1); }
-  .customer-logo { flex-shrink: 0; width: 120px; height: 120px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
+  .customer-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .customer-logo:hover { transform: scale(1.1); }
   .brands-container { position: relative; width: 100%; min-height: 500px; padding: 40px 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; }
   @media (max-width: 768px) { .brands-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px 10px; min-height: unset; } .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } .brand-logo { width: 100% !important; height: 100% !important; } }
@@ -298,8 +298,8 @@ export default function Partners() {
                 <img 
                   src={`/q/${logo}`} 
                   alt={`Customer ${logo}`}
-                  width={120}
-                  height={120}
+                  width={160}
+                  height={160}
                   style={{ objectFit: 'contain', width: '100%', height: '100%' }}
                 />
               </div>
@@ -321,7 +321,7 @@ export default function Partners() {
 
         <div className="brands-container">
           {brands.map((brand, i) => {
-            const size = 100;
+            const size = 140;
             return (
               <div 
                 key={`brand-${brand.id}`} 

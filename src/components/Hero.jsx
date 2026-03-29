@@ -188,7 +188,7 @@ export default function Hero() {
         </div>
         <div style={contentStyle}>
           <h1 style={headingStyle}>{data.title}</h1>
-          <p style={{ lineHeight: '2', marginBottom: '32px', color: '#555', fontSize: isMobile ? '15px' : '16px', animation: isVisible ? 'fadeInUp 0.8s ease-out 0.5s both' : 'none' }}>
+          <p style={{ lineHeight: '1.7', marginBottom: '32px', color: '#222', fontSize: isMobile ? '18px' : '22px', animation: isVisible ? 'fadeInUp 0.8s ease-out 0.5s both' : 'none' }}>
             {data.subtitle}
           </p>
           <a

@@ -131,7 +131,7 @@ export default function About() {
           <h2 style={{ fontSize: isMobile ? '28px' : '36px', marginBottom: '20px', animation: isVisible ? 'fadeInRight 0.8s ease-out' : 'none' }}>
             {data.title}
           </h2>
-          <p style={{ lineHeight: '2', color: '#555', fontSize: isMobile ? '15px' : '17px', animation: isVisible ? 'fadeInRight 0.8s ease-out 0.2s both' : 'none' }}>
+          <p style={{ lineHeight: '1.7', marginBottom: '32px', color: '#222', fontSize: isMobile ? '18px' : '22px', animation: isVisible ? 'fadeInUp 0.8s ease-out 0.5s both' : 'none' }}>
             {data.text}
           </p>
         </div>

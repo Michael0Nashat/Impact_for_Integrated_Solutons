@@ -63,12 +63,16 @@ export default function Services() {
           مجالات العمل
         </h2>
         <p style={{
-          fontSize: '1.2rem',
-          color: '#666',
-          maxWidth: '700px',
-          margin: '0 auto',
-          lineHeight: '1.6'
-        }}>
+          fontSize: '1.5rem',
+          color: '#000000ff',
+          maxWidth: '850px',
+          margin: '20px auto 0',
+          lineHeight: '1.8',
+          fontWeight: '500',
+          opacity: 0.95,
+          textShadow: '0 1px 2px rgba(0,0,0,0.05)'
+        }}
+        >
           نحن نقدم باقة متكاملة من الخدمات التقنية والأمنية بمواصفات عالمية
         </p>
       </div>
