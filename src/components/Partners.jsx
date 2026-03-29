@@ -71,6 +71,7 @@ const partnersStyles = `
   .scroll-row { display: flex; width: max-content; gap: 40px; margin-bottom: 30px; will-change: transform; }
   .scroll-right { animation: scrollRight 60s linear infinite; }
   .scroll-left { animation: scrollLeft 60s linear infinite; }
+  .scroll-container:hover .scroll-row { animation-play-state: paused; }
   .brand-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .brand-logo img { object-fit: contain; }
   .brand-logo:hover { transform: scale(1.1); }
@@ -83,7 +84,7 @@ const partnersStyles = `
   .brand-item:nth-child(3n) { animation-delay: 1s; }
   .brand-item:nth-child(4n) { animation-delay: 1.5s; }
   .project-sample-item { flex-shrink: 0; width: 260px; height: 195px; overflow: hidden; transition: transform 0.3s ease; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
-  .project-sample-item img { object-fit: cover; width: 100%; height: 100%; }
+  .project-sample-item img { object-fit: contain; width: 100%; height: 100%; }
   .project-sample-item:hover { transform: scale(1.04); }
   .project-video-item { flex-shrink: 0; width: 220px; height: 165px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
   .project-video-item video { object-fit: cover; width: 100%; height: 100%; display: block; }
@@ -123,7 +124,7 @@ function LazyScrollImage({ src, alt, width, height }) {
 
   return (
     <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden' }}>
-      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />}
+      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'contain', width: '100%', height: '100%' }} />}
     </div>
   );
 }
@@ -255,7 +256,7 @@ export default function Partners() {
           أمثلة من مشاريعنا
         </h3>
         <div className="scroll-container" style={{ marginTop: '16px' }}>
-          <div className="scroll-row scroll-right" style={{ animationDuration: '240s' }}>
+          <div className="scroll-row scroll-right" style={{ animationDuration: '15s' }}>
             {(() => {
               const imgs = projectSamples.length > 0 ? projectSamples : sampleProjectImages;
               return [...imgs, ...imgs].map((src, i) => (

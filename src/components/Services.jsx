@@ -24,13 +24,13 @@ export default function Services() {
       id: 'web-mobile',
       title: 'تصميم المواقع وتطبيقات الموبايل',
       services: [
-        { title: 'تصميم الموبايل ابلكيشن', subtitle: 'تطبيقات توصلك للعميل بسرعة وبأعلى كفاءة ممكنة', color: 'blue', img: '/IMG-20260329-WA0017.jpg', tags: ['Mobile Apps', 'UXUI'] },
-        { title: 'تصميم المواقع', subtitle: 'مواقع مبهرة بتجربة استخدام سهلة جداً ومناسبة للشركات', color: 'red', img: '/IMG-20260329-WA0019.jpg', tags: ['Wed Design', 'Responsive'] },
-        { title: 'مواقع تجارة إلكترونية', subtitle: 'PWA باستخدام WooCommerce مع واجهة React متطورة', color: 'green', img: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800', tags: ['E-commerce', 'React'] },
-        { title: 'تطوير المحتوى', subtitle: 'قصص جذابة للناس ومتوافقة مع محركات البحث', color: 'yellow', img: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800', tags: ['Content制作', 'SEO Writing'] },
-        { title: 'تحسين محركات البحث (SEO)', subtitle: 'زوّد ظهورك على الإنترنت بخبرتنا الممتدة', color: 'orange', img: '/IMG-20260329-WA0018.jpg', tags: ['SEO', 'Google Rank'] },
-        { title: 'البريد الإلكتروني', subtitle: 'تواصل مع جمهورك من خلال حملات إيميل قوية وفعالة', color: 'brown', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800', tags: ['Email', 'Marketing'] },
-        { title: 'الصيانة والدعم الفني', subtitle: 'خلّي شغلك ماشي بسلاسة من خلال خدماتنا الاحترافية', color: 'grey', img: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&q=80&w=800', tags: ['Support', 'Maintenance'] },
+        { title: 'تصميم الموبايل ابلكيشن', color: 'blue', img: '/IMG-20260329-WA0017.jpg', tags: ['Mobile Apps', 'UXUI'] },
+        { title: 'تصميم المواقع', color: 'red', img: '/IMG-20260329-WA0019.jpg', tags: ['Wed Design', 'Responsive'] },
+        { title: 'مواقع تجارة إلكترونية', color: 'green', img: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800', tags: ['E-commerce', 'React'] },
+        { title: 'تطوير المحتوى', color: 'yellow', img: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800', tags: ['Content制作', 'SEO Writing'] },
+        { title: 'تحسين محركات البحث (SEO)', color: 'orange', img: '/IMG-20260329-WA0018.jpg', tags: ['SEO', 'Google Rank'] },
+        { title: 'البريد الإلكتروني', color: 'brown', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800', tags: ['Email', 'Marketing'] },
+        { title: 'الصيانة والدعم الفني', color: 'grey', img: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&q=80&w=800', tags: ['Support', 'Maintenance'] },
       ]
     },
     {
@@ -39,7 +39,6 @@ export default function Services() {
       services: [
         {
           title: 'خليك دايمًا قدام المنافسين',
-          subtitle: 'التسويق الإلكتروني مش بس إعلان… ده نمو حقيقي لبيزنسك',
           color: 'blue',
           img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800',
           tags: ['Growth', 'Success'],
@@ -92,50 +91,71 @@ export default function Services() {
             </div>
           )}
 
-          <div className={category.id === 'light-current' ? 'compact-grid' : 'projcard-container'}>
-            {category.services.map((service, idx) => (
-              category.id === 'light-current' ? (
-                <div
-                  key={idx}
-                  className="compact-card"
-                  style={{
-                    '--card-color': `var(--projcard-${service.color}-color, ${service.color === 'blue' ? '#0088FF' :
-                        service.color === 'red' ? '#D62F1F' :
-                          service.color === 'green' ? '#40BD00' :
-                            service.color === 'yellow' ? '#F5AF41' :
-                              service.color === 'orange' ? '#FF5722' :
-                                service.color === 'brown' ? '#C49863' : '#424242'
-                      })`
-                  }}
-                >
-                  <div className="compact-title">{service.title}</div>
-                  <div className="compact-subtitle">{service.subtitle}</div>
+          {category.id === 'digital-marketing' ? (
+            <div className="marketing-container">
+              {category.services.map((service, idx) => (
+                <div key={idx} className="marketing-card">
+                  <div className="marketing-content">
+                    <div className="marketing-tags">
+                      {service.tags.map((tag, tIdx) => (
+                        <span key={tIdx} className="marketing-tag">{tag}</span>
+                      ))}
+                    </div>
+                    <h3 className="marketing-title">{service.title}</h3>
+                    <p className="marketing-desc">{service.customDesc}</p>
+                  </div>
+                  <div className="marketing-image">
+                    <img src={service.img} alt={service.title} />
+                  </div>
                 </div>
-              ) : (
-                <div
-                  key={idx}
-                  className={`projcard projcard-${service.color}`}
-                >
-                  <div className="projcard-innerbox">
-                    <img className="projcard-img" src={service.img} alt={service.title} />
-                    <div className="projcard-textbox">
-                      <div className="projcard-title">{service.title}</div>
-                      <div className="projcard-subtitle">{service.subtitle}</div>
-                      <div className="projcard-bar"></div>
-                      <div className="projcard-description">
-                        {service.customDesc || service.subtitle}
-                      </div>
-                      <div className="projcard-tagbox">
-                        {service.tags.map((tag, tIdx) => (
-                          <span key={tIdx} className="projcard-tag">{tag}</span>
-                        ))}
+              ))}
+            </div>
+          ) : (
+            <div className={category.id === 'light-current' ? 'compact-grid' : 'projcard-container'}>
+              {category.services.map((service, idx) => (
+                category.id === 'light-current' ? (
+                  <div
+                    key={idx}
+                    className="compact-card"
+                    style={{
+                      '--card-color': `var(--projcard-${service.color}-color, ${service.color === 'blue' ? '#0088FF' :
+                          service.color === 'red' ? '#D62F1F' :
+                            service.color === 'green' ? '#40BD00' :
+                              service.color === 'yellow' ? '#F5AF41' :
+                                service.color === 'orange' ? '#FF5722' :
+                                  service.color === 'brown' ? '#C49863' : '#424242'
+                        })`
+                    }}
+                  >
+                    <div className="compact-title">{service.title}</div>
+                    <div className="compact-subtitle">{service.subtitle}</div>
+                  </div>
+                ) : (
+                  <div
+                    key={idx}
+                    className={`projcard projcard-${service.color}`}
+                  >
+                    <div className="projcard-innerbox">
+                      <img className="projcard-img" src={service.img} alt={service.title} />
+                      <div className="projcard-textbox">
+                        <div className="projcard-title">{service.title}</div>
+                        <div className="projcard-subtitle">{service.subtitle}</div>
+                        <div className="projcard-bar"></div>
+                        <div className="projcard-description">
+                          {service.customDesc || service.subtitle}
+                        </div>
+                        <div className="projcard-tagbox">
+                          {service.tags.map((tag, tIdx) => (
+                            <span key={tIdx} className="projcard-tag">{tag}</span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )
-            ))}
-          </div>
+                )
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </section>
