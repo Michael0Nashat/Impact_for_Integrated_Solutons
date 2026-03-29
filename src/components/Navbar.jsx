@@ -82,20 +82,15 @@ export default function Navbar() {
   return (
     <nav style={navStyle}>
       <div style={logoStyle}>
-        <span style={{ 
-          fontSize: isMobile ? '12px' : '16px', 
-          lineHeight: 1.4, 
-          fontWeight: 600, 
-          textAlign: 'center', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center',
-          whiteSpace: 'nowrap',
-          letterSpacing: '0.3px',
-        }}>
-          <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>mpact </span><span style={{ color: '#ffc107' }}>f</span><span style={{ color: '#ffffff' }}>or</span></span>
-          <span><span style={{ color: '#ffc107' }}>I</span><span style={{ color: '#ffffff' }}>ntegrated </span><span style={{ color: '#ffc107' }}>S</span><span style={{ color: '#ffffff' }}>olutions</span></span>
-        </span>
+        <img 
+          src="/IMG-20260323-WA0015-removebg-preview.png" 
+          alt="Impact Logo" 
+          style={{ 
+            height: '100%', 
+            width: 'auto',
+            objectFit: 'contain'
+          }} 
+        />
       </div>
       <button 
         style={menuButtonStyle}
