@@ -67,11 +67,19 @@ const partnersStyles = `
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-10px) rotate(2deg); }
   }
-  .scroll-container { overflow: hidden; width: 100%; margin-top: 60px; }
+  .scroll-container { 
+    overflow: hidden; 
+    width: 100vw; 
+    position: relative; 
+    left: 50%; 
+    right: 50%; 
+    margin-left: -50vw; 
+    margin-right: -50vw; 
+    margin-top: 60px; 
+  }
   .scroll-row { display: flex; width: max-content; gap: 40px; margin-bottom: 30px; will-change: transform; }
   .scroll-right { animation: scrollRight 60s linear infinite; }
   .scroll-left { animation: scrollLeft 60s linear infinite; }
-  .scroll-container:hover .scroll-row { animation-play-state: paused; }
   .brand-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .brand-logo img { object-fit: contain; }
   .brand-logo:hover { transform: scale(1.1); }
