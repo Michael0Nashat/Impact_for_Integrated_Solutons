@@ -32,10 +32,56 @@ export default function ProjectSamplesEditor({ token }) {
   async function handleFileChange(e) {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Check file size (optional but good for UX)
+    if (file.size > 10 * 1024 * 1024) {
+      return setMsg('الملف كبير جداً، يرجى اختيار ملف أصغر من 10 ميجابايت');
+    }
+
     setLoading(true);
     const reader = new FileReader();
-    reader.onload = () => { setForm(f => ({ ...f, img: reader.result })); setLoading(false); };
-    reader.onerror = () => { setMsg('فشل قراءة الملف'); setLoading(false); };
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Resize if too large
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1200;
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Compress as JPEG
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
+        setForm(f => ({ ...f, img: compressedBase64 }));
+        setLoading(false);
+      };
+      img.onerror = () => {
+        setMsg('خطأ في تحميل الصورة');
+        setLoading(false);
+      };
+      img.src = event.target.result;
+    };
+    reader.onerror = () => {
+      setMsg('فشل قراءة الملف');
+      setLoading(false);
+    };
     reader.readAsDataURL(file);
   }
 
