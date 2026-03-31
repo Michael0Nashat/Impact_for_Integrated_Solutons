@@ -291,7 +291,7 @@ export default function Partners() {
           أمثلة من مشاريعنا
         </h3>
         <div className="scroll-container" style={{ marginTop: '16px' }}>
-          <div className="scroll-row scroll-right" style={{ animationDuration: '15s' }}>
+          <div className="scroll-row scroll-right" style={{ animationDuration: '60s' }}>
             {(() => {
               const imgs = projectSamples.length > 0 ? projectSamples : sampleProjectImages;
               return [...imgs, ...imgs].map((src, i) => (
