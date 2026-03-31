@@ -56,12 +56,12 @@ const projectVideos = [
 
 const partnersStyles = `
   @keyframes scrollRight {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(50%); }
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(50%, 0, 0); }
   }
   @keyframes scrollLeft {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
   }
   @keyframes float {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -77,14 +77,36 @@ const partnersStyles = `
     margin-right: -50vw; 
     margin-top: 60px; 
   }
-  .scroll-row { display: flex; width: max-content; gap: 40px; margin-bottom: 30px; will-change: transform; }
+  .scroll-row { 
+    display: flex; 
+    width: max-content; 
+    gap: 40px; 
+    margin-bottom: 30px; 
+    will-change: transform; 
+    transform: translate3d(0,0,0);
+    backface-visibility: hidden;
+  }
   .scroll-right { animation: scrollRight 60s linear infinite; }
   .scroll-left { animation: scrollLeft 60s linear infinite; }
   .brand-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .brand-logo img { object-fit: contain; }
   .brand-logo:hover { transform: scale(1.1); }
-  .customer-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
-  .customer-logo:hover { transform: scale(1.1); }
+  .customer-logo { 
+    flex-shrink: 0; 
+    width: 160px; 
+    height: 160px; 
+    overflow: hidden; 
+    transition: transform 0.3s ease; 
+    background: transparent; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 15px; 
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  .customer-logo:hover { transform: scale(1.1) translateZ(0); }
   .brands-container { position: relative; width: 100%; min-height: 500px; padding: 40px 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; }
   @media (max-width: 768px) { .brands-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px 10px; min-height: unset; } .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } .brand-logo { width: 100% !important; height: 100% !important; } }
   .brand-item { position: relative; animation: float 3s ease-in-out infinite; }
@@ -100,11 +122,11 @@ const partnersStyles = `
 `;
 
 const customerLogos = [
+  '5.png',
   '6.png',
   'images.png',
   '3.png',
   '4.png',
-  '5.png',
   '7.png',
   '8.png',
   '9.png',
@@ -163,7 +185,7 @@ function LazyVideo({ src }) {
     const video = videoRef.current;
     if (!video) return;
     if (inView) {
-      video.play().catch(() => {});
+      video.play().catch(() => { });
     } else {
       video.pause();
     }
@@ -203,7 +225,7 @@ export default function Partners() {
         setIsMobile(window.innerWidth <= 768);
       }, 200);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
@@ -217,16 +239,16 @@ export default function Partners() {
 
     const section = document.getElementById('partners');
     if (section) observer.observe(section);
-    
+
     fetch(`${API}/brands`)
       .then(r => r.json())
       .then(data => Array.isArray(data) && setBrands(data))
-      .catch(() => {});
+      .catch(() => { });
 
     fetch(`${API}/project-samples`)
       .then(r => r.json())
       .then(data => Array.isArray(data) && data.length > 0 && setProjectSamples(data.map(d => d.img)))
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       window.removeEventListener('resize', checkMobile);
@@ -304,19 +326,20 @@ export default function Partners() {
           <div className="scroll-row scroll-right">
             {[...customerLogos, ...customerLogos].map((logo, i) => (
               <div key={`customer-${i}`} className="customer-logo">
-                <img 
-                  src={`/q/${logo}`} 
+                <img
+                  src={`/q/${logo}`}
                   alt={`Customer ${logo}`}
                   width={160}
                   height={160}
                   style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                  decoding="async"
                 />
               </div>
             ))}
           </div>
         </div>
 
-          
+
         <h3 style={{
           textAlign: 'center',
           fontSize: isMobile ? '24px' : '32px',
@@ -332,14 +355,14 @@ export default function Partners() {
           {brands.map((brand, i) => {
             const size = 140;
             return (
-              <div 
-                key={`brand-${brand.id}`} 
+              <div
+                key={`brand-${brand.id}`}
                 className="brand-item"
                 style={{ width: `${size}px`, height: `${size}px` }}
               >
                 <div className="brand-logo" style={{ width: '100%', height: '100%' }}>
-                  <img 
-                    src={brand.img} 
+                  <img
+                    src={brand.img}
                     alt={brand.name || `Brand ${i + 1}`}
                     width={size}
                     height={size}
