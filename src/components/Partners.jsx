@@ -115,7 +115,7 @@ const partnersStyles = `
   .brand-item:nth-child(4n) { animation-delay: 1.5s; }
   .project-sample-item { flex-shrink: 0; width: 260px; height: 195px; overflow: hidden; transition: transform 0.3s ease; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
   .project-sample-item img { object-fit: contain; width: 100%; height: 100%; }
-  .project-sample-item:hover { transform: scale(1.04); }
+  .project-sample-item:hover { transform: scale(1.1); }
   .project-video-item { flex-shrink: 0; width: 220px; height: 165px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
   .project-video-item video { object-fit: cover; width: 100%; height: 100%; display: block; }
   .project-video-item:hover { transform: scale(1.04); }
@@ -291,7 +291,7 @@ export default function Partners() {
           أمثلة من مشاريعنا
         </h3>
         <div className="scroll-container" style={{ marginTop: '16px' }}>
-          <div className="scroll-row scroll-right" style={{ animationDuration: '100s' }}>
+          <div className="scroll-row scroll-right">
             {(() => {
               const imgs = projectSamples.length > 0 ? projectSamples : sampleProjectImages;
               return [...imgs, ...imgs].map((src, i) => (
