@@ -20,7 +20,6 @@ export default function Dashboard({ onLogout, token }) {
     hero, saveHero, about, saveAbout, 
     projects, addProject, updateProject, deleteProject,
     defaultSystems, addDefaultSystem, deleteDefaultSystem,
-    highlights, addHighlight, deleteHighlight
   } = useDashboardData(token);
 
   return (

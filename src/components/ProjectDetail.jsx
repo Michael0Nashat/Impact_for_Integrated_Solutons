@@ -41,7 +41,7 @@ export default function ProjectDetail() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dynSystems, setDynSystems] = useState([]);
-  const [dynHighlights, setDynHighlights] = useState([]);
+
 
   useEffect(() => {
     // Fetch project
@@ -59,13 +59,7 @@ export default function ProjectDetail() {
     fetch(`${API}/default-systems`)
       .then(r => r.json())
       .then(data => setDynSystems(Array.isArray(data) ? data.map(s => s.name) : []))
-      .catch(() => setDynSystems([]));
-
-    // Fetch highlights
-    fetch(`${API}/highlights`)
-      .then(r => r.json())
-      .then(data => setDynHighlights(Array.isArray(data) && data.length ? data.map(h => ({ icon: '✨', label: h.label })) : defaultHighlights))
-      .catch(() => setDynHighlights(defaultHighlights))
+      .catch(() => setDynSystems([]))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -123,7 +117,7 @@ export default function ProjectDetail() {
 
         {/* highlights row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-          {dynHighlights.map((h, i) => (
+          {defaultHighlights.map((h, i) => (
             <div key={i} style={{ ...cardBox, marginBottom: 0, textAlign: 'center', padding: '20px' }}>
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>{h.icon}</div>
               <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#333' }}>{h.label}</div>
