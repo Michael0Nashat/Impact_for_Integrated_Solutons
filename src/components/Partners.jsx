@@ -167,7 +167,7 @@ function LazyVideo({ src }) {
   const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
 
   const poster = src
-    .replace('/video/upload/', '/image/upload/w_400,h_300,c_fill,q_auto,f_auto/')
+    .replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,so_0,q_auto,f_auto/')
     .replace(/\.mp4$/, '.jpg');
 
   useEffect(() => {
@@ -204,6 +204,11 @@ function LazyVideo({ src }) {
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
+        onError={(e) => {
+          if (e.target.poster) {
+            e.target.removeAttribute('poster');
+          }
+        }}
         style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
       />
     </div>
