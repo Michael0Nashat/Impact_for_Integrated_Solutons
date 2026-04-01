@@ -86,8 +86,8 @@ const partnersStyles = `
     transform: translate3d(0,0,0);
     backface-visibility: hidden;
   }
-  .scroll-right { animation: scrollRight 60s linear infinite; }
-  .scroll-left { animation: scrollLeft 60s linear infinite; }
+  .scroll-right { animation: scrollRight 120s linear infinite; }
+  .scroll-left { animation: scrollLeft 120s linear infinite; }
   .brand-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .brand-logo img { object-fit: contain; }
   .brand-logo:hover { transform: scale(1.1); }
