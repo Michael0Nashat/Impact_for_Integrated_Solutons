@@ -108,7 +108,7 @@ const partnersStyles = `
   }
   .customer-logo:hover { transform: scale(1.1) translateZ(0); }
   .brands-container { position: relative; width: 100%; min-height: 500px; padding: 40px 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; }
-  @media (max-width: 768px) { .brands-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px 10px; min-height: unset; } .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } .brand-logo { width: 100% !important; height: 100% !important; } }
+  @media (max-width: 768px) { .brands-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px 10px; min-height: unset; } .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } .brand-logo { width: 100% !important; height: 100% !important; } }
   .brand-item { position: relative; animation: float 3s ease-in-out infinite; }
   .brand-item:nth-child(odd) { animation-delay: 0.5s; }
   .brand-item:nth-child(3n) { animation-delay: 1s; }
