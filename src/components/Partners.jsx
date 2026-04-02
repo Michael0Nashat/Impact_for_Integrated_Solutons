@@ -85,11 +85,13 @@ const partnersStyles = `
     will-change: transform; 
     transform: translate3d(0,0,0);
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
   }
   .scroll-right { animation: scrollRight 120s linear infinite; }
   .scroll-left { animation: scrollLeft 120s linear infinite; }
   .brand-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
-  .brand-logo img { object-fit: contain; }
+  .brand-logo img { object-fit: contain; -webkit-object-fit: contain; }
   .brand-logo:hover { transform: scale(1.1); }
   .customer-logo { 
     flex-shrink: 0; 
@@ -105,6 +107,8 @@ const partnersStyles = `
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
   }
   .customer-logo:hover { transform: scale(1.1) translateZ(0); }
   .brands-container { position: relative; width: 100%; min-height: 500px; padding: 40px 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; }
@@ -113,11 +117,11 @@ const partnersStyles = `
   .brand-item:nth-child(odd) { animation-delay: 0.5s; }
   .brand-item:nth-child(3n) { animation-delay: 1s; }
   .brand-item:nth-child(4n) { animation-delay: 1.5s; }
-  .project-sample-item { flex-shrink: 0; width: 260px; height: 195px; overflow: hidden; transition: transform 0.3s ease; }
-  .project-sample-item img { object-fit: contain; width: 100%; height: 100%; }
+  .project-sample-item { flex-shrink: 0; width: 260px; height: 195px; overflow: hidden; transition: transform 0.3s ease; -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .project-sample-item img { object-fit: contain; -webkit-object-fit: contain; width: 100%; height: 100%; image-rendering: -webkit-optimize-contrast; }
   .project-sample-item:hover { transform: scale(1.1); }
-  .project-video-item { flex-shrink: 0; width: 220px; height: 165px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-  .project-video-item video { object-fit: cover; width: 100%; height: 100%; display: block; }
+  .project-video-item { flex-shrink: 0; width: 220px; height: 165px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .project-video-item video { object-fit: cover; -webkit-object-fit: cover; width: 100%; height: 100%; display: block; }
   .project-video-item:hover { transform: scale(1.04); }
 `;
 
@@ -142,19 +146,49 @@ const customerLogos = [
 function LazyScrollImage({ src, alt, width, height }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
-      { rootMargin: '300px' }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    let observer;
+    try {
+      observer = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+        { rootMargin: '300px' }
+      );
+      if (ref.current) observer.observe(ref.current);
+    } catch (e) {
+      // Fallback for older browsers
+      setVisible(true);
+    }
+    return () => {
+      if (observer) observer.disconnect();
+    };
   }, []);
 
   return (
-    <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden' }}>
-      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'contain', width: '100%', height: '100%' }} />}
+    <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {visible && !error && (
+        <img 
+          src={src} 
+          alt={alt} 
+          width={width} 
+          height={height} 
+          style={{ objectFit: 'contain', WebkitObjectFit: 'contain', width: '100%', height: '100%', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            setError(true);
+            setLoaded(true);
+          }}
+        />
+      )}
+      {error && (
+        <div style={{ color: '#999', fontSize: '12px', textAlign: 'center' }}>
+          📷
+        </div>
+      )}
     </div>
   );
 }
@@ -163,36 +197,55 @@ function LazyVideo({ src }) {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const [inView, setInView] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
+  // Optimized for mobile with better iOS compatibility
+  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fit,q_50,vc_auto/');
 
+  // Create poster image URL
   const poster = src
-    .replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,so_0,q_auto,f_auto/')
+    .replace('/video/upload/', '/video/upload/w_400,h_300,c_fit,so_0,q_auto,f_jpg/')
     .replace(/\.mp4$/, '.jpg');
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setInView(entry.isIntersecting);
-      },
-      { threshold: 0.2 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    let observer;
+    try {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setInView(entry.isIntersecting);
+        },
+        { threshold: 0.2 }
+      );
+      if (ref.current) observer.observe(ref.current);
+    } catch (e) {
+      setInView(true);
+    }
+    return () => {
+      if (observer) observer.disconnect();
+    };
   }, []);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    
     if (inView) {
-      video.play().catch(() => { });
+      // iOS requires user interaction for autoplay, but we can try
+      video.play().catch((e) => {
+        console.log('Video autoplay prevented:', e);
+      });
     } else {
       video.pause();
     }
   }, [inView]);
 
   return (
-    <div ref={ref} style={{ width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
+    <div ref={ref} style={{ width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#000' }}>
+      {!loaded && (
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+          🎬
+        </div>
+      )}
       <video
         ref={videoRef}
         src={optimizedSrc}
@@ -204,12 +257,15 @@ function LazyVideo({ src }) {
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
+        controlsList="nodownload"
+        onLoadedData={() => setLoaded(true)}
         onError={(e) => {
+          console.error('Video loading error:', e);
           if (e.target.poster) {
             e.target.removeAttribute('poster');
           }
         }}
-        style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
+        style={{ objectFit: 'cover', WebkitObjectFit: 'cover', width: '100%', height: '100%', display: loaded ? 'block' : 'none' }}
       />
     </div>
   );
@@ -297,7 +353,7 @@ export default function Partners() {
               return [...imgs, ...imgs].map((src, i) => (
                 <div key={`sample-${i}`} className="project-sample-item">
                   <LazyScrollImage
-                    src={src.replace('/upload/', '/upload/w_520,h_390,c_fill,q_auto,f_auto/')}
+                    src={src.replace('/upload/', '/upload/w_520,h_390,c_fit,q_auto,f_jpg/')}
                     alt={`مشروع ${i + 1}`}
                     width={260}
                     height={195}

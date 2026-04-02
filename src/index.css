@@ -11,6 +11,9 @@ body {
   overflow-x: hidden;
   position: relative;
   font-family: 'Cairo', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* Background Animated Squares */
@@ -845,5 +848,22 @@ body {
 
   .marketing-stats {
     gap: 30px;
+  }
+}
+
+/* iOS Safari Optimizations */
+@media screen and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 2) {
+  img, video {
+    -webkit-font-smoothing: antialiased;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  
+  .project-sample-item,
+  .project-video-item,
+  .customer-logo,
+  .brand-logo {
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 }
