@@ -146,49 +146,19 @@ const customerLogos = [
 function LazyScrollImage({ src, alt, width, height }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
-    let observer;
-    try {
-      observer = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
-        { rootMargin: '300px' }
-      );
-      if (ref.current) observer.observe(ref.current);
-    } catch (e) {
-      // Fallback for older browsers
-      setVisible(true);
-    }
-    return () => {
-      if (observer) observer.disconnect();
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { rootMargin: '300px' }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {visible && !error && (
-        <img 
-          src={src} 
-          alt={alt} 
-          width={width} 
-          height={height} 
-          style={{ objectFit: 'contain', WebkitObjectFit: 'contain', width: '100%', height: '100%', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setLoaded(true)}
-          onError={() => {
-            setError(true);
-            setLoaded(true);
-          }}
-        />
-      )}
-      {error && (
-        <div style={{ color: '#999', fontSize: '12px', textAlign: 'center' }}>
-          📷
-        </div>
-      )}
+    <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden' }}>
+      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'contain', width: '100%', height: '100%' }} />}
     </div>
   );
 }
@@ -197,55 +167,36 @@ function LazyVideo({ src }) {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const [inView, setInView] = useState(false);
-  const [loaded, setLoaded] = useState(false);
 
-  // Optimized for mobile with better iOS compatibility
-  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fit,q_50,vc_auto/');
+  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
 
-  // Create poster image URL
   const poster = src
-    .replace('/video/upload/', '/video/upload/w_400,h_300,c_fit,so_0,q_auto,f_jpg/')
+    .replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,so_0,q_auto,f_auto/')
     .replace(/\.mp4$/, '.jpg');
 
   useEffect(() => {
-    let observer;
-    try {
-      observer = new IntersectionObserver(
-        ([entry]) => {
-          setInView(entry.isIntersecting);
-        },
-        { threshold: 0.2 }
-      );
-      if (ref.current) observer.observe(ref.current);
-    } catch (e) {
-      setInView(true);
-    }
-    return () => {
-      if (observer) observer.disconnect();
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+      },
+      { threshold: 0.2 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    
     if (inView) {
-      // iOS requires user interaction for autoplay, but we can try
-      video.play().catch((e) => {
-        console.log('Video autoplay prevented:', e);
-      });
+      video.play().catch(() => { });
     } else {
       video.pause();
     }
   }, [inView]);
 
   return (
-    <div ref={ref} style={{ width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#000' }}>
-      {!loaded && (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-          🎬
-        </div>
-      )}
+    <div ref={ref} style={{ width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}>
       <video
         ref={videoRef}
         src={optimizedSrc}
@@ -257,15 +208,12 @@ function LazyVideo({ src }) {
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
-        controlsList="nodownload"
-        onLoadedData={() => setLoaded(true)}
         onError={(e) => {
-          console.error('Video loading error:', e);
           if (e.target.poster) {
             e.target.removeAttribute('poster');
           }
         }}
-        style={{ objectFit: 'cover', WebkitObjectFit: 'cover', width: '100%', height: '100%', display: loaded ? 'block' : 'none' }}
+        style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }}
       />
     </div>
   );
