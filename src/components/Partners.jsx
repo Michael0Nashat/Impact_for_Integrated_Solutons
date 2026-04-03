@@ -80,7 +80,7 @@ const partnersStyles = `
   .scroll-row { 
     display: flex; 
     width: max-content; 
-    gap: 40px; 
+    gap: 30px; 
     margin-bottom: 30px; 
     will-change: transform; 
     transform: translate3d(0,0,0);
@@ -112,17 +112,24 @@ const partnersStyles = `
   }
   .customer-logo:hover { transform: scale(1.1) translateZ(0); }
   .brands-container { position: relative; width: 100%; min-height: 500px; padding: 40px 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; }
-  @media (max-width: 768px) { .brands-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px 10px; min-height: unset; } .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } .brand-logo { width: 100% !important; height: 100% !important; } }
+  @media (max-width: 768px) { 
+    .brands-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px 10px; min-height: unset; } 
+    .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } 
+    .brand-logo { width: 100% !important; height: 100% !important; }
+    .scroll-row { gap: 15px; margin-bottom: 20px; }
+    .project-sample-item { width: 220px !important; height: 165px !important; }
+    .project-video-item { width: 220px !important; height: 165px !important; }
+  }
   .brand-item { position: relative; animation: float 3s ease-in-out infinite; }
   .brand-item:nth-child(odd) { animation-delay: 0.5s; }
   .brand-item:nth-child(3n) { animation-delay: 1s; }
   .brand-item:nth-child(4n) { animation-delay: 1.5s; }
-  .project-sample-item { flex-shrink: 0; width: 260px; height: 195px; overflow: hidden; transition: transform 0.3s ease; -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-  .project-sample-item img { object-fit: contain; -webkit-object-fit: contain; width: 100%; height: 100%; image-rendering: -webkit-optimize-contrast; }
-  .project-sample-item:hover { transform: scale(1.1); }
-  .project-video-item { flex-shrink: 0; width: 220px; height: 165px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .project-sample-item { flex-shrink: 0; width: 300px; height: 225px; overflow: hidden; transition: transform 0.3s ease; -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; }
+  .project-sample-item img { object-fit: cover; -webkit-object-fit: cover; width: 100%; height: 100%; image-rendering: -webkit-optimize-contrast; }
+  .project-sample-item:hover { transform: scale(1.05); }
+  .project-video-item { flex-shrink: 0; width: 300px; height: 225px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
   .project-video-item video { object-fit: cover; -webkit-object-fit: cover; width: 100%; height: 100%; display: block; }
-  .project-video-item:hover { transform: scale(1.04); }
+  .project-video-item:hover { transform: scale(1.05); }
 `;
 
 const customerLogos = [
@@ -158,7 +165,7 @@ function LazyScrollImage({ src, alt, width, height }) {
 
   return (
     <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden' }}>
-      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'contain', width: '100%', height: '100%' }} />}
+      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />}
     </div>
   );
 }
@@ -168,10 +175,10 @@ function LazyVideo({ src }) {
   const videoRef = useRef(null);
   const [inView, setInView] = useState(false);
 
-  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,q_40,vc_auto/');
+  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_600,h_450,c_fill,q_40,vc_auto/');
 
   const poster = src
-    .replace('/video/upload/', '/video/upload/w_400,h_300,c_fill,so_0,q_auto,f_auto/')
+    .replace('/video/upload/', '/video/upload/w_600,h_450,c_fill,so_0,q_auto,f_auto/')
     .replace(/\.mp4$/, '.jpg');
 
   useEffect(() => {
@@ -301,10 +308,10 @@ export default function Partners() {
               return [...imgs, ...imgs].map((src, i) => (
                 <div key={`sample-${i}`} className="project-sample-item">
                   <LazyScrollImage
-                    src={src.replace('/upload/', '/upload/w_520,h_390,c_fit,q_auto,f_jpg/')}
+                    src={src.replace('/upload/', '/upload/w_600,h_450,c_fill,q_auto,f_jpg/')}
                     alt={`مشروع ${i + 1}`}
-                    width={260}
-                    height={195}
+                    width={300}
+                    height={225}
                     priority={i < 4}
                   />
                 </div>
@@ -318,11 +325,11 @@ export default function Partners() {
           display: 'flex',
           flexWrap: 'wrap',
           justifyContent: 'center',
-          gap: '16px',
+          gap: isMobile ? '15px' : '30px',
           marginTop: '20px'
         }}>
           {projectVideos.map((src, i) => (
-            <div key={`video-${i}`} style={{ width: isMobile ? 'calc(50% - 8px)' : '300px', height: isMobile ? '140px' : '165px' }}>
+            <div key={`video-${i}`} className="project-video-item">
               <LazyVideo src={src} />
             </div>
           ))}
