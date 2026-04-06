@@ -699,6 +699,25 @@ body {
   opacity: 0.9;
 }
 
+@media screen and (max-width: 768px) {
+  .category-hero {
+    height: 250px;
+    margin-bottom: 25px;
+  }
+
+  .category-hero-overlay {
+    padding: 20px;
+  }
+
+  .category-hero-title {
+    font-size: 24px;
+  }
+
+  .category-hero-subtitle {
+    font-size: 15px;
+  }
+}
+
 /* Project Detail Responsive Styles */
 .project-detail-wrapper {
   direction: rtl;

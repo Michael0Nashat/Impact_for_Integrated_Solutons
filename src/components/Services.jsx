@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState, useRef } from 'react';
 
-function CategorySection({ category }) {
+function CategorySection({ category, isMobile }) {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -27,7 +27,7 @@ function CategorySection({ category }) {
       ref={sectionRef}
       className="category-section" 
       style={{ 
-        marginBottom: '80px',
+        marginBottom: isMobile ? '40px' : '80px',
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
         transition: `all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.1s`
@@ -149,9 +149,17 @@ function CategorySection({ category }) {
 
 export default function Services() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef(null);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -166,7 +174,10 @@ export default function Services() {
       observer.observe(sectionRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   const categories = useMemo(() => [
@@ -220,11 +231,11 @@ export default function Services() {
     <section 
       id="services" 
       ref={sectionRef}
-      style={{ padding: '80px 0', direction: 'rtl', overflow: 'hidden' }}
+      style={{ padding: isMobile ? '40px 0' : '80px 0', direction: 'rtl', overflow: 'hidden' }}
     >
-      <div className="container" style={{ textAlign: 'center', marginBottom: '60px' }}>
+      <div className="container" style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '60px', padding: isMobile ? '0 20px' : '0' }}>
         <h2 style={{
-          fontSize: '2.8rem',
+          fontSize: isMobile ? '1.8rem' : '2.8rem',
           fontWeight: '900',
           color: '#1a1a1a',
           position: 'relative',
@@ -237,7 +248,7 @@ export default function Services() {
           مجالات العمل
         </h2>
         <p style={{
-          fontSize: '1.5rem',
+          fontSize: isMobile ? '1.1rem' : '1.5rem',
           color: '#000000ff',
           maxWidth: '850px',
           margin: '20px auto 0',
@@ -253,7 +264,7 @@ export default function Services() {
         </p>
       </div>
       {categories.map((category, catIdx) => (
-        <CategorySection key={category.id} category={category} catIdx={catIdx} />
+        <CategorySection key={category.id} category={category} catIdx={catIdx} isMobile={isMobile} />
       ))}
     </section>
   );
