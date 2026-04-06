@@ -41,6 +41,7 @@ const partnersStyles = `
     -webkit-transform: translateZ(0);
   }
   .scroll-right { animation: scrollRight 120s linear infinite; }
+  .scroll-projects { animation: scrollRight 60s linear infinite; }
   .scroll-left { animation: scrollLeft 120s linear infinite; }
   .brand-logo { flex-shrink: 0; width: 160px; height: 160px; overflow: hidden; transition: transform 0.3s ease; background: transparent; display: flex; align-items: center; justify-content: center; padding: 15px; }
   .brand-logo img { object-fit: contain; -webkit-object-fit: contain; }
@@ -255,7 +256,7 @@ export default function Partners() {
           أمثلة من مشاريعنا
         </h3>
         <div className="scroll-container" style={{ marginTop: '16px' }}>
-          <div className="scroll-row scroll-right">
+          <div className="scroll-row scroll-projects">
             {[...projectSamples, ...projectSamples].map((src, i) => (
               <div key={`sample-${i}`} className="project-sample-item">
                 <LazyScrollImage
