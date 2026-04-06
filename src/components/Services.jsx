@@ -12,7 +12,7 @@ function CategorySection({ category }) {
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0, rootMargin: '0px 0px -100px 0px' }
     );
 
     if (sectionRef.current) {
@@ -159,7 +159,7 @@ export default function Services() {
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0, rootMargin: '0px 0px -50px 0px' }
     );
 
     if (sectionRef.current) {
