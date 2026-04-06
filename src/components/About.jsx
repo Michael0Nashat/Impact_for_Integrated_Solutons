@@ -6,6 +6,10 @@ const aboutStyles = `
     from { opacity: 0; transform: translateX(30px); }
     to { opacity: 1; transform: translateX(0); }
   }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
@@ -139,6 +143,7 @@ export default function About() {
           <img
             src={data.image?.startsWith('data:') ? data.image : `${data.image}?t=${imgTs}`}
             key={data.image}
+            alt={data.title || 'من نحن'}
             style={imageStyle}
             onMouseEnter={e => { e.target.style.transform = 'scale(1.05)'; e.target.style.boxShadow = '0 50px 120px rgba(0,0,0,0.2)'; }}
             onMouseLeave={e => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 40px 100px rgba(0,0,0,0.15)'; }}
