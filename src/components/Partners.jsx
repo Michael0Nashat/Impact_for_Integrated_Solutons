@@ -1,54 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { API } from '../dashboard/useDashboardData';
 
-const sampleProjectImages = [
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481623/IMG_0421_holfs0.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481617/IMG_0422_nx9y15.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481614/IMG_0436_ihs3ml.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481595/IMG_0433_cff2mn.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481578/IMG_0370_wmgj12.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481552/IMG_0456_lfwwbr.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481497/IMG_1306_hputdm.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481475/ACBD4F43-8BE8-49C8-BEF3-1DA83C8DD56D_okvlko.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481474/WhatsApp_Image_2025-07-22_at_15.00.55_61bf7ca1_cwloka.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481467/IMG_1105_x4nl9t.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481465/3E2BED8F-1649-47CA-A00B-D0C890237A20_sudhf5.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481462/WhatsApp_Image_2025-07-22_at_15.00.53_e963a71d_ryh8iz.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481460/WhatsApp_Image_2025-07-22_at_15.00.54_605b8a75_kmmwiw.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481459/IMG_1318_p9dzgv.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481458/IMG_1327_ebr2nm.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481451/WhatsApp_Image_2025-07-22_at_15.00.54_2b168ceb_tnakp0.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481439/IMG_0902_pirc8g.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481434/IMG_0890_zc8did.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481425/IMG_0901_nlk9nj.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481407/IMG_0883_p750qx.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481407/IMG_1092_zxcsiu.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481407/IMG_1093_eal4ug.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481403/IMG_1079_iokslv.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481398/IMG_0880_qjfibb.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481398/IMG_0937_ekiw2u.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481394/IMG_0936_pzjspv.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481390/IMG_0836_u7ah9u.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481379/IMG_0889_u76clr.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481365/IMG_0879_ed4vu2.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481360/IMG_0826_mtge7z.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481323/IMG_0792_begbjy.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481304/IMG_0701_h99ywh.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481292/IMG_0852_vda3ub.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481288/IMG_0853_wbmcqd.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481283/IMG_0837_bhzac8.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481276/IMG_0850_qrjhru.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481232/IMG_0514_pakddr.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481228/IMG_0537_zjmdjj.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481227/IMG_0587_pmdf0h.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481220/IMG_0518_cz8ahh.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481213/IMG_0506_jkczig.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481210/IMG_0497_owjlja.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481209/IMG_0499_akz56k.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481209/IMG_0479_mapwex.jpg',
-  'https://res.cloudinary.com/dk9ss8rxl/image/upload/v1773481205/IMG_0460_vnkdsp.jpg',
-];
-
 const projectVideos = [
   'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418897/07F5CAC5-FBAC-466C-A3E8-EE36EF2F2AAA_ejisyy.mp4',
   'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418446/IMG_0879_yq5rms.mp4',
@@ -117,15 +69,15 @@ const partnersStyles = `
     .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } 
     .brand-logo { width: 100% !important; height: 100% !important; }
     .scroll-row { gap: 15px; margin-bottom: 20px; }
-    .project-sample-item { width: 220px !important; height: 165px !important; }
+    .project-sample-item { width: auto !important; height: 220px !important; }
     .project-video-item { width: 220px !important; height: 165px !important; }
   }
   .brand-item { position: relative; animation: float 3s ease-in-out infinite; }
   .brand-item:nth-child(odd) { animation-delay: 0.5s; }
   .brand-item:nth-child(3n) { animation-delay: 1s; }
   .brand-item:nth-child(4n) { animation-delay: 1.5s; }
-  .project-sample-item { flex-shrink: 0; width: 300px; height: 225px; overflow: hidden; transition: transform 0.3s ease; -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; }
-  .project-sample-item img { object-fit: cover; -webkit-object-fit: cover; width: 100%; height: 100%; image-rendering: -webkit-optimize-contrast; }
+  .project-sample-item { flex-shrink: 0; width: auto; height: 300px; overflow: hidden; transition: transform 0.3s ease; -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .project-sample-item img { object-fit: contain; -webkit-object-fit: contain; width: auto; height: 100%; image-rendering: -webkit-optimize-contrast; }
   .project-sample-item:hover { transform: scale(1.05); }
   .project-video-item { flex-shrink: 0; width: 300px; height: 225px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
   .project-video-item video { object-fit: cover; -webkit-object-fit: cover; width: 100%; height: 100%; display: block; }
@@ -150,7 +102,7 @@ const customerLogos = [
   '18.png'
 ];
 
-function LazyScrollImage({ src, alt, width, height, priority }) {
+function LazyScrollImage({ src, alt, priority }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(priority || false);
 
@@ -165,8 +117,8 @@ function LazyScrollImage({ src, alt, width, height, priority }) {
   }, [priority]);
 
   return (
-    <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden' }}>
-      {visible && <img src={src} alt={alt} width={width} height={height} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />}
+    <div ref={ref} style={{ height: '100%', borderRadius: 'inherit', display: 'flex' }}>
+      {visible && <img src={src} alt={alt} style={{ objectFit: 'contain', width: 'auto', height: '100%' }} />}
     </div>
   );
 }
@@ -304,20 +256,15 @@ export default function Partners() {
         </h3>
         <div className="scroll-container" style={{ marginTop: '16px' }}>
           <div className="scroll-row scroll-right">
-            {(() => {
-              const imgs = projectSamples.length > 0 ? projectSamples : sampleProjectImages;
-              return [...imgs, ...imgs].map((src, i) => (
-                <div key={`sample-${i}`} className="project-sample-item">
-                  <LazyScrollImage
-                    src={src.replace('/upload/', '/upload/w_600,h_450,c_fill,q_auto,f_jpg/')}
-                    alt={`مشروع ${i + 1}`}
-                    width={300}
-                    height={225}
-                    priority={i < 4}
-                  />
-                </div>
-              ));
-            })()}
+            {[...projectSamples, ...projectSamples].map((src, i) => (
+              <div key={`sample-${i}`} className="project-sample-item">
+                <LazyScrollImage
+                  src={src.replace('/upload/', '/upload/q_auto,f_jpg/')}
+                  alt={`مشروع ${i + 1}`}
+                  priority={i < 4}
+                />
+              </div>
+            ))}
           </div>
         </div>
 
