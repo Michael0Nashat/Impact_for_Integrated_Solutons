@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState, useRef } from 'react';
 
-function CategorySection({ category, isMobile }) {
+function CategorySection({ category }) {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -27,13 +27,13 @@ function CategorySection({ category, isMobile }) {
       ref={sectionRef}
       className="category-section" 
       style={{ 
-        marginBottom: isMobile ? '40px' : '80px',
+        marginBottom: '80px',
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
         transition: `all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.1s`
       }}
     >
-      <h2 className="section-title" style={{ fontSize: isMobile ? '1.8rem' : '2.2rem', marginBottom: isMobile ? '30px' : '50px' }}>
+      <h2 className="section-title">
         {category.title}
       </h2>
 
@@ -46,20 +46,19 @@ function CategorySection({ category, isMobile }) {
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
-                transition: `all 0.6s cubic-bezier(0.17, 0.55, 0.55, 1) ${0.3 + idx * 0.1}s`,
-                flexDirection: isMobile ? 'column' : 'row'
+                transition: `all 0.6s cubic-bezier(0.17, 0.55, 0.55, 1) ${0.3 + idx * 0.1}s`
               }}
             >
-              <div className="marketing-content" style={{ padding: isMobile ? '30px 20px' : '60px' }}>
-                <div className="marketing-tags" style={{ justifyContent: isMobile ? 'center' : 'flex-start' }}>
+              <div className="marketing-content">
+                <div className="marketing-tags">
                   {service.tags.map((tag, tIdx) => (
-                    <span key={tIdx} className="marketing-tag" style={{ fontSize: isMobile ? '11px' : '13px' }}>{tag}</span>
+                    <span key={tIdx} className="marketing-tag">{tag}</span>
                   ))}
                 </div>
-                <h3 className="marketing-title" style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', textAlign: isMobile ? 'center' : 'right' }}>{service.title}</h3>
-                <p className="marketing-desc" style={{ fontSize: isMobile ? '1rem' : '1.2rem', textAlign: isMobile ? 'center' : 'right' }}>{service.customDesc}</p>
+                <h3 className="marketing-title">{service.title}</h3>
+                <p className="marketing-desc">{service.customDesc}</p>
               </div>
-              <div className="marketing-image" style={{ height: isMobile ? '250px' : 'auto', minHeight: isMobile ? '250px' : '450px' }}>
+              <div className="marketing-image">
                 <img src={service.img} alt={service.title} />
               </div>
             </div>
@@ -74,19 +73,19 @@ function CategorySection({ category, isMobile }) {
               transition: 'all 1.2s cubic-bezier(0.17, 0.55, 0.55, 1) 0.2s'
             }}>
               <img src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=1200" alt={category.title} />
-              <div className="category-hero-overlay" style={{ padding: isMobile ? '20px' : '40px' }}>
-                <div className="category-hero-title" style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>{category.title}</div>
-                <div className="category-hero-subtitle" style={{ fontSize: isMobile ? '0.9rem' : '1.1rem' }}>حلول أمنية وبنية تحتية متكاملة للمنشآت الحديثة</div>
+              <div className="category-hero-overlay">
+                <div className="category-hero-title">{category.title}</div>
+                <div className="category-hero-subtitle">حلول أمنية وبنية تحتية متكاملة للمنشآت الحديثة</div>
               </div>
             </div>
           )}
 
-          <div className={category.id === 'light-current' ? 'compact-grid' : 'projcard-container'} style={{ width: isMobile ? '100%' : 'auto', padding: isMobile ? '0 10px' : '0' }}>
+          <div className={category.id === 'light-current' ? 'compact-grid' : 'projcard-container'}>
             {category.services.map((service, idx) => (
               category.id === 'light-current' ? (
                 <div
                   key={idx}
-                  className={`compact-card ${isVisible ? 'animate-shimmer' : ''}`}
+                  className="compact-card"
                   style={{
                     '--card-color': `var(--projcard-${service.color}-color, ${service.color === 'blue' ? '#0088FF' :
                       service.color === 'red' ? '#D62F1F' :
@@ -97,17 +96,15 @@ function CategorySection({ category, isMobile }) {
                       })`,
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.9)',
-                    transition: `all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${0.3 + idx * 0.08}s`,
-                    minHeight: isMobile ? '100px' : '140px',
-                    padding: isMobile ? '20px 15px' : '30px 25px'
+                    transition: `all 0.5s cubic-bezier(0.17, 0.55, 0.55, 1) ${0.3 + idx * 0.05}s`
                   }}
                 >
-                  <div className="compact-title" style={{ fontSize: isMobile ? '1.1rem' : '1.4rem' }}>{service.title}</div>
-                  <div className="compact-subtitle" style={{ fontSize: isMobile ? '0.9rem' : '1rem' }}>{service.subtitle}</div>
+                  <div className="compact-title">{service.title}</div>
+                  <div className="compact-subtitle">{service.subtitle}</div>
                   {service.tags && (
                     <div className="compact-tagbox">
-                      {service.tags.slice(0, isMobile ? 4 : 7).map((tag, tIdx) => (
-                        <span key={tIdx} className="compact-tag" style={{ fontSize: isMobile ? '10px' : '12px' }}>{tag}</span>
+                      {service.tags.slice(0, 7).map((tag, tIdx) => (
+                        <span key={tIdx} className="compact-tag">{tag}</span>
                       ))}
                     </div>
                   )}
@@ -124,18 +121,18 @@ function CategorySection({ category, isMobile }) {
                 >
                   <div className="projcard-innerbox">
                     <img className="projcard-img" src={service.img} alt={service.title} />
-                    <div className="projcard-textbox" style={{ padding: isMobile ? '20px' : 'default' }}>
-                      <div className="projcard-title" style={{ fontSize: isMobile ? '1.3rem' : '1.5rem' }}>{service.title}</div>
+                    <div className="projcard-textbox">
+                      <div className="projcard-title">{service.title}</div>
                       <div className="projcard-bar"></div>
-                      <div className="projcard-description" style={{ fontSize: isMobile ? '0.9rem' : '1rem' }}>
+                      <div className="projcard-description">
                         {service.customDesc || service.subtitle}
                       </div>
                       {service.customDesc && (
-                        <div className="projcard-subtitle" style={{ marginTop: '10px', fontSize: isMobile ? '0.85rem' : '0.9rem' }}>{service.subtitle}</div>
+                        <div className="projcard-subtitle" style={{ marginTop: '10px' }}>{service.subtitle}</div>
                       )}
-                      <div className="projcard-tagbox" style={{ marginTop: isMobile ? '10px' : '15px' }}>
-                        {service.tags.slice(0, isMobile ? 5 : service.tags.length).map((tag, tIdx) => (
-                          <span key={tIdx} className="projcard-tag" style={{ fontSize: isMobile ? '11px' : '14px' }}>{tag}</span>
+                      <div className="projcard-tagbox">
+                        {service.tags.map((tag, tIdx) => (
+                          <span key={tIdx} className="projcard-tag">{tag}</span>
                         ))}
                       </div>
                     </div>
@@ -152,17 +149,9 @@ function CategorySection({ category, isMobile }) {
 
 export default function Services() {
   const [isVisible, setIsVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -177,10 +166,7 @@ export default function Services() {
       observer.observe(sectionRef.current);
     }
 
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', checkMobile);
-    };
+    return () => observer.disconnect();
   }, []);
 
   const categories = useMemo(() => [
@@ -234,11 +220,11 @@ export default function Services() {
     <section 
       id="services" 
       ref={sectionRef}
-      style={{ padding: isMobile ? '40px 0' : '80px 0', direction: 'rtl', overflow: 'hidden' }}
+      style={{ padding: '80px 0', direction: 'rtl', overflow: 'hidden' }}
     >
-      <div className="container" style={{ textAlign: 'center', marginBottom: isMobile ? '30px' : '60px', padding: isMobile ? '0 20px' : '0' }}>
+      <div className="container" style={{ textAlign: 'center', marginBottom: '60px' }}>
         <h2 style={{
-          fontSize: isMobile ? '1.8rem' : '2.8rem',
+          fontSize: '2.8rem',
           fontWeight: '900',
           color: '#1a1a1a',
           position: 'relative',
@@ -251,7 +237,7 @@ export default function Services() {
           مجالات العمل
         </h2>
         <p style={{
-          fontSize: isMobile ? '1.1rem' : '1.5rem',
+          fontSize: '1.5rem',
           color: '#000000ff',
           maxWidth: '850px',
           margin: '20px auto 0',
@@ -267,7 +253,7 @@ export default function Services() {
         </p>
       </div>
       {categories.map((category, catIdx) => (
-        <CategorySection key={category.id} category={category} catIdx={catIdx} isMobile={isMobile} />
+        <CategorySection key={category.id} category={category} catIdx={catIdx} />
       ))}
     </section>
   );
