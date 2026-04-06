@@ -222,7 +222,7 @@ export default function Services() {
       ref={sectionRef}
       style={{ padding: 'clamp(40px, 8vw, 80px) 0', direction: 'rtl', overflow: 'hidden' }}
     >
-      <div className="container" style={{ textAlign: 'center', marginBottom: '60px', padding: '0 20px' }}>
+      <div className="container" style={{ textAlign: 'center', marginBottom: '60px', padding: '0 20px', boxSizing: 'border-box', width: '100%' }}>
         <h2 style={{
           fontSize: 'clamp(2rem, 5vw, 2.8rem)',
           fontWeight: '900',
@@ -240,13 +240,15 @@ export default function Services() {
           fontSize: 'clamp(1rem, 3vw, 1.5rem)',
           color: '#000000ff',
           maxWidth: '850px',
+          width: '100%',
           margin: '20px auto 0',
           lineHeight: '1.8',
           fontWeight: '500',
           opacity: isVisible ? 0.95 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
           transition: 'all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.3s',
-          textShadow: '0 1px 2px rgba(0,0,0,0.05)'
+          textShadow: '0 1px 2px rgba(0,0,0,0.05)',
+          wordWrap: 'break-word'
         }}
         >
           نحن نقدم باقة متكاملة من الخدمات التقنية والأمنية بمواصفات عالمية

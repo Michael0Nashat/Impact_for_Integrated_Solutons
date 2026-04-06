@@ -150,18 +150,19 @@ const customerLogos = [
   '18.png'
 ];
 
-function LazyScrollImage({ src, alt, width, height }) {
+function LazyScrollImage({ src, alt, width, height, priority }) {
   const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(priority || false);
 
   useEffect(() => {
+    if (priority) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
       { rootMargin: '300px' }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, []);
+  }, [priority]);
 
   return (
     <div ref={ref} style={{ width, height, borderRadius: 'inherit', overflow: 'hidden' }}>
@@ -227,6 +228,7 @@ function LazyVideo({ src }) {
 }
 
 export default function Partners() {
+  const sectionRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [brands, setBrands] = useState([]);
@@ -253,8 +255,7 @@ export default function Partners() {
       });
     }, { threshold: 0.2 });
 
-    const section = document.getElementById('partners');
-    if (section) observer.observe(section);
+    if (sectionRef.current) observer.observe(sectionRef.current);
 
     fetch(`${API}/brands`)
       .then(r => r.json())
@@ -289,7 +290,7 @@ export default function Partners() {
   return (
     <>
       <style>{partnersStyles}</style>
-      <section id="partners" style={sectionStyle}>
+      <section id="partners" ref={sectionRef} style={sectionStyle}>
 
         <h3 style={{
           textAlign: 'center',
