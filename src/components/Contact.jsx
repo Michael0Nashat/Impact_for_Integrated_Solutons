@@ -12,6 +12,11 @@ export default function Contact() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
 
   useEffect(() => {
     const checkMobile = () => {
@@ -34,6 +39,7 @@ export default function Contact() {
       observer.observe(section);
       // fallback: if already in view on load
       const rect = section.getBoundingClientRect();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (rect.top < window.innerHeight) setIsVisible(true);
     }
 
@@ -43,9 +49,23 @@ export default function Contact() {
     };
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('تم إرسال رسالتك بنجاح!');
+    const { name, email, message } = formData;
+    const subject = `رسالة جديدة من ${name}`;
+    const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
+    const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
+    const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+    alert('تم فتح تطبيق البريد لإرسال رسالتك!');
   };
 
   const sectionStyle = {
@@ -125,7 +145,10 @@ export default function Contact() {
           <form onSubmit={handleSubmit}>
             <input
               type="text"
+              name="name"
               placeholder="الاسم"
+              value={formData.name}
+              onChange={handleChange}
               style={getInputStyle('name')}
               onFocus={() => setFocusedInput('name')}
               onBlur={() => setFocusedInput(null)}
@@ -133,15 +156,21 @@ export default function Contact() {
             />
             <input
               type="email"
+              name="email"
               placeholder="البريد الإلكتروني"
+              value={formData.email}
+              onChange={handleChange}
               style={getInputStyle('email')}
               onFocus={() => setFocusedInput('email')}
               onBlur={() => setFocusedInput(null)}
               required
             />
             <textarea
+              name="message"
               rows="5"
               placeholder="رسالتك"
+              value={formData.message}
+              onChange={handleChange}
               style={getInputStyle('message')}
               onFocus={() => setFocusedInput('message')}
               onBlur={() => setFocusedInput(null)}

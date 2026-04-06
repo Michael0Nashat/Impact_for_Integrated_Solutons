@@ -1,6 +1,174 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
+
+function CategorySection({ category }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div 
+      ref={sectionRef}
+      className="category-section" 
+      style={{ 
+        marginBottom: '80px',
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+        transition: `all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.1s`
+      }}
+    >
+      <h2 className="section-title">
+        {category.title}
+      </h2>
+
+      {category.id === 'digital-marketing' ? (
+        <div className="marketing-container">
+          {category.services.map((service, idx) => (
+            <div 
+              key={idx} 
+              className="marketing-card"
+              style={{
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+                transition: `all 0.6s cubic-bezier(0.17, 0.55, 0.55, 1) ${0.3 + idx * 0.1}s`
+              }}
+            >
+              <div className="marketing-content">
+                <div className="marketing-tags">
+                  {service.tags.map((tag, tIdx) => (
+                    <span key={tIdx} className="marketing-tag">{tag}</span>
+                  ))}
+                </div>
+                <h3 className="marketing-title">{service.title}</h3>
+                <p className="marketing-desc">{service.customDesc}</p>
+              </div>
+              <div className="marketing-image">
+                <img src={service.img} alt={service.title} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {category.id === 'light-current' && (
+            <div className="category-hero" style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'scale(1)' : 'scale(1.05)',
+              transition: 'all 1.2s cubic-bezier(0.17, 0.55, 0.55, 1) 0.2s'
+            }}>
+              <img src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=1200" alt={category.title} />
+              <div className="category-hero-overlay">
+                <div className="category-hero-title">{category.title}</div>
+                <div className="category-hero-subtitle">حلول أمنية وبنية تحتية متكاملة للمنشآت الحديثة</div>
+              </div>
+            </div>
+          )}
+
+          <div className={category.id === 'light-current' ? 'compact-grid' : 'projcard-container'}>
+            {category.services.map((service, idx) => (
+              category.id === 'light-current' ? (
+                <div
+                  key={idx}
+                  className={`compact-card ${isVisible ? 'animate-shimmer' : ''}`}
+                  style={{
+                    '--card-color': `var(--projcard-${service.color}-color, ${service.color === 'blue' ? '#0088FF' :
+                      service.color === 'red' ? '#D62F1F' :
+                        service.color === 'green' ? '#40BD00' :
+                          service.color === 'yellow' ? '#F5AF41' :
+                            service.color === 'orange' ? '#FF5722' :
+                              service.color === 'brown' ? '#C49863' : '#424242'
+                      })`,
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.9)',
+                    transition: `all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${0.3 + idx * 0.08}s`
+                  }}
+                >
+                  <div className="compact-title">{service.title}</div>
+                  <div className="compact-subtitle">{service.subtitle}</div>
+                  {service.tags && (
+                    <div className="compact-tagbox">
+                      {service.tags.slice(0, 7).map((tag, tIdx) => (
+                        <span key={tIdx} className="compact-tag">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div
+                  key={idx}
+                  className={`projcard projcard-${service.color}`}
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateX(0)' : (idx % 2 === 0 ? 'translateX(50px)' : 'translateX(-50px)'),
+                    transition: `all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) ${0.3 + idx * 0.15}s`
+                  }}
+                >
+                  <div className="projcard-innerbox">
+                    <img className="projcard-img" src={service.img} alt={service.title} />
+                    <div className="projcard-textbox">
+                      <div className="projcard-title">{service.title}</div>
+                      <div className="projcard-bar"></div>
+                      <div className="projcard-description">
+                        {service.customDesc || service.subtitle}
+                      </div>
+                      {service.customDesc && (
+                        <div className="projcard-subtitle" style={{ marginTop: '10px' }}>{service.subtitle}</div>
+                      )}
+                      <div className="projcard-tagbox">
+                        {service.tags.map((tag, tIdx) => (
+                          <span key={tIdx} className="projcard-tag">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function Services() {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const categories = useMemo(() => [
     {
       id: 'light-current',
@@ -49,7 +217,11 @@ export default function Services() {
   ], []);
 
   return (
-    <section id="services" style={{ padding: '80px 0', direction: 'rtl' }}>
+    <section 
+      id="services" 
+      ref={sectionRef}
+      style={{ padding: '80px 0', direction: 'rtl', overflow: 'hidden' }}
+    >
       <div className="container" style={{ textAlign: 'center', marginBottom: '60px' }}>
         <h2 style={{
           fontSize: '2.8rem',
@@ -57,7 +229,10 @@ export default function Services() {
           color: '#1a1a1a',
           position: 'relative',
           display: 'inline-block',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+          transition: 'all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.1s'
         }}>
           مجالات العمل
         </h2>
@@ -68,106 +243,17 @@ export default function Services() {
           margin: '20px auto 0',
           lineHeight: '1.8',
           fontWeight: '500',
-          opacity: 0.95,
+          opacity: isVisible ? 0.95 : 0,
+          transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'all 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) 0.3s',
           textShadow: '0 1px 2px rgba(0,0,0,0.05)'
         }}
         >
           نحن نقدم باقة متكاملة من الخدمات التقنية والأمنية بمواصفات عالمية
         </p>
       </div>
-      {categories.map((category) => (
-        <div key={category.id} className="category-section" style={{ marginBottom: '80px' }}>
-          <h2 className="section-title">
-            {category.title}
-          </h2>
-
-          {category.id === 'digital-marketing' ? (
-            <div className="marketing-container">
-              {category.services.map((service, idx) => (
-                <div key={idx} className="marketing-card">
-                  <div className="marketing-content">
-                    <div className="marketing-tags">
-                      {service.tags.map((tag, tIdx) => (
-                        <span key={tIdx} className="marketing-tag">{tag}</span>
-                      ))}
-                    </div>
-                    <h3 className="marketing-title">{service.title}</h3>
-                    <p className="marketing-desc">{service.customDesc}</p>
-                  </div>
-                  <div className="marketing-image">
-                    <img src={service.img} alt={service.title} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <>
-              {category.id === 'light-current' && (
-                <div className="category-hero">
-                  <img src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=1200" alt={category.title} />
-                  <div className="category-hero-overlay">
-                    <div className="category-hero-title">{category.title}</div>
-                    <div className="category-hero-subtitle">حلول أمنية وبنية تحتية متكاملة للمنشآت الحديثة</div>
-                  </div>
-                </div>
-              )}
-
-              <div className={category.id === 'light-current' ? 'compact-grid' : 'projcard-container'}>
-                {category.services.map((service, idx) => (
-                  category.id === 'light-current' ? (
-                    <div
-                      key={idx}
-                      className="compact-card"
-                      style={{
-                        '--card-color': `var(--projcard-${service.color}-color, ${service.color === 'blue' ? '#0088FF' :
-                          service.color === 'red' ? '#D62F1F' :
-                            service.color === 'green' ? '#40BD00' :
-                              service.color === 'yellow' ? '#F5AF41' :
-                                service.color === 'orange' ? '#FF5722' :
-                                  service.color === 'brown' ? '#C49863' : '#424242'
-                          })`
-                      }}
-                    >
-                      <div className="compact-title">{service.title}</div>
-                      <div className="compact-subtitle">{service.subtitle}</div>
-                      {service.tags && (
-                        <div className="compact-tagbox">
-                          {service.tags.slice(0, 7).map((tag, tIdx) => (
-                            <span key={tIdx} className="compact-tag">{tag}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div
-                      key={idx}
-                      className={`projcard projcard-${service.color}`}
-                    >
-                      <div className="projcard-innerbox">
-                        <img className="projcard-img" src={service.img} alt={service.title} />
-                        <div className="projcard-textbox">
-                          <div className="projcard-title">{service.title}</div>
-                          <div className="projcard-bar"></div>
-                          <div className="projcard-description">
-                            {service.customDesc || service.subtitle}
-                          </div>
-                          {service.customDesc && (
-                            <div className="projcard-subtitle" style={{ marginTop: '10px' }}>{service.subtitle}</div>
-                          )}
-                          <div className="projcard-tagbox">
-                            {service.tags.map((tag, tIdx) => (
-                              <span key={tIdx} className="projcard-tag">{tag}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+      {categories.map((category, catIdx) => (
+        <CategorySection key={category.id} category={category} catIdx={catIdx} />
       ))}
     </section>
   );
