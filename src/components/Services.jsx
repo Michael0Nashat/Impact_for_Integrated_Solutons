@@ -220,11 +220,11 @@ export default function Services() {
     <section 
       id="services" 
       ref={sectionRef}
-      style={{ padding: '80px 0', direction: 'rtl', overflow: 'hidden' }}
+      style={{ padding: 'clamp(40px, 8vw, 80px) 0', direction: 'rtl', overflow: 'hidden' }}
     >
-      <div className="container" style={{ textAlign: 'center', marginBottom: '60px' }}>
+      <div className="container" style={{ textAlign: 'center', marginBottom: '60px', padding: '0 20px' }}>
         <h2 style={{
-          fontSize: '2.8rem',
+          fontSize: 'clamp(2rem, 5vw, 2.8rem)',
           fontWeight: '900',
           color: '#1a1a1a',
           position: 'relative',
@@ -237,7 +237,7 @@ export default function Services() {
           مجالات العمل
         </h2>
         <p style={{
-          fontSize: '1.5rem',
+          fontSize: 'clamp(1rem, 3vw, 1.5rem)',
           color: '#000000ff',
           maxWidth: '850px',
           margin: '20px auto 0',
