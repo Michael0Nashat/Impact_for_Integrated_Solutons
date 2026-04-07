@@ -70,14 +70,14 @@ const partnersStyles = `
     .brand-item { width: 100% !important; height: auto !important; aspect-ratio: 1; } 
     .brand-logo { width: 100% !important; height: 100% !important; }
     .scroll-row { gap: 15px; margin-bottom: 20px; }
-    .project-sample-item { width: auto !important; height: 220px !important; }
+    .project-sample-item { width: auto !important; height: 220px !important; min-width: 180px; }
     .project-video-item { width: 220px !important; height: 165px !important; }
   }
   .brand-item { position: relative; animation: float 3s ease-in-out infinite; }
   .brand-item:nth-child(odd) { animation-delay: 0.5s; }
   .brand-item:nth-child(3n) { animation-delay: 1s; }
   .brand-item:nth-child(4n) { animation-delay: 1.5s; }
-  .project-sample-item { flex-shrink: 0; width: auto; height: 300px; overflow: hidden; transition: transform 0.3s ease; -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .project-sample-item { flex-shrink: 0; width: auto; min-width: 250px; height: 300px; overflow: hidden; transition: transform 0.3s ease; -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
   .project-sample-item img { object-fit: contain; -webkit-object-fit: contain; width: auto; height: 100%; image-rendering: -webkit-optimize-contrast; }
   .project-sample-item:hover { transform: scale(1.05); }
   .project-video-item { flex-shrink: 0; width: 300px; height: 225px; overflow: hidden; border-radius: 12px; transition: transform 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.15); -webkit-transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
@@ -103,26 +103,7 @@ const customerLogos = [
   '18.png'
 ];
 
-function LazyScrollImage({ src, alt, priority }) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(priority || false);
 
-  useEffect(() => {
-    if (priority) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
-      { rootMargin: '300px' }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [priority]);
-
-  return (
-    <div ref={ref} style={{ height: '100%', borderRadius: 'inherit', display: 'flex' }}>
-      {visible && <img src={src} alt={alt} style={{ objectFit: 'contain', width: 'auto', height: '100%' }} />}
-    </div>
-  );
-}
 
 function LazyVideo({ src }) {
   const ref = useRef(null);
@@ -259,10 +240,11 @@ export default function Partners() {
           <div className="scroll-row scroll-projects">
             {[...projectSamples, ...projectSamples].map((src, i) => (
               <div key={`sample-${i}`} className="project-sample-item">
-                <LazyScrollImage
+                <img
                   src={src.replace('/upload/', '/upload/q_auto,f_jpg/')}
                   alt={`مشروع ${i + 1}`}
-                  priority={i < 4}
+                  loading={i < 4 ? "eager" : "lazy"}
+                  decoding="async"
                 />
               </div>
             ))}
