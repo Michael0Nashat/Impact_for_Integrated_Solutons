@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const contactStyles = `
   @keyframes fadeInLeft {
@@ -9,7 +10,9 @@ const contactStyles = `
 
 export default function Contact() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [isPrivacyHovered, setIsPrivacyHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [formData, setFormData] = useState({
@@ -129,6 +132,21 @@ export default function Contact() {
     boxShadow: isButtonHovered ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)'
   };
 
+  const privacyBtnStyle = {
+    width: '100%',
+    marginTop: '12px',
+    padding: isMobile ? '12px' : '14px',
+    background: 'transparent',
+    border: '2px solid #ffc107',
+    color: isPrivacyHovered ? '#0f172a' : '#ffc107',
+    background: isPrivacyHovered ? '#ffc107' : 'transparent',
+    fontWeight: 700,
+    borderRadius: '40px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    fontSize: isMobile ? '14px' : '15px'
+  };
+
   return (
     <>
       <style>{contactStyles}</style>
@@ -141,6 +159,21 @@ export default function Contact() {
             <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{ color: 'inherit', textDecoration: 'none' }}>01278370467</a></p>
             <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>mina.elwahsh@iisolutions.com.eg</a></p>
             <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>k.mohsen@iisolutions.com.eg</a></p>
+            <p
+              style={{
+                marginTop: '12px',
+                fontSize: isMobile ? '13px' : '14px',
+                color: '#000000ff',
+                cursor: 'pointer',
+                textDecoration: isPrivacyHovered ? 'underline' : 'none',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={() => setIsPrivacyHovered(true)}
+              onMouseLeave={() => setIsPrivacyHovered(false)}
+              onClick={() => navigate('/privacy-policy')}
+            >
+              🔒 سياسة الخصوصية / Privacy Policy
+            </p>
           </div>
           <form onSubmit={handleSubmit}>
             <input

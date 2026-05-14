@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FaFacebook, FaLinkedin } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function Footer() {
   const [hoveredLink, setHoveredLink] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -106,6 +108,26 @@ export default function Footer() {
             />
           </div>
         </div>
+      </div>
+      <div style={{ textAlign: 'center', marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px' }}>
+        <button
+          onClick={() => navigate('/privacy-policy')}
+          style={{
+            background: 'transparent',
+            border: '1px solid #ffc107',
+            color: '#ffc107',
+            padding: '8px 24px',
+            borderRadius: '40px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 600,
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={e => { e.target.style.background = '#ffc107'; e.target.style.color = '#0f172a'; }}
+          onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.color = '#ffc107'; }}
+        >
+          🔒 سياسة الخصوصية / Privacy Policy
+        </button>
       </div>
     </footer>
   );
