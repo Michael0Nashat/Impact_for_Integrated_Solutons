@@ -161,6 +161,7 @@ export default function Contact() {
             <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>k.mohsen@iisolutions.com.eg</a></p>
             <p
               style={{
+                ...getInfoStyle(0.7),
                 marginTop: '12px',
                 fontSize: isMobile ? '13px' : '14px',
                 color: '#000000ff',
