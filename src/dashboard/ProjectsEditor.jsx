@@ -1,16 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { s } from './dashStyles';
 
 const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '', systems: [] };
-
-const SORT_OPTIONS = [
-  { value: 'newest', label: 'الأحدث أولاً' },
-  { value: 'oldest', label: 'الأقدم أولاً' },
-  { value: 'title_asc', label: 'الاسم (أ-ي)' },
-  { value: 'title_desc', label: 'الاسم (ي-أ)' },
-  { value: 'category', label: 'حسب التصنيف' },
-  { value: 'status', label: 'حسب الحالة' },
-];
 
 export default function ProjectsEditor({ 
   projects, onAdd, onUpdate, onDelete, 
@@ -24,47 +15,8 @@ export default function ProjectsEditor({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [newSystem, setNewSystem] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  const sortedProjects = useMemo(() => {
-    const list = [...projects];
-
-    const getTitle = (p) => (p.title ?? '').toString();
-    const getCategory = (p) => (p.category ?? '').toString();
-    const getStatus = (p) => (p.status ?? '').toString();
-    // يدعم أي مفتاح تاريخ/ترتيب متاح في كائن المشروع، مع fallback على id
-    const getOrderKey = (p) => {
-      const raw = p.created_at ?? p.createdAt ?? p.date ?? p.id ?? 0;
-      const t = new Date(raw).getTime();
-      return Number.isNaN(t) ? (Number(p.id) || 0) : t;
-    };
-
-    switch (sortBy) {
-      case 'oldest':
-        list.sort((a, b) => getOrderKey(a) - getOrderKey(b));
-        break;
-      case 'title_asc':
-        list.sort((a, b) => getTitle(a).localeCompare(getTitle(b), 'ar'));
-        break;
-      case 'title_desc':
-        list.sort((a, b) => getTitle(b).localeCompare(getTitle(a), 'ar'));
-        break;
-      case 'category':
-        list.sort((a, b) => getCategory(a).localeCompare(getCategory(b), 'ar'));
-        break;
-      case 'status':
-        list.sort((a, b) => getStatus(a).localeCompare(getStatus(b), 'ar'));
-        break;
-      case 'newest':
-      default:
-        list.sort((a, b) => getOrderKey(b) - getOrderKey(a));
-        break;
-    }
-
-    return list;
-  }, [projects, sortBy]);
 
   const openAdd = () => { setForm(empty); setImgPreview(''); setEditing(null); setUploadError(''); setShowModal(true); };
   const openEdit = (p) => {
@@ -142,34 +94,9 @@ export default function ProjectsEditor({
   return (
     <div style={s.section}>
       <h2 style={s.sectionTitle}>🗂️ إدارة المشاريع</h2>
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
-        <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <label style={{ color: '#94a3b8', fontSize: 13, whiteSpace: 'nowrap' }}>↕️ فرز حسب:</label>
-          <select
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            style={{
-              background: '#1e293b',
-              color: '#f1f5f9',
-              border: '1px solid #334155',
-              borderRadius: 8,
-              padding: '6px 10px',
-              fontSize: 13,
-              cursor: 'pointer'
-            }}
-          >
-            {SORT_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
+      <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
       <div style={s.grid3}>
-        {sortedProjects.map(p => (
+        {projects.map(p => (
           <div key={p.id} style={s.card}>
             {p.img && <img src={p.img} alt={p.title} style={s.cardImg} />}
             <div style={s.cardBody}>
