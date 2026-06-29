@@ -21,7 +21,7 @@ export default function Projects() {
 
   useEffect(() => {
     const loadProjects = () => {
-      fetch(`${API}/projects`)
+      fetch(`${API}/projects/reorder`)
         .then(r => r.json())
         .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
         .catch(() => setProjects(allProjects));
