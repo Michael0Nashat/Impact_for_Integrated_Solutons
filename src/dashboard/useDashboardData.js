@@ -132,8 +132,11 @@ export function useDashboardData(token = '') {
   };
 
   // Reorder projects (drag & drop). orderedIds = array of project ids in the new display order.
+  // IMPORTANT: this now throws on failure (instead of swallowing the error) so the UI
+  // (ProjectsEditor) can show a visible message and snap the drag back to the last good order.
   const reorderProjects = async (orderedIds) => {
     // Optimistic UI update: reorder local state immediately so the drag feels instant.
+    const previous = projects;
     setProjects(prev => {
       const byId = new Map(prev.map(p => [Number(p.id), p]));
       const next = orderedIds.map(id => byId.get(Number(id))).filter(Boolean);
@@ -147,7 +150,16 @@ export function useDashboardData(token = '') {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ order: orderedIds.map(Number) }),
       });
-      if (!res.ok) throw new Error('Reorder failed');
+
+      if (res.status === 401) {
+        setProjects(previous);
+        throw new Error('Unauthorized');
+      }
+      if (!res.ok) {
+        setProjects(previous);
+        throw new Error(`Reorder failed (${res.status})`);
+      }
+
       const updated = await res.json();
       if (Array.isArray(updated)) {
         setProjects(updated);
@@ -155,12 +167,14 @@ export function useDashboardData(token = '') {
       window.dispatchEvent(new Event('projects-updated'));
     } catch (e) {
       console.error('reorderProjects error:', e.message);
-      // Re-fetch the real order from the server so the UI doesn't stay out of sync.
+      // Re-fetch the real order from the server so the UI doesn't stay out of sync,
+      // then re-throw so the caller (drag UI) can surface a visible error.
       try {
         const listRes = await fetch(`${API}/projects`);
         const list = await listRes.json();
         if (Array.isArray(list)) setProjects(list);
       } catch {}
+      throw e;
     }
   };
 

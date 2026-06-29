@@ -21,6 +21,7 @@ export default function ProjectsEditor({
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const [savingOrder, setSavingOrder] = useState(false);
+  const [orderError, setOrderError] = useState('');
   const lastProjectsRef = useRef(projects);
 
   // Keep local order in sync whenever the parent's projects list actually changes
@@ -128,17 +129,19 @@ export default function ProjectsEditor({
     setDragOverId(null);
     if (draggingId === null || draggingId === targetId) { setDraggingId(null); return; }
 
-    setOrderedProjects(prev => {
-      const list = [...prev];
-      const fromIdx = list.findIndex(p => p.id === draggingId);
-      const toIdx = list.findIndex(p => p.id === targetId);
-      if (fromIdx === -1 || toIdx === -1) return prev;
-      const [moved] = list.splice(fromIdx, 1);
-      list.splice(toIdx, 0, moved);
-      persistOrder(list);
-      return list;
-    });
+    // Compute the new order synchronously, then fire the async persist
+    // OUTSIDE the setState updater (updaters must be pure — no side effects/async calls in them).
+    const fromIdx = orderedProjects.findIndex(p => p.id === draggingId);
+    const toIdx = orderedProjects.findIndex(p => p.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) { setDraggingId(null); return; }
+
+    const list = [...orderedProjects];
+    const [moved] = list.splice(fromIdx, 1);
+    list.splice(toIdx, 0, moved);
+
+    setOrderedProjects(list);
     setDraggingId(null);
+    persistOrder(list);
   };
 
   const handleDragEnd = () => {
@@ -149,8 +152,17 @@ export default function ProjectsEditor({
   const persistOrder = async (list) => {
     if (!onReorder) return;
     setSavingOrder(true);
+    setOrderError('');
     try {
       await onReorder(list.map(p => p.id));
+    } catch (e) {
+      setOrderError(
+        e?.message === 'Unauthorized'
+          ? '⚠️ فشل حفظ الترتيب: انتهت صلاحية الجلسة، سجّل الدخول من جديد'
+          : '⚠️ فشل حفظ الترتيب، حاول مرة أخرى'
+      );
+      // Snap back to the last known-good order from the server.
+      setOrderedProjects(lastProjectsRef.current);
     } finally {
       setSavingOrder(false);
     }
@@ -165,6 +177,7 @@ export default function ProjectsEditor({
           💡 اسحب الكرت من أيقونة ⠿ لتغيير ترتيب ظهور المشاريع في الموقع
         </span>
         {savingOrder && <span style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري حفظ الترتيب...</span>}
+        {orderError && <span style={{ color: '#f87171', fontSize: 13 }}>{orderError}</span>}
       </div>
       <div style={s.grid3}>
         {orderedProjects.map(p => {
