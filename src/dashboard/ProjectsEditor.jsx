@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { s } from './dashStyles';
 
 const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '', systems: [] };
@@ -16,19 +16,13 @@ export default function ProjectsEditor({
   const [uploadError, setUploadError] = useState('');
   const [newSystem, setNewSystem] = useState('');
 
-  // Local order state so dragging feels instant; synced back to parent on drop.
-  const [orderedProjects, setOrderedProjects] = useState(projects);
+  // No local copy of the order: render directly from the `projects` prop.
+  // The parent (useDashboardData.reorderProjects) does the optimistic
+  // reorder of its own state, so this component always reflects the
+  // single source of truth and can't drift out of sync with it.
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const [savingOrder, setSavingOrder] = useState(false);
-  const lastProjectsRef = useRef(projects);
-
-  // Keep local order in sync whenever the parent's projects list actually changes
-  // (e.g. after add/delete/refresh), without clobbering an in-progress drag.
-  if (lastProjectsRef.current !== projects) {
-    lastProjectsRef.current = projects;
-    setOrderedProjects(projects);
-  }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -123,30 +117,22 @@ export default function ProjectsEditor({
     if (dragOverId === id) setDragOverId(null);
   };
 
-  const handleDrop = (e, targetId) => {
+  const handleDrop = async (e, targetId) => {
     e.preventDefault();
     setDragOverId(null);
-    if (draggingId === null || draggingId === targetId) { setDraggingId(null); return; }
-
-    setOrderedProjects(prev => {
-      const list = [...prev];
-      const fromIdx = list.findIndex(p => p.id === draggingId);
-      const toIdx = list.findIndex(p => p.id === targetId);
-      if (fromIdx === -1 || toIdx === -1) return prev;
-      const [moved] = list.splice(fromIdx, 1);
-      list.splice(toIdx, 0, moved);
-      persistOrder(list);
-      return list;
-    });
+    const sourceId = draggingId;
     setDraggingId(null);
-  };
+    if (sourceId === null || sourceId === targetId) return;
 
-  const handleDragEnd = () => {
-    setDraggingId(null);
-    setDragOverId(null);
-  };
+    // Compute the new order from the current `projects` prop (the source of truth)
+    // rather than a separate local copy that can fall out of sync with it.
+    const list = [...projects];
+    const fromIdx = list.findIndex(p => p.id === sourceId);
+    const toIdx = list.findIndex(p => p.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const [moved] = list.splice(fromIdx, 1);
+    list.splice(toIdx, 0, moved);
 
-  const persistOrder = async (list) => {
     if (!onReorder) return;
     setSavingOrder(true);
     try {
@@ -154,6 +140,11 @@ export default function ProjectsEditor({
     } finally {
       setSavingOrder(false);
     }
+  };
+
+  const handleDragEnd = () => {
+    setDraggingId(null);
+    setDragOverId(null);
   };
 
   return (
@@ -167,7 +158,7 @@ export default function ProjectsEditor({
         {savingOrder && <span style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري حفظ الترتيب...</span>}
       </div>
       <div style={s.grid3}>
-        {orderedProjects.map(p => {
+        {projects.map(p => {
           const isDragging = draggingId === p.id;
           const isDragOver = dragOverId === p.id && draggingId !== p.id;
           return (
