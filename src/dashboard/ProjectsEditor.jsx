@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { s } from './dashStyles';
 
 const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '', systems: [] };
 
 export default function ProjectsEditor({ 
-  projects, onAdd, onUpdate, onDelete, 
+  projects, onAdd, onUpdate, onDelete, onReorder,
   token,
   defaultSystems = [], addDefaultSystem, deleteDefaultSystem
 }) {
@@ -15,6 +15,20 @@ export default function ProjectsEditor({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [newSystem, setNewSystem] = useState('');
+
+  // Local order state so dragging feels instant; synced back to parent on drop.
+  const [orderedProjects, setOrderedProjects] = useState(projects);
+  const [draggingId, setDraggingId] = useState(null);
+  const [dragOverId, setDragOverId] = useState(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const lastProjectsRef = useRef(projects);
+
+  // Keep local order in sync whenever the parent's projects list actually changes
+  // (e.g. after add/delete/refresh), without clobbering an in-progress drag.
+  if (lastProjectsRef.current !== projects) {
+    lastProjectsRef.current = projects;
+    setOrderedProjects(projects);
+  }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -91,28 +105,118 @@ export default function ProjectsEditor({
     setShowModal(false);
   };
 
+  /* ── Drag & drop reordering ── */
+
+  const handleDragStart = (e, id) => {
+    setDraggingId(id);
+    e.dataTransfer.effectAllowed = 'move';
+    // Firefox requires data to be set for drag to work
+    e.dataTransfer.setData('text/plain', String(id));
+  };
+
+  const handleDragOver = (e, id) => {
+    e.preventDefault();
+    if (id !== draggingId) setDragOverId(id);
+  };
+
+  const handleDragLeave = (id) => {
+    if (dragOverId === id) setDragOverId(null);
+  };
+
+  const handleDrop = (e, targetId) => {
+    e.preventDefault();
+    setDragOverId(null);
+    if (draggingId === null || draggingId === targetId) { setDraggingId(null); return; }
+
+    setOrderedProjects(prev => {
+      const list = [...prev];
+      const fromIdx = list.findIndex(p => p.id === draggingId);
+      const toIdx = list.findIndex(p => p.id === targetId);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      const [moved] = list.splice(fromIdx, 1);
+      list.splice(toIdx, 0, moved);
+      persistOrder(list);
+      return list;
+    });
+    setDraggingId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingId(null);
+    setDragOverId(null);
+  };
+
+  const persistOrder = async (list) => {
+    if (!onReorder) return;
+    setSavingOrder(true);
+    try {
+      await onReorder(list.map(p => p.id));
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
   return (
     <div style={s.section}>
       <h2 style={s.sectionTitle}>🗂️ إدارة المشاريع</h2>
-      <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
+        <span style={{ color: '#94a3b8', fontSize: 13 }}>
+          💡 اسحب الكرت من أيقونة ⠿ لتغيير ترتيب ظهور المشاريع في الموقع
+        </span>
+        {savingOrder && <span style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري حفظ الترتيب...</span>}
+      </div>
       <div style={s.grid3}>
-        {projects.map(p => (
-          <div key={p.id} style={s.card}>
-            {p.img && <img src={p.img} alt={p.title} style={s.cardImg} />}
-            <div style={s.cardBody}>
-              <p style={s.cardTitle}>{p.title}</p>
-              <p style={s.cardDesc}>
-                {(p.description ?? p.desc ?? '').slice(0, 80)}
-                {(p.description ?? p.desc ?? '').length > 80 ? '...' : ''}
-              </p>
-              {p.category && <span style={s.badge}>{p.category}</span>}
-              <div style={s.cardActions}>
-                <button style={s.editBtn} onClick={() => openEdit(p)}>✏️ تعديل</button>
-                <button style={s.deleteBtn} onClick={() => onDelete(p.id)}>🗑️ حذف</button>
+        {orderedProjects.map(p => {
+          const isDragging = draggingId === p.id;
+          const isDragOver = dragOverId === p.id && draggingId !== p.id;
+          return (
+            <div
+              key={p.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, p.id)}
+              onDragOver={(e) => handleDragOver(e, p.id)}
+              onDragLeave={() => handleDragLeave(p.id)}
+              onDrop={(e) => handleDrop(e, p.id)}
+              onDragEnd={handleDragEnd}
+              style={{
+                ...s.card,
+                position: 'relative',
+                opacity: isDragging ? 0.4 : 1,
+                outline: isDragOver ? '2px dashed #10b981' : 'none',
+                outlineOffset: isDragOver ? 2 : 0,
+                transition: 'opacity 0.15s, outline 0.1s',
+                cursor: 'grab'
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute', top: 8, insetInlineStart: 8,
+                  background: 'rgba(15,23,42,0.75)', color: '#f1f5f9',
+                  borderRadius: 6, width: 28, height: 28,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 16, lineHeight: 1, zIndex: 2, userSelect: 'none'
+                }}
+                title="اسحب لتغيير الترتيب"
+              >
+                ⠿
+              </div>
+              {p.img && <img src={p.img} alt={p.title} style={s.cardImg} draggable={false} />}
+              <div style={s.cardBody}>
+                <p style={s.cardTitle}>{p.title}</p>
+                <p style={s.cardDesc}>
+                  {(p.description ?? p.desc ?? '').slice(0, 80)}
+                  {(p.description ?? p.desc ?? '').length > 80 ? '...' : ''}
+                </p>
+                {p.category && <span style={s.badge}>{p.category}</span>}
+                <div style={s.cardActions}>
+                  <button style={s.editBtn} onClick={() => openEdit(p)}>✏️ تعديل</button>
+                  <button style={s.deleteBtn} onClick={() => onDelete(p.id)}>🗑️ حذف</button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {showModal && (
