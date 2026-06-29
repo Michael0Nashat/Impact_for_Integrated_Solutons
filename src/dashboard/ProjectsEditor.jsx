@@ -1,10 +1,19 @@
-import { useState, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { s } from './dashStyles';
 
 const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '', systems: [] };
 
-export default function ProjectsEditor({
-  projects, onAdd, onUpdate, onDelete, onReorder,
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'الأحدث أولاً' },
+  { value: 'oldest', label: 'الأقدم أولاً' },
+  { value: 'title_asc', label: 'الاسم (أ-ي)' },
+  { value: 'title_desc', label: 'الاسم (ي-أ)' },
+  { value: 'category', label: 'حسب التصنيف' },
+  { value: 'status', label: 'حسب الحالة' },
+];
+
+export default function ProjectsEditor({ 
+  projects, onAdd, onUpdate, onDelete, 
   token,
   defaultSystems = [], addDefaultSystem, deleteDefaultSystem
 }) {
@@ -15,13 +24,47 @@ export default function ProjectsEditor({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [newSystem, setNewSystem] = useState('');
-
-  // Drag & drop state
-  const [dragIndex, setDragIndex] = useState(null);
-  const [overIndex, setOverIndex] = useState(null);
-  const dragGhost = useRef(null);
+  const [sortBy, setSortBy] = useState('newest');
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const sortedProjects = useMemo(() => {
+    const list = [...projects];
+
+    const getTitle = (p) => (p.title ?? '').toString();
+    const getCategory = (p) => (p.category ?? '').toString();
+    const getStatus = (p) => (p.status ?? '').toString();
+    // يدعم أي مفتاح تاريخ/ترتيب متاح في كائن المشروع، مع fallback على id
+    const getOrderKey = (p) => {
+      const raw = p.created_at ?? p.createdAt ?? p.date ?? p.id ?? 0;
+      const t = new Date(raw).getTime();
+      return Number.isNaN(t) ? (Number(p.id) || 0) : t;
+    };
+
+    switch (sortBy) {
+      case 'oldest':
+        list.sort((a, b) => getOrderKey(a) - getOrderKey(b));
+        break;
+      case 'title_asc':
+        list.sort((a, b) => getTitle(a).localeCompare(getTitle(b), 'ar'));
+        break;
+      case 'title_desc':
+        list.sort((a, b) => getTitle(b).localeCompare(getTitle(a), 'ar'));
+        break;
+      case 'category':
+        list.sort((a, b) => getCategory(a).localeCompare(getCategory(b), 'ar'));
+        break;
+      case 'status':
+        list.sort((a, b) => getStatus(a).localeCompare(getStatus(b), 'ar'));
+        break;
+      case 'newest':
+      default:
+        list.sort((a, b) => getOrderKey(b) - getOrderKey(a));
+        break;
+    }
+
+    return list;
+  }, [projects, sortBy]);
 
   const openAdd = () => { setForm(empty); setImgPreview(''); setEditing(null); setUploadError(''); setShowModal(true); };
   const openEdit = (p) => {
@@ -43,7 +86,7 @@ export default function ProjectsEditor({
   const handleImg = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+    
     if (file.size > 10 * 1024 * 1024) {
       return setUploadError('الملف كبير جداً (أقصى حد 10MB)');
     }
@@ -96,75 +139,38 @@ export default function ProjectsEditor({
     setShowModal(false);
   };
 
-  /* ── Drag & Drop reordering ── */
-  const handleDragStart = (e, index) => {
-    setDragIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-    // Firefox requires setData to enable dragging
-    e.dataTransfer.setData('text/plain', String(index));
-  };
-
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    if (index !== overIndex) setOverIndex(index);
-  };
-
-  const handleDragEnd = () => {
-    setDragIndex(null);
-    setOverIndex(null);
-  };
-
-  const handleDrop = (e, dropIndex) => {
-    e.preventDefault();
-    if (dragIndex === null || dragIndex === dropIndex) {
-      handleDragEnd();
-      return;
-    }
-    const reordered = [...projects];
-    const [moved] = reordered.splice(dragIndex, 1);
-    reordered.splice(dropIndex, 0, moved);
-    handleDragEnd();
-    if (onReorder) onReorder(reordered);
-  };
-
   return (
     <div style={s.section}>
       <h2 style={s.sectionTitle}>🗂️ إدارة المشاريع</h2>
-      <p style={{ color: '#94a3b8', fontSize: 13, marginTop: -8, marginBottom: 16 }}>
-        اسحب أي كارت وحركه لأعلى أو لأسفل لتغيير ترتيب ظهور المشاريع في الموقع
-      </p>
-      <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
-      <div style={s.grid3}>
-        {projects.map((p, i) => (
-          <div
-            key={p.id}
-            draggable
-            onDragStart={(e) => handleDragStart(e, i)}
-            onDragOver={(e) => handleDragOver(e, i)}
-            onDrop={(e) => handleDrop(e, i)}
-            onDragEnd={handleDragEnd}
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+        <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <label style={{ color: '#94a3b8', fontSize: 13, whiteSpace: 'nowrap' }}>↕️ فرز حسب:</label>
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value)}
             style={{
-              ...s.card,
-              cursor: 'grab',
-              opacity: dragIndex === i ? 0.4 : 1,
-              border: overIndex === i && dragIndex !== i
-                ? '2px dashed #ffc107'
-                : (s.card.border || '2px solid transparent'),
-              transition: 'opacity 0.15s ease, border 0.15s ease',
-              position: 'relative',
+              background: '#1e293b',
+              color: '#f1f5f9',
+              border: '1px solid #334155',
+              borderRadius: 8,
+              padding: '6px 10px',
+              fontSize: 13,
+              cursor: 'pointer'
             }}
           >
-            <div
-              title="اسحب لتغيير الترتيب"
-              style={{
-                position: 'absolute', top: 8, right: 8, zIndex: 2,
-                background: 'rgba(15,23,42,0.75)', color: '#f1f5f9',
-                borderRadius: 8, padding: '4px 8px', fontSize: 14,
-                pointerEvents: 'none', userSelect: 'none',
-              }}
-            >
-              ⠿
-            </div>
+            {SORT_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={s.grid3}>
+        {sortedProjects.map(p => (
+          <div key={p.id} style={s.card}>
             {p.img && <img src={p.img} alt={p.title} style={s.cardImg} />}
             <div style={s.cardBody}>
               <p style={s.cardTitle}>{p.title}</p>
@@ -204,42 +210,42 @@ export default function ProjectsEditor({
 
             <div style={{ marginBottom: 20 }}>
               <label style={s.label}>الأنظمة المنفذة</label>
-              <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-                gap: 8, background: '#1e293b', padding: 12, borderRadius: 10, border: '1px solid #334155'
+              <div style={{ 
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
+                gap: 8, background: '#1e293b', padding: 12, borderRadius: 10, border: '1px solid #334155' 
               }}>
                 {defaultSystems.map(sys => (
                   <label key={sys.id} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#f1f5f9', fontSize: 13, cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={form.systems?.includes(sys.name)}
+                    <input 
+                      type="checkbox" 
+                      checked={form.systems?.includes(sys.name)} 
                       onChange={e => {
-                        const next = e.target.checked
+                        const next = e.target.checked 
                           ? [...(form.systems || []), sys.name]
                           : (form.systems || []).filter(x => x !== sys.name);
                         set('systems', next);
-                      }}
+                      }} 
                     />
                     {sys.name}
                   </label>
                 ))}
                 {(form.systems || []).filter(s => !defaultSystems.find(ds => ds.name === s)).map(sys => (
                   <label key={sys} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#10b981', fontSize: 13, cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={true}
+                    <input 
+                      type="checkbox" 
+                      checked={true} 
                       onChange={() => {
                         const next = (form.systems || []).filter(x => x !== sys);
                         set('systems', next);
-                      }}
+                      }} 
                     />
                     {sys} (إضافي)
                   </label>
                 ))}
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                <input
-                  style={{ ...s.input, marginBottom: 0, flex: 1, fontSize: 12, padding: '6px 10px' }}
+                <input 
+                  style={{ ...s.input, marginBottom: 0, flex: 1, fontSize: 12, padding: '6px 10px' }} 
                   placeholder="أضف نظاماً مخصصاً لهذا المشروع"
                   id="customSystemInput"
                   onKeyDown={e => {
@@ -253,7 +259,7 @@ export default function ProjectsEditor({
                     }
                   }}
                 />
-                <button
+                <button 
                   style={{ ...s.addBtn, margin: 0, padding: '0 12px', fontSize: 12 }}
                   onClick={(e) => {
                     e.preventDefault();

@@ -84,7 +84,7 @@ export function useDashboardData(token = '') {
       if (!res.ok) throw new Error('Add failed');
       const created = await res.json();
       if (!created || !created.id) throw new Error('Invalid response');
-      setProjects(prev => [...prev, created]);
+      setProjects(prev => [created, ...prev]);
       window.dispatchEvent(new Event('projects-updated'));
     } catch (e) {
       console.error('addProject error:', e.message);
@@ -131,26 +131,6 @@ export function useDashboardData(token = '') {
     window.dispatchEvent(new Event('projects-updated'));
   };
 
-  // Reorder projects via drag & drop — takes the new full ordered array
-  const reorderProjects = async (orderedProjects) => {
-    const previous = projects;
-    setProjects(orderedProjects); // optimistic UI update
-    try {
-      const res = await fetch(`${API}/projects/reorder`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ order: orderedProjects.map(p => ({ id: p.id })) }),
-      });
-      if (!res.ok) throw new Error('Reorder failed');
-      const updatedList = await res.json();
-      if (Array.isArray(updatedList)) setProjects(updatedList);
-      window.dispatchEvent(new Event('projects-updated'));
-    } catch (e) {
-      console.error('reorderProjects error:', e.message);
-      setProjects(previous); // rollback on failure
-    }
-  };
-
   // Default Systems CRUD
   const addDefaultSystem = async (name) => {
     const res = await fetch(`${API}/default-systems`, {
@@ -174,7 +154,7 @@ export function useDashboardData(token = '') {
 
   return {
     hero, saveHero, about, saveAbout,
-    projects, addProject, updateProject, deleteProject, reorderProjects,
+    projects, addProject, updateProject, deleteProject,
     defaultSystems, addDefaultSystem, deleteDefaultSystem,
   };
 }
