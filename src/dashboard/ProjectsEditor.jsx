@@ -1,10 +1,19 @@
-import { useState, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { s } from './dashStyles';
 
 const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '', systems: [] };
 
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'الأحدث أولاً' },
+  { value: 'oldest', label: 'الأقدم أولاً' },
+  { value: 'title_asc', label: 'الاسم (أ-ي)' },
+  { value: 'title_desc', label: 'الاسم (ي-أ)' },
+  { value: 'category', label: 'حسب التصنيف' },
+  { value: 'status', label: 'حسب الحالة' },
+];
+
 export default function ProjectsEditor({ 
-  projects, onAdd, onUpdate, onDelete, onReorder,
+  projects, onAdd, onUpdate, onDelete, 
   token,
   defaultSystems = [], addDefaultSystem, deleteDefaultSystem
 }) {
@@ -15,23 +24,47 @@ export default function ProjectsEditor({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [newSystem, setNewSystem] = useState('');
-
-  // Local order state so dragging feels instant; synced back to parent on drop.
-  const [orderedProjects, setOrderedProjects] = useState(projects);
-  const [draggingId, setDraggingId] = useState(null);
-  const [dragOverId, setDragOverId] = useState(null);
-  const [savingOrder, setSavingOrder] = useState(false);
-  const [orderError, setOrderError] = useState('');
-  const lastProjectsRef = useRef(projects);
-
-  // Keep local order in sync whenever the parent's projects list actually changes
-  // (e.g. after add/delete/refresh), without clobbering an in-progress drag.
-  if (lastProjectsRef.current !== projects) {
-    lastProjectsRef.current = projects;
-    setOrderedProjects(projects);
-  }
+  const [sortBy, setSortBy] = useState('newest');
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const sortedProjects = useMemo(() => {
+    const list = [...projects];
+
+    const getTitle = (p) => (p.title ?? '').toString();
+    const getCategory = (p) => (p.category ?? '').toString();
+    const getStatus = (p) => (p.status ?? '').toString();
+    // يدعم أي مفتاح تاريخ/ترتيب متاح في كائن المشروع، مع fallback على id
+    const getOrderKey = (p) => {
+      const raw = p.created_at ?? p.createdAt ?? p.date ?? p.id ?? 0;
+      const t = new Date(raw).getTime();
+      return Number.isNaN(t) ? (Number(p.id) || 0) : t;
+    };
+
+    switch (sortBy) {
+      case 'oldest':
+        list.sort((a, b) => getOrderKey(a) - getOrderKey(b));
+        break;
+      case 'title_asc':
+        list.sort((a, b) => getTitle(a).localeCompare(getTitle(b), 'ar'));
+        break;
+      case 'title_desc':
+        list.sort((a, b) => getTitle(b).localeCompare(getTitle(a), 'ar'));
+        break;
+      case 'category':
+        list.sort((a, b) => getCategory(a).localeCompare(getCategory(b), 'ar'));
+        break;
+      case 'status':
+        list.sort((a, b) => getStatus(a).localeCompare(getStatus(b), 'ar'));
+        break;
+      case 'newest':
+      default:
+        list.sort((a, b) => getOrderKey(b) - getOrderKey(a));
+        break;
+    }
+
+    return list;
+  }, [projects, sortBy]);
 
   const openAdd = () => { setForm(empty); setImgPreview(''); setEditing(null); setUploadError(''); setShowModal(true); };
   const openEdit = (p) => {
@@ -106,130 +139,53 @@ export default function ProjectsEditor({
     setShowModal(false);
   };
 
-  /* ── Drag & drop reordering ── */
-
-  const handleDragStart = (e, id) => {
-    setDraggingId(id);
-    e.dataTransfer.effectAllowed = 'move';
-    // Firefox requires data to be set for drag to work
-    e.dataTransfer.setData('text/plain', String(id));
-  };
-
-  const handleDragOver = (e, id) => {
-    e.preventDefault();
-    if (id !== draggingId) setDragOverId(id);
-  };
-
-  const handleDragLeave = (id) => {
-    if (dragOverId === id) setDragOverId(null);
-  };
-
-  const handleDrop = (e, targetId) => {
-    e.preventDefault();
-    setDragOverId(null);
-    if (draggingId === null || draggingId === targetId) { setDraggingId(null); return; }
-
-    // Compute the new order synchronously, then fire the async persist
-    // OUTSIDE the setState updater (updaters must be pure — no side effects/async calls in them).
-    const fromIdx = orderedProjects.findIndex(p => p.id === draggingId);
-    const toIdx = orderedProjects.findIndex(p => p.id === targetId);
-    if (fromIdx === -1 || toIdx === -1) { setDraggingId(null); return; }
-
-    const list = [...orderedProjects];
-    const [moved] = list.splice(fromIdx, 1);
-    list.splice(toIdx, 0, moved);
-
-    setOrderedProjects(list);
-    setDraggingId(null);
-    persistOrder(list);
-  };
-
-  const handleDragEnd = () => {
-    setDraggingId(null);
-    setDragOverId(null);
-  };
-
-  const persistOrder = async (list) => {
-    if (!onReorder) return;
-    setSavingOrder(true);
-    setOrderError('');
-    try {
-      await onReorder(list.map(p => p.id));
-    } catch (e) {
-      setOrderError(
-        e?.message === 'Unauthorized'
-          ? '⚠️ فشل حفظ الترتيب: انتهت صلاحية الجلسة، سجّل الدخول من جديد'
-          : '⚠️ فشل حفظ الترتيب، حاول مرة أخرى'
-      );
-      // Snap back to the last known-good order from the server.
-      setOrderedProjects(lastProjectsRef.current);
-    } finally {
-      setSavingOrder(false);
-    }
-  };
-
   return (
     <div style={s.section}>
       <h2 style={s.sectionTitle}>🗂️ إدارة المشاريع</h2>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
         <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
-        <span style={{ color: '#94a3b8', fontSize: 13 }}>
-          💡 اسحب الكرت من أيقونة ⠿ لتغيير ترتيب ظهور المشاريع في الموقع
-        </span>
-        {savingOrder && <span style={{ color: '#ffc107', fontSize: 13 }}>⏳ جاري حفظ الترتيب...</span>}
-        {orderError && <span style={{ color: '#f87171', fontSize: 13 }}>{orderError}</span>}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <label style={{ color: '#94a3b8', fontSize: 13, whiteSpace: 'nowrap' }}>↕️ فرز حسب:</label>
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value)}
+            style={{
+              background: '#1e293b',
+              color: '#f1f5f9',
+              border: '1px solid #334155',
+              borderRadius: 8,
+              padding: '6px 10px',
+              fontSize: 13,
+              cursor: 'pointer'
+            }}
+          >
+            {SORT_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
+
       <div style={s.grid3}>
-        {orderedProjects.map(p => {
-          const isDragging = draggingId === p.id;
-          const isDragOver = dragOverId === p.id && draggingId !== p.id;
-          return (
-            <div
-              key={p.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, p.id)}
-              onDragOver={(e) => handleDragOver(e, p.id)}
-              onDragLeave={() => handleDragLeave(p.id)}
-              onDrop={(e) => handleDrop(e, p.id)}
-              onDragEnd={handleDragEnd}
-              style={{
-                ...s.card,
-                position: 'relative',
-                opacity: isDragging ? 0.4 : 1,
-                outline: isDragOver ? '2px dashed #10b981' : 'none',
-                outlineOffset: isDragOver ? 2 : 0,
-                transition: 'opacity 0.15s, outline 0.1s',
-                cursor: 'grab'
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute', top: 8, insetInlineStart: 8,
-                  background: 'rgba(15,23,42,0.75)', color: '#f1f5f9',
-                  borderRadius: 6, width: 28, height: 28,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 16, lineHeight: 1, zIndex: 2, userSelect: 'none'
-                }}
-                title="اسحب لتغيير الترتيب"
-              >
-                ⠿
-              </div>
-              {p.img && <img src={p.img} alt={p.title} style={s.cardImg} draggable={false} />}
-              <div style={s.cardBody}>
-                <p style={s.cardTitle}>{p.title}</p>
-                <p style={s.cardDesc}>
-                  {(p.description ?? p.desc ?? '').slice(0, 80)}
-                  {(p.description ?? p.desc ?? '').length > 80 ? '...' : ''}
-                </p>
-                {p.category && <span style={s.badge}>{p.category}</span>}
-                <div style={s.cardActions}>
-                  <button style={s.editBtn} onClick={() => openEdit(p)}>✏️ تعديل</button>
-                  <button style={s.deleteBtn} onClick={() => onDelete(p.id)}>🗑️ حذف</button>
-                </div>
+        {sortedProjects.map(p => (
+          <div key={p.id} style={s.card}>
+            {p.img && <img src={p.img} alt={p.title} style={s.cardImg} />}
+            <div style={s.cardBody}>
+              <p style={s.cardTitle}>{p.title}</p>
+              <p style={s.cardDesc}>
+                {(p.description ?? p.desc ?? '').slice(0, 80)}
+                {(p.description ?? p.desc ?? '').length > 80 ? '...' : ''}
+              </p>
+              {p.category && <span style={s.badge}>{p.category}</span>}
+              <div style={s.cardActions}>
+                <button style={s.editBtn} onClick={() => openEdit(p)}>✏️ تعديل</button>
+                <button style={s.deleteBtn} onClick={() => onDelete(p.id)}>🗑️ حذف</button>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {showModal && (
