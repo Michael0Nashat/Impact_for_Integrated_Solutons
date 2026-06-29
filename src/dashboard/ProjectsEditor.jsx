@@ -124,7 +124,7 @@ export default function ProjectsEditor({
             <input style={s.input} value={form.title} onChange={e => set('title', e.target.value)} />
 
             <label style={s.label}>الوصف</label>
-            <textarea style={s.textarea} value={form.desc} onChange={e => set('desc', e.target.value)} rows={4} />
+            <textarea style={s.textarea} value={form.desc} onChange={e => set('desc', e.target.value)} rows={10} />
 
             <label style={s.label}>التصنيف</label>
             <input style={s.input} value={form.category} onChange={e => set('category', e.target.value)} />
