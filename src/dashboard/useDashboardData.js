@@ -131,6 +131,39 @@ export function useDashboardData(token = '') {
     window.dispatchEvent(new Event('projects-updated'));
   };
 
+  // Reorder projects (drag & drop). orderedIds = array of project ids in the new display order.
+  const reorderProjects = async (orderedIds) => {
+    // Optimistic UI update: reorder local state immediately so the drag feels instant.
+    setProjects(prev => {
+      const byId = new Map(prev.map(p => [Number(p.id), p]));
+      const next = orderedIds.map(id => byId.get(Number(id))).filter(Boolean);
+      // Safety net: if anything didn't map (e.g. stale id), keep the original list.
+      return next.length === prev.length ? next : prev;
+    });
+
+    try {
+      const res = await fetch(`${API}/projects/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ order: orderedIds.map(Number) }),
+      });
+      if (!res.ok) throw new Error('Reorder failed');
+      const updated = await res.json();
+      if (Array.isArray(updated)) {
+        setProjects(updated);
+      }
+      window.dispatchEvent(new Event('projects-updated'));
+    } catch (e) {
+      console.error('reorderProjects error:', e.message);
+      // Re-fetch the real order from the server so the UI doesn't stay out of sync.
+      try {
+        const listRes = await fetch(`${API}/projects`);
+        const list = await listRes.json();
+        if (Array.isArray(list)) setProjects(list);
+      } catch {}
+    }
+  };
+
   // Default Systems CRUD
   const addDefaultSystem = async (name) => {
     const res = await fetch(`${API}/default-systems`, {
@@ -154,7 +187,7 @@ export function useDashboardData(token = '') {
 
   return {
     hero, saveHero, about, saveAbout,
-    projects, addProject, updateProject, deleteProject,
+    projects, addProject, updateProject, deleteProject, reorderProjects,
     defaultSystems, addDefaultSystem, deleteDefaultSystem,
   };
 }
