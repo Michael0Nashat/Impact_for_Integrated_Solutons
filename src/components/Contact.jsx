@@ -20,11 +20,6 @@ export default function Contact() {
     email: '',
     message: ''
   });
-  const [contactInfo, setContactInfo] = useState({
-    address: '1 مصطفى رفعت, شيراتون',
-    phone: '01027742000',
-    email: 'mina.elwahsh@iisolutions.com.eg',
-  });
 
   useEffect(() => {
     const checkMobile = () => {
@@ -57,22 +52,6 @@ export default function Contact() {
     };
   }, []);
 
-  useEffect(() => {
-    fetch('https://impact-for-integrated-solutons-serv.vercel.app/api/contacts')
-      .then(res => res.json())
-      .then(rows => {
-        if (Array.isArray(rows) && rows.length > 0) {
-          const c = rows[0];
-          setContactInfo(prev => ({
-            address: c.address || prev.address,
-            phone: c.phone || prev.phone,
-            email: c.email || prev.email,
-          }));
-        }
-      })
-      .catch(e => console.error('Failed to load contact info:', e));
-  }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -86,7 +65,7 @@ export default function Contact() {
     const { name, email, message } = formData;
     const subject = `رسالة جديدة من ${name}`;
     const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
-    const recipients = contactInfo.email;
+    const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
     const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoUrl;
     alert('تم فتح تطبيق البريد لإرسال رسالتك!');
@@ -175,19 +154,11 @@ export default function Contact() {
         <h2 style={headingStyle}>اتصل بنا</h2>
         <div style={containerStyle}>
           <div>
-            {contactInfo.address && (
-              <p style={getInfoStyle(0.4)}>📍 {contactInfo.address}</p>
-            )}
-            {contactInfo.phone && (
-              <p style={getInfoStyle(0.5)}>
-                📞 <a href={`tel:${contactInfo.phone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{contactInfo.phone}</a>
-              </p>
-            )}
-            {contactInfo.email && (
-              <p style={getInfoStyle(0.6)}>
-                📧 <a href={`mailto:${contactInfo.email}`} style={{ color: 'inherit', textDecoration: 'none' }}>{contactInfo.email}</a>
-              </p>
-            )}
+            <p style={getInfoStyle(0.4)}>📍 1 مصطفى رفعت, شيراتون</p>
+            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01027742000" style={{ color: 'inherit', textDecoration: 'none' }}>01027742000</a></p>
+            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{ color: 'inherit', textDecoration: 'none' }}>01278370467</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>mina.elwahsh@iisolutions.com.eg</a></p>
+            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>k.mohsen@iisolutions.com.eg</a></p>
             <p
               style={{
                 ...getInfoStyle(0.7),
