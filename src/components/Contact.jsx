@@ -12,16 +12,45 @@ export default function Contact() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isPrivacyHovered, setIsPrivacyHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [contactData, setContactData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
+
+  // Fetch contact data from API
+  useEffect(() => {
+    const fetchContactData = async () => {
+      try {
+        const response = await fetch('https://impact-for-integrated-solutons-serv.vercel.app/api/contacts');
+        if (!response.ok) {
+          throw new Error('Failed to fetch contact data');
+        }
+        const data = await response.json();
+        setContactData(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+        // Fallback to static data if API fails
+        setContactData({
+          address: '1 مصطفى رفعت, شيراتون',
+          phone1: '01027742000',
+          phone2: '01278370467',
+          email1: 'mina.elwahsh@iisolutions.com.eg',
+          email2: 'k.mohsen@iisolutions.com.eg'
+        });
+      }
+    };
+
+    fetchContactData();
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -42,9 +71,7 @@ export default function Contact() {
     const section = document.getElementById('contact');
     if (section) {
       observer.observe(section);
-      // fallback: if already in view on load
       const rect = section.getBoundingClientRect();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (rect.top < window.innerHeight) setIsVisible(true);
     }
 
@@ -60,83 +87,50 @@ export default function Contact() {
       ...prev,
       [name]: value
     }));
-    // Clear status when user starts typing again
-    if (submitStatus) setSubmitStatus(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
     const { name, email, message } = formData;
-
-    // Prepare contact data with address
-    const contactData = {
-      address: '1 مصطفى رفعت, شيراتون',
-      phone: ['01027742000', '01278370467'].join(','), // Store both numbers
-      email: ['mina.elwahsh@iisolutions.com.eg', 'k.mohsen@iisolutions.com.eg'].join(','),
-      // Additional fields for the message
-      name: name,
-      message: message
-    };
-
+    
+    // Send to API endpoint
     try {
       const response = await fetch('https://impact-for-integrated-solutons-serv.vercel.app/api/contacts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(contactData),
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          subject: `رسالة جديدة من ${name}`,
+          recipients: ['mina.elwahsh@iisolutions.com.eg', 'k.mohsen@iisolutions.com.eg']
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error('Failed to send message');
       }
 
-      const result = await response.json();
-      console.log('Contact saved successfully:', result);
+      alert('تم إرسال رسالتك بنجاح!');
       
-      setSubmitStatus('success');
-      
-      // Also open mail client as a backup
-      const subject = `رسالة جديدة من ${name}`;
-      const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
-      const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
-      const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      
-      // Open mail client
-      window.open(mailtoUrl, '_blank');
-      
-      // Reset form after successful submission
+      // Reset form
       setFormData({
         name: '',
         email: '',
         message: ''
       });
-
-      // Auto-clear success message after 5 seconds
-      setTimeout(() => {
-        setSubmitStatus(null);
-      }, 5000);
-
-    } catch (error) {
-      console.error('Error submitting contact:', error);
-      setSubmitStatus('error');
+    } catch (err) {
+      console.error('Error sending message:', err);
       
-      // Fallback: Open mail client if API fails
+      // Fallback to mailto
       const subject = `رسالة جديدة من ${name}`;
       const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
       const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
       const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.open(mailtoUrl, '_blank');
-
-      // Auto-clear error message after 5 seconds
-      setTimeout(() => {
-        setSubmitStatus(null);
-      }, 5000);
-    } finally {
-      setIsSubmitting(false);
+      window.location.href = mailtoUrl;
+      alert('تم فتح تطبيق البريد لإرسال رسالتك!');
     }
   };
 
@@ -194,25 +188,11 @@ export default function Contact() {
     border: 'none',
     fontWeight: 800,
     borderRadius: '40px',
-    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+    cursor: 'pointer',
     transition: 'all 0.3s ease',
     fontSize: isMobile ? '15px' : '16px',
-    transform: isButtonHovered && !isSubmitting ? 'translateY(-3px) scale(1.02)' : 'translateY(0) scale(1)',
-    boxShadow: isButtonHovered && !isSubmitting ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)',
-    opacity: isSubmitting ? 0.7 : 1
-  };
-
-  const statusMessageStyle = {
-    textAlign: 'center',
-    padding: '12px',
-    borderRadius: '10px',
-    marginTop: '12px',
-    fontSize: isMobile ? '14px' : '15px',
-    fontWeight: '600',
-    backgroundColor: submitStatus === 'success' ? '#d4edda' : '#f8d7da',
-    color: submitStatus === 'success' ? '#155724' : '#721c24',
-    border: `1px solid ${submitStatus === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
-    display: submitStatus ? 'block' : 'none'
+    transform: isButtonHovered ? 'translateY(-3px) scale(1.02)' : 'translateY(0) scale(1)',
+    boxShadow: isButtonHovered ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)'
   };
 
   const privacyBtnStyle = {
@@ -230,6 +210,16 @@ export default function Contact() {
     fontSize: isMobile ? '14px' : '15px'
   };
 
+  if (loading) {
+    return (
+      <section id="contact" style={sectionStyle}>
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <p>جاري تحميل معلومات الاتصال...</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
       <style>{contactStyles}</style>
@@ -237,11 +227,27 @@ export default function Contact() {
         <h2 style={headingStyle}>اتصل بنا</h2>
         <div style={containerStyle}>
           <div>
-            <p style={getInfoStyle(0.4)}>📍 1 مصطفى رفعت, شيراتون</p>
-            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01027742000" style={{ color: 'inherit', textDecoration: 'none' }}>01027742000</a></p>
-            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{ color: 'inherit', textDecoration: 'none' }}>01278370467</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>mina.elwahsh@iisolutions.com.eg</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>k.mohsen@iisolutions.com.eg</a></p>
+            <p style={getInfoStyle(0.4)}>📍 {contactData?.address || '1 مصطفى رفعت, شيراتون'}</p>
+            <p style={getInfoStyle(0.5)}>
+              📞 <a href={`tel:${contactData?.phone1 || '01027742000'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {contactData?.phone1 || '01027742000'}
+              </a>
+            </p>
+            <p style={getInfoStyle(0.5)}>
+              📞 <a href={`tel:${contactData?.phone2 || '01278370467'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {contactData?.phone2 || '01278370467'}
+              </a>
+            </p>
+            <p style={getInfoStyle(0.6)}>
+              📧 <a href={`mailto:${contactData?.email1 || 'mina.elwahsh@iisolutions.com.eg'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {contactData?.email1 || 'mina.elwahsh@iisolutions.com.eg'}
+              </a>
+            </p>
+            <p style={getInfoStyle(0.6)}>
+              📧 <a href={`mailto:${contactData?.email2 || 'k.mohsen@iisolutions.com.eg'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {contactData?.email2 || 'k.mohsen@iisolutions.com.eg'}
+              </a>
+            </p>
             <p
               style={{
                 ...getInfoStyle(0.7),
@@ -270,7 +276,6 @@ export default function Contact() {
               onFocus={() => setFocusedInput('name')}
               onBlur={() => setFocusedInput(null)}
               required
-              disabled={isSubmitting}
             />
             <input
               type="email"
@@ -282,7 +287,6 @@ export default function Contact() {
               onFocus={() => setFocusedInput('email')}
               onBlur={() => setFocusedInput(null)}
               required
-              disabled={isSubmitting}
             />
             <textarea
               name="message"
@@ -294,22 +298,15 @@ export default function Contact() {
               onFocus={() => setFocusedInput('message')}
               onBlur={() => setFocusedInput(null)}
               required
-              disabled={isSubmitting}
             />
             <button
               type="submit"
               style={buttonStyle}
               onMouseEnter={() => setIsButtonHovered(true)}
               onMouseLeave={() => setIsButtonHovered(false)}
-              disabled={isSubmitting}
             >
-              {isSubmitting ? 'جاري الإرسال...' : 'إرسال'}
+              إرسال
             </button>
-            <div style={statusMessageStyle}>
-              {submitStatus === 'success' 
-                ? '✅ تم إرسال رسالتك بنجاح!' 
-                : '❌ حدث خطأ أثناء الإرسال. تم فتح البريد الإلكتروني كحل بديل.'}
-            </div>
           </form>
         </div>
       </section>
