@@ -12,9 +12,6 @@ export default function Contact() {
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isPrivacyHovered, setIsPrivacyHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [contactData, setContactData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
@@ -24,33 +21,40 @@ export default function Contact() {
     message: ''
   });
 
-  // Fetch contact data from API
+  const [contactInfo, setContactInfo] = useState({
+  address: "",
+  phone: [],
+  email: []
+});
+  
   useEffect(() => {
-    const fetchContactData = async () => {
-      try {
-        const response = await fetch('https://impact-for-integrated-solutons-serv.vercel.app/api/contacts');
-        if (!response.ok) {
-          throw new Error('Failed to fetch contact data');
-        }
-        const data = await response.json();
-        setContactData(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-        // Fallback to static data if API fails
-        setContactData({
-          address: '1 مصطفى رفعت, شيراتون',
-          phone1: '01027742000',
-          phone2: '01278370467',
-          email1: 'mina.elwahsh@iisolutions.com.eg',
-          email2: 'k.mohsen@iisolutions.com.eg'
+  const fetchContact = async () => {
+    try {
+      const res = await fetch(
+        "https://impact-for-integrated-solutons-serv.vercel.app/api/contacts"
+      );
+
+      const data = await res.json();
+
+      if (Array.isArray(data) && data.length > 0) {
+        setContactInfo({
+          address: data[0].address || "",
+          phone: data
+            .map((item) => item.phone)
+            .filter(Boolean),
+
+          email: data
+            .map((item) => item.email)
+            .filter(Boolean),
         });
       }
-    };
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    fetchContactData();
-  }, []);
+  fetchContact();
+}, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -71,7 +75,9 @@ export default function Contact() {
     const section = document.getElementById('contact');
     if (section) {
       observer.observe(section);
+      // fallback: if already in view on load
       const rect = section.getBoundingClientRect();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (rect.top < window.innerHeight) setIsVisible(true);
     }
 
@@ -89,49 +95,15 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const { name, email, message } = formData;
-    
-    // Send to API endpoint
-    try {
-      const response = await fetch('https://impact-for-integrated-solutons-serv.vercel.app/api/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          message,
-          subject: `رسالة جديدة من ${name}`,
-          recipients: ['mina.elwahsh@iisolutions.com.eg', 'k.mohsen@iisolutions.com.eg']
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
-      alert('تم إرسال رسالتك بنجاح!');
-      
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        message: ''
-      });
-    } catch (err) {
-      console.error('Error sending message:', err);
-      
-      // Fallback to mailto
-      const subject = `رسالة جديدة من ${name}`;
-      const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
-      const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
-      const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailtoUrl;
-      alert('تم فتح تطبيق البريد لإرسال رسالتك!');
-    }
+    const subject = `رسالة جديدة من ${name}`;
+    const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
+    const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
+    const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+    alert('تم فتح تطبيق البريد لإرسال رسالتك!');
   };
 
   const sectionStyle = {
@@ -210,61 +182,58 @@ export default function Contact() {
     fontSize: isMobile ? '14px' : '15px'
   };
 
-  if (loading) {
-    return (
-      <section id="contact" style={sectionStyle}>
-        <div style={{ textAlign: 'center', padding: '50px' }}>
-          <p>جاري تحميل معلومات الاتصال...</p>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <>
       <style>{contactStyles}</style>
       <section id="contact" style={sectionStyle}>
         <h2 style={headingStyle}>اتصل بنا</h2>
         <div style={containerStyle}>
-          <div>
-            <p style={getInfoStyle(0.4)}>📍 {contactData?.address || '1 مصطفى رفعت, شيراتون'}</p>
-            <p style={getInfoStyle(0.5)}>
-              📞 <a href={`tel:${contactData?.phone1 || '01027742000'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                {contactData?.phone1 || '01027742000'}
-              </a>
-            </p>
-            <p style={getInfoStyle(0.5)}>
-              📞 <a href={`tel:${contactData?.phone2 || '01278370467'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                {contactData?.phone2 || '01278370467'}
-              </a>
-            </p>
-            <p style={getInfoStyle(0.6)}>
-              📧 <a href={`mailto:${contactData?.email1 || 'mina.elwahsh@iisolutions.com.eg'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                {contactData?.email1 || 'mina.elwahsh@iisolutions.com.eg'}
-              </a>
-            </p>
-            <p style={getInfoStyle(0.6)}>
-              📧 <a href={`mailto:${contactData?.email2 || 'k.mohsen@iisolutions.com.eg'}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                {contactData?.email2 || 'k.mohsen@iisolutions.com.eg'}
-              </a>
-            </p>
-            <p
-              style={{
-                ...getInfoStyle(0.7),
-                marginTop: '12px',
-                fontSize: isMobile ? '13px' : '14px',
-                color: '#000000ff',
-                cursor: 'pointer',
-                textDecoration: isPrivacyHovered ? 'underline' : 'none',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={() => setIsPrivacyHovered(true)}
-              onMouseLeave={() => setIsPrivacyHovered(false)}
-              onClick={() => navigate('/privacy-policy')}
-            >
-              🔒 سياسة الخصوصية / Privacy Policy
-            </p>
-          </div>
+         <div>
+  <p style={getInfoStyle(0.4)}>
+    📍 {contactInfo.address}
+  </p>
+
+  {contactInfo.phone.map((phone, index) => (
+    <p key={index} style={getInfoStyle(0.5 + index * 0.05)}>
+      📞{" "}
+      <a
+        href={`tel:${phone}`}
+        style={{ color: "inherit", textDecoration: "none" }}
+      >
+        {phone}
+      </a>
+    </p>
+  ))}
+
+  {contactInfo.email.map((email, index) => (
+    <p key={index} style={getInfoStyle(0.6 + index * 0.05)}>
+      📧{" "}
+      <a
+        href={`mailto:${email}`}
+        style={{ color: "inherit", textDecoration: "none" }}
+      >
+        {email}
+      </a>
+    </p>
+  ))}
+
+  <p
+    style={{
+      ...getInfoStyle(0.8),
+      marginTop: "12px",
+      fontSize: isMobile ? "13px" : "14px",
+      color: "#000",
+      cursor: "pointer",
+      textDecoration: isPrivacyHovered ? "underline" : "none",
+      transition: "all .3s ease",
+    }}
+    onMouseEnter={() => setIsPrivacyHovered(true)}
+    onMouseLeave={() => setIsPrivacyHovered(false)}
+    onClick={() => navigate("/privacy-policy")}
+  >
+    🔒 سياسة الخصوصية / Privacy Policy
+  </p>
+</div>
           <form onSubmit={handleSubmit}>
             <input
               type="text"
