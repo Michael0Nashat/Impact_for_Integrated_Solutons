@@ -23,10 +23,10 @@ function formToPayload(form) {
   const emails = form.emails.map(v => v.trim()).filter(Boolean);
 
   return {
-    addresses,
-    phones,
-    emails,
-    // legacy fields for backward compatibility with the current backend schema
+    addresses: addresses.length ? addresses : [''],
+    phones: phones.length ? phones : [''],
+    emails: emails.length ? emails : [''],
+    // legacy fields for backward compatibility
     address: addresses[0] || '',
     phone: phones[0] || '',
     email: emails[0] || '',
@@ -169,22 +169,22 @@ export default function ContactEditor({ token }) {
     return (
       <div style={styles.wrapper}>
         <div style={styles.cardsGrid}>
-          {view.addresses.filter(Boolean).map((a, i) => (
-            <div style={styles.fieldCard} key={`addr-${i}`}>
-              <span style={styles.displayLabel}>📍 العنوان {view.addresses.length > 1 ? i + 1 : ''}</span>
-              <span style={styles.displayValue}>{a}</span>
-            </div>
-          ))}
           {view.phones.filter(Boolean).map((p, i) => (
             <div style={styles.fieldCard} key={`phone-${i}`}>
-              <span style={styles.displayLabel}>📞 هاتف {i + 1}</span>
+              <span style={styles.displayLabel}>📞 هاتف {view.phones.filter(Boolean).length > 1 ? i + 1 : ''}</span>
               <span style={styles.displayValue}>{p}</span>
             </div>
           ))}
           {view.emails.filter(Boolean).map((em, i) => (
             <div style={styles.fieldCard} key={`email-${i}`}>
-              <span style={styles.displayLabel}>📧 بريد إلكتروني {i + 1}</span>
+              <span style={styles.displayLabel}>📧 بريد إلكتروني {view.emails.filter(Boolean).length > 1 ? i + 1 : ''}</span>
               <span style={styles.displayValue}>{em}</span>
+            </div>
+          ))}
+          {view.addresses.filter(Boolean).map((a, i) => (
+            <div style={styles.fieldCard} key={`addr-${i}`}>
+              <span style={styles.displayLabel}>📍 العنوان {view.addresses.filter(Boolean).length > 1 ? i + 1 : ''}</span>
+              <span style={styles.displayValue}>{a}</span>
             </div>
           ))}
         </div>
@@ -213,18 +213,6 @@ export default function ContactEditor({ token }) {
     <div style={styles.wrapper}>
       <form onSubmit={handleSubmit} style={styles.form}>
         <FieldGroup
-          title="العناوين"
-          icon="📍"
-          field="addresses"
-          items={form.addresses}
-          onChange={updateItem}
-          onAdd={addItem}
-          onRemove={removeItem}
-          placeholder="مثال: 1 مصطفى رفعت, شيراتون"
-          type="text"
-        />
-
-        <FieldGroup
           title="أرقام الهاتف"
           icon="📞"
           field="phones"
@@ -246,6 +234,18 @@ export default function ContactEditor({ token }) {
           onRemove={removeItem}
           placeholder="example@domain.com"
           type="email"
+        />
+
+        <FieldGroup
+          title="العناوين"
+          icon="📍"
+          field="addresses"
+          items={form.addresses}
+          onChange={updateItem}
+          onAdd={addItem}
+          onRemove={removeItem}
+          placeholder="مثال: 1 مصطفى رفعت, شيراتون"
+          type="text"
         />
 
         <div style={styles.formActions}>
