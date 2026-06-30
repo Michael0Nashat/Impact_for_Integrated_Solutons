@@ -9,27 +9,43 @@ const emptyForm = () => ({
 });
 
 function contactToForm(c) {
-  if (!c) return emptyForm();
+  if (!c) {
+    return {
+      addresses: [''],
+      phones: [''],
+      emails: [''],
+    };
+  }
+
   return {
-    addresses: c.addresses?.length ? c.addresses : [c.address || ''],
-    phones: c.phones?.length ? c.phones : [c.phone || ''],
-    emails: c.emails?.length ? c.emails : [c.email || ''],
+    addresses:
+      Array.isArray(c.addresses) && c.addresses.length
+        ? c.addresses
+        : c.address
+        ? [c.address]
+        : [''],
+
+    phones:
+      Array.isArray(c.phones) && c.phones.length
+        ? c.phones
+        : c.phone
+        ? [c.phone]
+        : [''],
+
+    emails:
+      Array.isArray(c.emails) && c.emails.length
+        ? c.emails
+        : c.email
+        ? [c.email]
+        : [''],
   };
 }
 
 function formToPayload(form) {
-  const addresses = form.addresses.map(v => v.trim()).filter(Boolean);
-  const phones = form.phones.map(v => v.trim()).filter(Boolean);
-  const emails = form.emails.map(v => v.trim()).filter(Boolean);
-
   return {
-    addresses: addresses.length ? addresses : [''],
-    phones: phones.length ? phones : [''],
-    emails: emails.length ? emails : [''],
-    // legacy fields for backward compatibility
-    address: addresses[0] || '',
-    phone: phones[0] || '',
-    email: emails[0] || '',
+    addresses: form.addresses.filter(v => v.trim() !== ''),
+    phones: form.phones.filter(v => v.trim() !== ''),
+    emails: form.emails.filter(v => v.trim() !== ''),
   };
 }
 
@@ -50,15 +66,15 @@ export default function ContactEditor({ token }) {
     setLoading(true);
     try {
       const res = await fetch(API_BASE);
-      const rows = await res.json();
-      if (Array.isArray(rows) && rows.length > 0) {
-        const first = rows[0];
-        setContact(first);
-        setForm(contactToForm(first));
-      } else {
-        setContact(null);
-        setForm(emptyForm());
-      }
+     const rows = await res.json();
+
+if (Array.isArray(rows) && rows.length) {
+    setContact(rows[0]);
+    setForm(contactToForm(rows[0]));
+} else {
+    setContact(null);
+    setForm(emptyForm());
+}
     } catch (e) {
       console.error('Failed to load contact info:', e);
     } finally {
