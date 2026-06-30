@@ -20,7 +20,6 @@ export default function Contact() {
     email: '',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -61,64 +60,15 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
     const { name, email, message } = formData;
-    
-    try {
-      // Send to API
-      const response = await fetch('https://impact-for-integrated-solutons-serv.vercel.app/api/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          message
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
-      const result = await response.json();
-      console.log('Message sent successfully:', result);
-      
-      // Also open email client as fallback
-      const subject = `رسالة جديدة من ${name}`;
-      const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
-      const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
-      const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      
-      // Open email client
-      window.open(mailtoUrl, '_blank');
-      
-      alert('تم إرسال رسالتك بنجاح!');
-      
-      // Clear form
-      setFormData({
-        name: '',
-        email: '',
-        message: ''
-      });
-      
-    } catch (error) {
-      console.error('Error sending message:', error);
-      alert('حدث خطأ في إرسال الرسالة. سيتم فتح تطبيق البريد الإلكتروني.');
-      
-      // Fallback to email client only
-      const subject = `رسالة جديدة من ${name}`;
-      const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
-      const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
-      const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailtoUrl;
-    } finally {
-      setIsSubmitting(false);
-    }
+    const subject = `رسالة جديدة من ${name}`;
+    const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
+    const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
+    const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+    alert('تم فتح تطبيق البريد لإرسال رسالتك!');
   };
 
   const sectionStyle = {
@@ -171,16 +121,15 @@ export default function Contact() {
   const buttonStyle = {
     width: '100%',
     padding: isMobile ? '14px' : '16px',
-    background: isButtonHovered || isSubmitting ? '#e0a800' : '#ffc107',
+    background: isButtonHovered ? '#e0a800' : '#ffc107',
     border: 'none',
     fontWeight: 800,
     borderRadius: '40px',
-    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+    cursor: 'pointer',
     transition: 'all 0.3s ease',
     fontSize: isMobile ? '15px' : '16px',
-    transform: isButtonHovered && !isSubmitting ? 'translateY(-3px) scale(1.02)' : 'translateY(0) scale(1)',
-    boxShadow: isButtonHovered && !isSubmitting ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)',
-    opacity: isSubmitting ? 0.7 : 1
+    transform: isButtonHovered ? 'translateY(-3px) scale(1.02)' : 'translateY(0) scale(1)',
+    boxShadow: isButtonHovered ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)'
   };
 
   const privacyBtnStyle = {
@@ -266,9 +215,8 @@ export default function Contact() {
               style={buttonStyle}
               onMouseEnter={() => setIsButtonHovered(true)}
               onMouseLeave={() => setIsButtonHovered(false)}
-              disabled={isSubmitting}
             >
-              {isSubmitting ? 'جاري الإرسال...' : 'إرسال'}
+              إرسال
             </button>
           </form>
         </div>
