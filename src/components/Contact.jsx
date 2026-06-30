@@ -15,10 +15,17 @@ export default function Contact() {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
+  });
+  const [contactInfo, setContactInfo] = useState({
+    address: "",
+    phones: [],
+    emails: [],
   });
 
   useEffect(() => {
@@ -52,6 +59,38 @@ export default function Contact() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchContacts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch("https://impact-for-integrated-solutons-serv.vercel.app/api/contacts");
+        if (!response.ok) throw new Error('فشل في تحميل بيانات التواصل');
+        const rows = await response.json();
+        
+        // البحث عن أول سجل يحتوي على عنوان
+        const addressRow = rows.find(r => r.address && r.address.trim() !== '');
+        
+        setContactInfo({
+          address: addressRow?.address || "",
+          phones: rows
+            .map(r => r.phone)
+            .filter(phone => phone && phone.trim() !== ''),
+          emails: rows
+            .map(r => r.email)
+            .filter(email => email && email.trim() !== '')
+        });
+      } catch (err) {
+        console.error('خطأ في تحميل بيانات التواصل:', err);
+        setError(err.message || 'حدث خطأ أثناء تحميل بيانات التواصل');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContacts();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -65,7 +104,7 @@ export default function Contact() {
     const { name, email, message } = formData;
     const subject = `رسالة جديدة من ${name}`;
     const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
-    const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
+    const recipients = contactInfo.emails.join(';'); // استخدام ; بدلاً من , (أفضل للـ mailto)
     const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoUrl;
     alert('تم فتح تطبيق البريد لإرسال رسالتك!');
@@ -147,6 +186,56 @@ export default function Contact() {
     fontSize: isMobile ? '14px' : '15px'
   };
 
+  // عرض رسالة التحميل
+  if (loading) {
+    return (
+      <section id="contact" style={sectionStyle}>
+        <div style={{
+          textAlign: 'center',
+          padding: '50px',
+          fontSize: '18px',
+          color: '#666'
+        }}>
+          جاري تحميل بيانات التواصل...
+        </div>
+      </section>
+    );
+  }
+
+  // عرض رسالة الخطأ
+  if (error) {
+    return (
+      <section id="contact" style={sectionStyle}>
+        <div style={{
+          textAlign: 'center',
+          padding: '50px',
+          fontSize: '18px',
+          color: '#e74c3c',
+          background: '#fde8e8',
+          borderRadius: '15px',
+          margin: '20px 0'
+        }}>
+          ⚠️ {error}
+          <br />
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: '15px',
+              padding: '10px 25px',
+              background: '#ffc107',
+              border: 'none',
+              borderRadius: '25px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
       <style>{contactStyles}</style>
@@ -154,11 +243,24 @@ export default function Contact() {
         <h2 style={headingStyle}>اتصل بنا</h2>
         <div style={containerStyle}>
           <div>
-            <p style={getInfoStyle(0.4)}>📍 1 مصطفى رفعت, شيراتون</p>
-            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01027742000" style={{ color: 'inherit', textDecoration: 'none' }}>01027742000</a></p>
-            <p style={getInfoStyle(0.5)}>📞 <a href="tel:01278370467" style={{ color: 'inherit', textDecoration: 'none' }}>01278370467</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:mina.elwahsh@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>mina.elwahsh@iisolutions.com.eg</a></p>
-            <p style={getInfoStyle(0.6)}>📧 <a href="mailto:k.mohsen@iisolutions.com.eg" style={{ color: 'inherit', textDecoration: 'none' }}>k.mohsen@iisolutions.com.eg</a></p>
+            {contactInfo.address && (
+              <p style={getInfoStyle(0.4)}>📍 {contactInfo.address}</p>
+            )}
+            {contactInfo.phones.map((phone, index) => (
+              <p key={`phone-${index}`} style={getInfoStyle(0.5 + index * 0.1)}>
+                📞 <a 
+                  href={`tel:${phone.replace(/\s/g, '')}`} 
+                  style={{ color: 'inherit', textDecoration: 'none' }}
+                >
+                  {phone}
+                </a>
+              </p>
+            ))}
+            {contactInfo.emails.map((email, index) => (
+              <p key={`email-${index}`} style={getInfoStyle(0.6 + index * 0.1)}>
+                📧 <a href={`mailto:${email}`} style={{ color: 'inherit', textDecoration: 'none' }}>{email}</a>
+              </p>
+            ))}
             <p
               style={{
                 ...getInfoStyle(0.7),

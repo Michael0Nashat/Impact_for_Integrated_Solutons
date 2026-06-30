@@ -1,0 +1,117 @@
+{
+  "id": "178d5c89-f5ba-44cf-8dee-90baf02a5848",
+  "title": "use CREATE TABLE IF NOT EXISTS contacts (\nid         SERI...",
+  "description": "Task breakdown for: use CREATE TABLE IF NOT EXISTS contacts (\nid         SERIAL PRIMARY KEY,\naddress    TEXT,\nphone    VARCHAR(20),\nemail    VARCHAR(255),\ncreated_at TIMESTAMPTZ DEFAULT NOW()\n); in files contact and Contacteditor in code",
+  "prompt": "use CREATE TABLE IF NOT EXISTS contacts (\nid         SERIAL PRIMARY KEY,\naddress    TEXT,\nphone    VARCHAR(20),\nemail    VARCHAR(255),\ncreated_at TIMESTAMPTZ DEFAULT NOW()\n); in files contact and Contacteditor in code",
+  "todos": [
+    {
+      "id": "3756b17a-16b9-4667-b0ef-f3762afced7f",
+      "title": "Analyze requirements: use CREATE TABLE IF NOT EXISTS contacts (\nid         SERIAL PRIMARY KEY,\nad...",
+      "description": "Analyze requirements: use CREATE TABLE IF NOT EXISTS contacts (\nid         SERIAL PRIMARY KEY,\naddress    TEXT,\nphone    VARCHAR(20),\nemail    VARCHAR(255),\ncreated_at TIMESTAMPTZ DEFAULT NOW()\n); in files contact and Contacteditor in code",
+      "status": "in-progress",
+      "priority": "high",
+      "complexity": "complex",
+      "category": "coding",
+      "dependsOn": [],
+      "blockedBy": [],
+      "filePaths": [],
+      "toolsNeeded": [
+        "edit_file",
+        "read_file"
+      ],
+      "estimatedTimeMs": 300000,
+      "actualTimeMs": 0,
+      "retryCount": 0,
+      "maxRetries": 2,
+      "subtasks": [],
+      "orderIndex": 0,
+      "createdAt": 1782841246797,
+      "progress": 0,
+      "tags": [],
+      "startedAt": 1782841247883
+    },
+    {
+      "id": "666cdecb-757d-4106-9fe0-2543a6bcd635",
+      "title": "Implement the solution",
+      "description": "Implement the solution",
+      "status": "pending",
+      "priority": "medium",
+      "complexity": "medium",
+      "category": "coding",
+      "dependsOn": [
+        "3756b17a-16b9-4667-b0ef-f3762afced7f"
+      ],
+      "blockedBy": [
+        "3756b17a-16b9-4667-b0ef-f3762afced7f"
+      ],
+      "filePaths": [],
+      "toolsNeeded": [
+        "edit_file"
+      ],
+      "estimatedTimeMs": 120000,
+      "actualTimeMs": 0,
+      "retryCount": 0,
+      "maxRetries": 2,
+      "subtasks": [],
+      "orderIndex": 1,
+      "createdAt": 1782841246798,
+      "progress": 0,
+      "tags": []
+    },
+    {
+      "id": "3dc8faba-0511-437b-8e66-6976a6309261",
+      "title": "Verify and test the implementation",
+      "description": "Verify and test the implementation",
+      "status": "pending",
+      "priority": "low",
+      "complexity": "medium",
+      "category": "testing",
+      "dependsOn": [
+        "666cdecb-757d-4106-9fe0-2543a6bcd635"
+      ],
+      "blockedBy": [
+        "666cdecb-757d-4106-9fe0-2543a6bcd635"
+      ],
+      "filePaths": [],
+      "toolsNeeded": [
+        "run_terminal_cmd"
+      ],
+      "estimatedTimeMs": 120000,
+      "actualTimeMs": 0,
+      "retryCount": 0,
+      "maxRetries": 2,
+      "subtasks": [],
+      "orderIndex": 2,
+      "createdAt": 1782841246798,
+      "progress": 0,
+      "tags": []
+    }
+  ],
+  "status": "active",
+  "progress": 0,
+  "stats": {
+    "totalTodos": 3,
+    "completedTodos": 0,
+    "failedTodos": 0,
+    "cancelledTodos": 0,
+    "inProgressTodos": 1,
+    "pendingTodos": 2,
+    "blockedTodos": 0,
+    "totalEstimatedTimeMs": 540000,
+    "totalActualTimeMs": 0,
+    "totalRetries": 0
+  },
+  "config": {
+    "maxConcurrentTodos": 3,
+    "autoStartNextTodo": true,
+    "showProgressNotifications": true,
+    "autoSaveInterval": 30000,
+    "retryOnFailure": true,
+    "maxRetries": 2,
+    "autoGenerateSubtasks": true,
+    "analyzeDependencies": true
+  },
+  "createdAt": 1782841246798,
+  "workspaceDirectory": "e:\\js\\react\\Impact_for_Integrated_Solutons",
+  "startedAt": 1782841247883
+}
