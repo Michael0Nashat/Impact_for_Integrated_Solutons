@@ -22,9 +22,9 @@ export default function Contact() {
   });
 
   const [contactInfo, setContactInfo] = useState({
-  address: "",
-  phone: [],
-  email: []
+  addresses: [],
+  phones: [],
+  emails: [],
 });
   
   useEffect(() => {
@@ -34,22 +34,23 @@ export default function Contact() {
         "https://impact-for-integrated-solutons-serv.vercel.app/api/contacts"
       );
 
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (Array.isArray(data) && data.length > 0) {
-        setContactInfo({
-          address: data[0].address || "",
-          phone: data
-            .map((item) => item.phone)
-            .filter(Boolean),
+        const contact = data[0];
 
-          email: data
-            .map((item) => item.email)
-            .filter(Boolean),
+        setContactInfo({
+          addresses: contact.addresses || [],
+          phones: contact.phones || [],
+          emails: contact.emails || [],
         });
       }
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch contacts:", err);
     }
   };
 
@@ -188,12 +189,15 @@ export default function Contact() {
       <section id="contact" style={sectionStyle}>
         <h2 style={headingStyle}>اتصل بنا</h2>
         <div style={containerStyle}>
-         <div>
-  <p style={getInfoStyle(0.4)}>
-    📍 {contactInfo.address}
-  </p>
+       <div>
 
-  {contactInfo.phone.map((phone, index) => (
+  {contactInfo.addresses.map((address, index) => (
+    <p key={index} style={getInfoStyle(0.4 + index * 0.05)}>
+      📍 {address}
+    </p>
+  ))}
+
+  {contactInfo.phones.map((phone, index) => (
     <p key={index} style={getInfoStyle(0.5 + index * 0.05)}>
       📞{" "}
       <a
@@ -205,7 +209,7 @@ export default function Contact() {
     </p>
   ))}
 
-  {contactInfo.email.map((email, index) => (
+  {contactInfo.emails.map((email, index) => (
     <p key={index} style={getInfoStyle(0.6 + index * 0.05)}>
       📧{" "}
       <a
@@ -233,6 +237,8 @@ export default function Contact() {
   >
     🔒 سياسة الخصوصية / Privacy Policy
   </p>
+
+</div>
 </div>
           <form onSubmit={handleSubmit}>
             <input
