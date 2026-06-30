@@ -15,6 +15,8 @@ export default function Contact() {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -58,17 +60,84 @@ export default function Contact() {
       ...prev,
       [name]: value
     }));
+    // Clear status when user starts typing again
+    if (submitStatus) setSubmitStatus(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
     const { name, email, message } = formData;
-    const subject = `رسالة جديدة من ${name}`;
-    const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
-    const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
-    const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
-    alert('تم فتح تطبيق البريد لإرسال رسالتك!');
+
+    // Prepare contact data with address
+    const contactData = {
+      address: '1 مصطفى رفعت, شيراتون',
+      phone: ['01027742000', '01278370467'].join(','), // Store both numbers
+      email: ['mina.elwahsh@iisolutions.com.eg', 'k.mohsen@iisolutions.com.eg'].join(','),
+      // Additional fields for the message
+      name: name,
+      message: message
+    };
+
+    try {
+      const response = await fetch('https://impact-for-integrated-solutons-serv.vercel.app/api/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Contact saved successfully:', result);
+      
+      setSubmitStatus('success');
+      
+      // Also open mail client as a backup
+      const subject = `رسالة جديدة من ${name}`;
+      const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
+      const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
+      const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      
+      // Open mail client
+      window.open(mailtoUrl, '_blank');
+      
+      // Reset form after successful submission
+      setFormData({
+        name: '',
+        email: '',
+        message: ''
+      });
+
+      // Auto-clear success message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus(null);
+      }, 5000);
+
+    } catch (error) {
+      console.error('Error submitting contact:', error);
+      setSubmitStatus('error');
+      
+      // Fallback: Open mail client if API fails
+      const subject = `رسالة جديدة من ${name}`;
+      const body = `الاسم: ${name}\nالبريد الإلكتروني: ${email}\n\nالرسالة:\n${message}`;
+      const recipients = 'mina.elwahsh@iisolutions.com.eg,k.mohsen@iisolutions.com.eg';
+      const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(mailtoUrl, '_blank');
+
+      // Auto-clear error message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus(null);
+      }, 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const sectionStyle = {
@@ -125,11 +194,25 @@ export default function Contact() {
     border: 'none',
     fontWeight: 800,
     borderRadius: '40px',
-    cursor: 'pointer',
+    cursor: isSubmitting ? 'not-allowed' : 'pointer',
     transition: 'all 0.3s ease',
     fontSize: isMobile ? '15px' : '16px',
-    transform: isButtonHovered ? 'translateY(-3px) scale(1.02)' : 'translateY(0) scale(1)',
-    boxShadow: isButtonHovered ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)'
+    transform: isButtonHovered && !isSubmitting ? 'translateY(-3px) scale(1.02)' : 'translateY(0) scale(1)',
+    boxShadow: isButtonHovered && !isSubmitting ? '0 10px 25px rgba(255, 193, 7, 0.4)' : '0 5px 15px rgba(255, 193, 7, 0.2)',
+    opacity: isSubmitting ? 0.7 : 1
+  };
+
+  const statusMessageStyle = {
+    textAlign: 'center',
+    padding: '12px',
+    borderRadius: '10px',
+    marginTop: '12px',
+    fontSize: isMobile ? '14px' : '15px',
+    fontWeight: '600',
+    backgroundColor: submitStatus === 'success' ? '#d4edda' : '#f8d7da',
+    color: submitStatus === 'success' ? '#155724' : '#721c24',
+    border: `1px solid ${submitStatus === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
+    display: submitStatus ? 'block' : 'none'
   };
 
   const privacyBtnStyle = {
@@ -187,6 +270,7 @@ export default function Contact() {
               onFocus={() => setFocusedInput('name')}
               onBlur={() => setFocusedInput(null)}
               required
+              disabled={isSubmitting}
             />
             <input
               type="email"
@@ -198,6 +282,7 @@ export default function Contact() {
               onFocus={() => setFocusedInput('email')}
               onBlur={() => setFocusedInput(null)}
               required
+              disabled={isSubmitting}
             />
             <textarea
               name="message"
@@ -209,15 +294,22 @@ export default function Contact() {
               onFocus={() => setFocusedInput('message')}
               onBlur={() => setFocusedInput(null)}
               required
+              disabled={isSubmitting}
             />
             <button
               type="submit"
               style={buttonStyle}
               onMouseEnter={() => setIsButtonHovered(true)}
               onMouseLeave={() => setIsButtonHovered(false)}
+              disabled={isSubmitting}
             >
-              إرسال
+              {isSubmitting ? 'جاري الإرسال...' : 'إرسال'}
             </button>
+            <div style={statusMessageStyle}>
+              {submitStatus === 'success' 
+                ? '✅ تم إرسال رسالتك بنجاح!' 
+                : '❌ حدث خطأ أثناء الإرسال. تم فتح البريد الإلكتروني كحل بديل.'}
+            </div>
           </form>
         </div>
       </section>
