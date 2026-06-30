@@ -189,7 +189,7 @@ export default function Contact() {
       <section id="contact" style={sectionStyle}>
         <h2 style={headingStyle}>اتصل بنا</h2>
         <div style={containerStyle}>
-       <div>
+         <div>
 
   {contactInfo.addresses.map((address, index) => (
     <p key={index} style={getInfoStyle(0.4 + index * 0.05)}>
@@ -238,7 +238,6 @@ export default function Contact() {
     🔒 سياسة الخصوصية / Privacy Policy
   </p>
 
-</div>
 </div>
           <form onSubmit={handleSubmit}>
             <input
