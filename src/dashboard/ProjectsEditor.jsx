@@ -20,6 +20,7 @@ export default function ProjectsEditor({
   const [orderedProjects, setOrderedProjects] = useState(projects);
   const dragIdx = useRef(null);
   const [draggingIdx, setDraggingIdx] = useState(null);
+  const [dragOverIdx, setDragOverIdx] = useState(null);
   const isDragging = useRef(false);
 
   useEffect(() => {
@@ -27,36 +28,46 @@ export default function ProjectsEditor({
     if (!isDragging.current) setOrderedProjects(projects);
   }, [projects]);
 
+  const cleanupDrag = () => {
+    dragIdx.current = null;
+    isDragging.current = false;
+    setDraggingIdx(null);
+    setDragOverIdx(null);
+  };
+
   const handleDragStart = (idx) => (e) => {
     dragIdx.current = idx;
     isDragging.current = true;
     setDraggingIdx(idx);
     e.dataTransfer.effectAllowed = 'move';
+    // بعض المتصفحات بتحتاج setData عشان تفعّل السحب صح
+    e.dataTransfer.setData('text/plain', String(idx));
   };
 
-  const handleDragEnter = (idx) => (e) => {
+  // بنمنع السلوك الافتراضي بس عشان نسمح بالإفلات، من غير ما نغير ترتيب العناصر أثناء السحب نفسه
+  const handleDragOver = (idx) => (e) => {
     e.preventDefault();
-    if (dragIdx.current === null || dragIdx.current === idx) return;
+    if (dragOverIdx !== idx) setDragOverIdx(idx);
+  };
+
+  // التبديل الفعلي في الترتيب بيحصل هنا بس، لحظة الإفلات
+  const handleDrop = (idx) => (e) => {
+    e.preventDefault();
+    const from = dragIdx.current;
+    if (from === null || from === idx) { cleanupDrag(); return; }
+
     setOrderedProjects(prev => {
       const next = [...prev];
-      const [moved] = next.splice(dragIdx.current, 1);
+      const [moved] = next.splice(from, 1);
       next.splice(idx, 0, moved);
+      if (typeof onReorder === 'function') onReorder(next);
       return next;
     });
-    dragIdx.current = idx;
-    setDraggingIdx(idx);
+
+    cleanupDrag();
   };
 
-  const handleDragOver = (e) => e.preventDefault();
-
-  const handleDragEnd = () => {
-    dragIdx.current = null;
-    isDragging.current = false;
-    setDraggingIdx(null);
-    if (typeof onReorder === 'function') {
-      onReorder(orderedProjects);
-    }
-  };
+  const handleDragEnd = () => cleanupDrag();
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -143,15 +154,17 @@ export default function ProjectsEditor({
             key={p.id}
             draggable
             onDragStart={handleDragStart(idx)}
-            onDragEnter={handleDragEnter(idx)}
-            onDragOver={handleDragOver}
+            onDragOver={handleDragOver(idx)}
+            onDrop={handleDrop(idx)}
             onDragEnd={handleDragEnd}
             style={{
               ...s.card,
               position: 'relative',
               cursor: 'grab',
               opacity: draggingIdx === idx ? 0.4 : 1,
-              transition: 'opacity 0.15s ease',
+              outline: dragOverIdx === idx && draggingIdx !== idx ? '2px dashed #ffc107' : 'none',
+              outlineOffset: -2,
+              transition: 'opacity 0.15s ease, outline 0.1s ease',
               userSelect: 'none'
             }}
           >
