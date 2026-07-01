@@ -21,8 +21,8 @@ export const DEFAULT_ABOUT = {
 function sortByOrder(list) {
   if (!Array.isArray(list)) return list;
   return [...list].sort((a, b) => {
-    const oa = a.order ?? a.position ?? 0;
-    const ob = b.order ?? b.position ?? 0;
+    const oa = a.sort_order ?? a.order ?? a.position ?? 0;
+    const ob = b.sort_order ?? b.order ?? b.position ?? 0;
     return oa - ob;
   });
 }
@@ -89,8 +89,6 @@ export function useDashboardData(token = '') {
           status: p.status,
           work_type: p.work_type,
           systems: p.systems || [],
-          // مشروع جديد بيتحط في الآخر
-          order: projects.length,
         }),
       });
       if (!res.ok) throw new Error('Add failed');
@@ -149,24 +147,16 @@ export function useDashboardData(token = '') {
     setProjects(newOrder);
 
     try {
-      await Promise.all(
-        newOrder.map((p, idx) =>
-          fetch(`${API}/projects/${Number(p.id)}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({
-              title: p.title,
-              description: p.description ?? p.desc,
-              category: p.category,
-              img: p.img,
-              status: p.status,
-              work_type: p.work_type,
-              systems: p.systems || [],
-              order: idx,
-            }),
-          })
-        )
-      );
+      const res = await fetch(`${API}/projects/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          order: newOrder.map((p, idx) => ({ id: Number(p.id), sort_order: idx })),
+        }),
+      });
+      if (!res.ok) throw new Error('Reorder failed');
+      const list = await res.json();
+      if (Array.isArray(list)) setProjects(sortByOrder(list));
       window.dispatchEvent(new Event('projects-updated'));
     } catch (e) {
       console.error('reorderProjects error:', e.message);
