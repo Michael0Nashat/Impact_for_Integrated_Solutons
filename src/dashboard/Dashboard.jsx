@@ -20,7 +20,7 @@ export default function Dashboard({ onLogout, token }) {
   const [activeTab, setActiveTab] = useState('hero');
   const { 
     hero, saveHero, about, saveAbout, 
-    projects, addProject, updateProject, deleteProject,
+    projects, addProject, updateProject, deleteProject, reorderProjects,
     defaultSystems, addDefaultSystem, deleteDefaultSystem,
   } = useDashboardData(token);
 
@@ -65,6 +65,7 @@ export default function Dashboard({ onLogout, token }) {
               onAdd={addProject}
               onUpdate={updateProject}
               onDelete={deleteProject}
+              onReorder={reorderProjects}
               token={token}
               defaultSystems={defaultSystems}
               addDefaultSystem={addDefaultSystem}
