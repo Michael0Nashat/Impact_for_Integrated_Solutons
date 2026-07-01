@@ -10,6 +10,15 @@ const projectStyles = `
   }
 `;
 
+function sortByOrder(list) {
+  if (!Array.isArray(list)) return list;
+  return [...list].sort((a, b) => {
+    const oa = a.order ?? a.position ?? 0;
+    const ob = b.order ?? b.position ?? 0;
+    return oa - ob;
+  });
+}
+
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -23,7 +32,7 @@ export default function Projects() {
     const loadProjects = () => {
       fetch(`${API}/projects`)
         .then(r => r.json())
-        .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
+        .then(data => setProjects(Array.isArray(data) && data.length ? sortByOrder(data) : allProjects))
         .catch(() => setProjects(allProjects));
     };
 

@@ -17,6 +17,16 @@ export const DEFAULT_ABOUT = {
   image: '/IMG-20260314-WA0029.jpg',
 };
 
+// نرتب المشاريع حسب حقل order/position لو موجود، وإلا نسيبها زي ما هي
+function sortByOrder(list) {
+  if (!Array.isArray(list)) return list;
+  return [...list].sort((a, b) => {
+    const oa = a.order ?? a.position ?? 0;
+    const ob = b.order ?? b.position ?? 0;
+    return oa - ob;
+  });
+}
+
 async function getSetting(key, fallback) {
   try {
     const res = await fetch(`${API}/settings/${key}`);
@@ -45,7 +55,7 @@ export function useDashboardData(token = '') {
 
     fetch(`${API}/projects`)
       .then(r => r.json())
-      .then(data => setProjects(Array.isArray(data) && data.length ? data : allProjects))
+      .then(data => setProjects(Array.isArray(data) && data.length ? sortByOrder(data) : allProjects))
       .catch(() => setProjects(allProjects));
 
     fetch(`${API}/default-systems`)
@@ -78,7 +88,9 @@ export function useDashboardData(token = '') {
           img: p.img,
           status: p.status,
           work_type: p.work_type,
-          systems: p.systems || []
+          systems: p.systems || [],
+          // مشروع جديد بيتحط في الآخر
+          order: projects.length,
         }),
       });
       if (!res.ok) throw new Error('Add failed');
@@ -103,7 +115,7 @@ export function useDashboardData(token = '') {
           img: p.img,
           status: p.status,
           work_type: p.work_type,
-          systems: p.systems || []
+          systems: p.systems || [],
         }),
       });
       if (!res.ok) throw new Error('Update failed');
@@ -112,7 +124,7 @@ export function useDashboardData(token = '') {
       const listRes = await fetch(`${API}/projects`);
       const list = await listRes.json();
       if (Array.isArray(list)) {
-        setProjects(list);
+        setProjects(sortByOrder(list));
       } else {
         setProjects(prev => prev.map(x => Number(x.id) === Number(id) ? updated : x));
       }
@@ -129,6 +141,42 @@ export function useDashboardData(token = '') {
     });
     setProjects(prev => prev.filter(x => Number(x.id) !== Number(id)));
     window.dispatchEvent(new Event('projects-updated'));
+  };
+
+  // تحديث ترتيب المشاريع بعد السحب والإفلات
+  const reorderProjects = async (newOrder) => {
+    // تحديث فوري في الواجهة
+    setProjects(newOrder);
+
+    try {
+      await Promise.all(
+        newOrder.map((p, idx) =>
+          fetch(`${API}/projects/${Number(p.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              title: p.title,
+              description: p.description ?? p.desc,
+              category: p.category,
+              img: p.img,
+              status: p.status,
+              work_type: p.work_type,
+              systems: p.systems || [],
+              order: idx,
+            }),
+          })
+        )
+      );
+      window.dispatchEvent(new Event('projects-updated'));
+    } catch (e) {
+      console.error('reorderProjects error:', e.message);
+      // لو حصل خطأ، نرجع نجيب الترتيب الصح من السيرفر
+      try {
+        const res = await fetch(`${API}/projects`);
+        const list = await res.json();
+        if (Array.isArray(list)) setProjects(sortByOrder(list));
+      } catch {}
+    }
   };
 
   // Default Systems CRUD
@@ -154,7 +202,7 @@ export function useDashboardData(token = '') {
 
   return {
     hero, saveHero, about, saveAbout,
-    projects, addProject, updateProject, deleteProject,
+    projects, addProject, updateProject, deleteProject, reorderProjects,
     defaultSystems, addDefaultSystem, deleteDefaultSystem,
   };
 }
