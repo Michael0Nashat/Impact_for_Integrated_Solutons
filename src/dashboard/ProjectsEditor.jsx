@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { s } from './dashStyles';
 
 const empty = { title: '', desc: '', category: '', img: '', status: '', work_type: '', systems: [] };
 
 export default function ProjectsEditor({ 
-  projects, onAdd, onUpdate, onDelete, 
+  projects, onAdd, onUpdate, onDelete, onReorder,
   token,
   defaultSystems = [], addDefaultSystem, deleteDefaultSystem
 }) {
@@ -15,6 +15,48 @@ export default function ProjectsEditor({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [newSystem, setNewSystem] = useState('');
+
+  // ترتيب المشاريع بالسحب والإفلات
+  const [orderedProjects, setOrderedProjects] = useState(projects);
+  const dragIdx = useRef(null);
+  const [draggingIdx, setDraggingIdx] = useState(null);
+  const isDragging = useRef(false);
+
+  useEffect(() => {
+    // نتابع تغييرات projects القادمة من فوق (إضافة/حذف/تحديث) طالما مفيش سحب جاري حالياً
+    if (!isDragging.current) setOrderedProjects(projects);
+  }, [projects]);
+
+  const handleDragStart = (idx) => (e) => {
+    dragIdx.current = idx;
+    isDragging.current = true;
+    setDraggingIdx(idx);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnter = (idx) => (e) => {
+    e.preventDefault();
+    if (dragIdx.current === null || dragIdx.current === idx) return;
+    setOrderedProjects(prev => {
+      const next = [...prev];
+      const [moved] = next.splice(dragIdx.current, 1);
+      next.splice(idx, 0, moved);
+      return next;
+    });
+    dragIdx.current = idx;
+    setDraggingIdx(idx);
+  };
+
+  const handleDragOver = (e) => e.preventDefault();
+
+  const handleDragEnd = () => {
+    dragIdx.current = null;
+    isDragging.current = false;
+    setDraggingIdx(null);
+    if (typeof onReorder === 'function') {
+      onReorder(orderedProjects);
+    }
+  };
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -96,8 +138,30 @@ export default function ProjectsEditor({
       <h2 style={s.sectionTitle}>🗂️ إدارة المشاريع</h2>
       <button style={s.addBtn} onClick={openAdd}>+ إضافة مشروع جديد</button>
       <div style={s.grid3}>
-        {projects.map(p => (
-          <div key={p.id} style={s.card}>
+        {orderedProjects.map((p, idx) => (
+          <div
+            key={p.id}
+            draggable
+            onDragStart={handleDragStart(idx)}
+            onDragEnter={handleDragEnter(idx)}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            style={{
+              ...s.card,
+              position: 'relative',
+              cursor: 'grab',
+              opacity: draggingIdx === idx ? 0.4 : 1,
+              transition: 'opacity 0.15s ease',
+              userSelect: 'none'
+            }}
+          >
+            <div style={{
+              position: 'absolute', top: 8, right: 8, background: 'rgba(15,23,42,0.7)',
+              color: '#94a3b8', borderRadius: 6, padding: '2px 6px', fontSize: 14,
+              lineHeight: 1, pointerEvents: 'none'
+            }}>
+              ⠿
+            </div>
             {p.img && <img src={p.img} alt={p.title} style={s.cardImg} />}
             <div style={s.cardBody}>
               <p style={s.cardTitle}>{p.title}</p>
