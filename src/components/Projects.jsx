@@ -13,8 +13,8 @@ const projectStyles = `
 function sortByOrder(list) {
   if (!Array.isArray(list)) return list;
   return [...list].sort((a, b) => {
-    const oa = a.order ?? a.position ?? 0;
-    const ob = b.order ?? b.position ?? 0;
+    const oa = a.sort_order ?? a.order ?? a.position ?? 0;
+    const ob = b.sort_order ?? b.order ?? b.position ?? 0;
     return oa - ob;
   });
 }
