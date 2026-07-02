@@ -5,6 +5,7 @@ import AboutEditor from './AboutEditor';
 import ProjectsEditor from './ProjectsEditor';
 import BrandsEditor from './BrandsEditor';
 import ProjectSamplesEditor from './ProjectSamplesEditor';
+import VideosEditor from "./VideosEditor";
 import ContactEditor from './Contacteditor'
 
 const tabs = [
@@ -13,6 +14,7 @@ const tabs = [
   { id: 'projects', label: '🗂️ المشاريع' },
   { id: 'brands', label: '🏷️ العلامات التجارية' },
   { id: 'project_samples', label: '🖼️ أمثلة من مشاريعنا' },
+  { id: 'videos', label: '🎥 الفيديوهات' },
   { id: 'contact', label: '📞 التواصل' },
 ];
 
@@ -74,6 +76,7 @@ export default function Dashboard({ onLogout, token }) {
           )}
           {activeTab === 'brands' && <BrandsEditor token={token} />}
           {activeTab === 'project_samples' && <ProjectSamplesEditor token={token} />}
+          {activeTab === "videos" && (<VideosEditor token={token} />)}
           {activeTab === 'contact' && <ContactEditor token={token} />}
         </div>
       </main>

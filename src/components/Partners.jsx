@@ -1,11 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { API } from '../dashboard/useDashboardData';
 
-const projectVideos = [
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418897/07F5CAC5-FBAC-466C-A3E8-EE36EF2F2AAA_ejisyy.mp4',
-  'https://res.cloudinary.com/dk9ss8rxl/video/upload/v1773418446/IMG_0879_yq5rms.mp4',
-];
-
 const partnersStyles = `
   @-webkit-keyframes scrollRight {
     0% { -webkit-transform: translateX(0); transform: translateX(0); }
@@ -139,6 +134,7 @@ const partnersStyles = `
     backface-visibility: hidden;
   }
   .project-video-item video { -webkit-object-fit: cover; object-fit: cover; width: 100%; height: 100%; display: block; }
+  .project-video-item iframe { width: 100%; height: 100%; display: block; border: 0; }
   .project-video-item:hover { transform: scale(1.05); }
 `;
 
@@ -160,18 +156,85 @@ const customerLogos = [
   '18.png'
 ];
 
+function getYouTubeId(url) {
+  if (!url) return null;
+  // Covers: watch?v=, youtu.be/, embed/, shorts/, live/, m.youtube.com,
+  // youtube-nocookie.com, with or without extra query params like &t=10s
+  const patterns = [
+    /youtu\.be\/([\w-]{11})/,
+    /youtube(?:-nocookie)?\.com\/watch\?(?:.*&)?v=([\w-]{11})/,
+    /youtube(?:-nocookie)?\.com\/embed\/([\w-]{11})/,
+    /youtube(?:-nocookie)?\.com\/shorts\/([\w-]{11})/,
+    /youtube(?:-nocookie)?\.com\/live\/([\w-]{11})/,
+    /youtube\.com\/v\/([\w-]{11})/,
+  ];
+  for (const re of patterns) {
+    const match = url.match(re);
+    if (match) return match[1];
+  }
+  return null;
+}
 
+function getVimeoId(url) {
+  if (!url) return null;
+  // Covers: vimeo.com/ID, player.vimeo.com/video/ID,
+  // vimeo.com/channels/xxx/ID, vimeo.com/groups/xxx/videos/ID
+  const patterns = [
+    /player\.vimeo\.com\/video\/(\d+)/,
+    /vimeo\.com\/(?:channels\/[\w-]+\/|groups\/[\w-]+\/videos\/)?(\d+)/,
+  ];
+  for (const re of patterns) {
+    const match = url.match(re);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+function getStreamableId(url) {
+  if (!url) return null;
+  // Covers: streamable.com/ID and the already-embeddable streamable.com/e/ID
+  const match = url.match(/streamable\.com\/(?:e\/)?([\w]+)/);
+  return match ? match[1] : null;
+}
+
+function getGoogleDriveId(url) {
+  if (!url) return null;
+  // Covers: drive.google.com/file/d/ID/view and drive.google.com/open?id=ID
+  const fileMatch = url.match(/\/d\/([^/?]+)/);
+  if (fileMatch) return fileMatch[1];
+  const openMatch = url.match(/[?&]id=([^&]+)/);
+  return openMatch ? openMatch[1] : null;
+}
+
+// Detect the real provider from the URL itself, so a video still plays
+// correctly even if the wrong provider was picked when it was added.
+function detectProvider(url) {
+  if (!url) return null;
+  if (/youtu\.be|youtube(?:-nocookie)?\.com/.test(url)) return 'youtube';
+  if (/vimeo\.com/.test(url)) return 'vimeo';
+  if (/streamable\.com/.test(url)) return 'streamable';
+  if (/drive\.google\.com/.test(url)) return 'google_drive';
+  if (/res\.cloudinary\.com/.test(url)) return 'cloudinary';
+  if (/\.(mp4|webm|mov|m4v|ogg)(\?|#|$)/i.test(url)) return 'mp4';
+  return null;
+}
 
 function LazyVideo({ src }) {
   const ref = useRef(null);
   const videoRef = useRef(null);
   const [inView, setInView] = useState(false);
 
-  const optimizedSrc = src.replace('/video/upload/', '/video/upload/w_600,h_450,c_fill,q_40,vc_auto/');
+  const isCloudinary = src.includes('res.cloudinary.com') && src.includes('/video/upload/');
 
-  const poster = src
-    .replace('/video/upload/', '/video/upload/w_600,h_450,c_fill,so_0,q_auto,f_auto/')
-    .replace(/\.mp4$/, '.jpg');
+  const optimizedSrc = isCloudinary
+    ? src.replace('/video/upload/', '/video/upload/w_600,h_450,c_fill,q_40,vc_auto/')
+    : src;
+
+  const poster = isCloudinary
+    ? src
+        .replace('/video/upload/', '/video/upload/w_600,h_450,c_fill,so_0,q_auto,f_auto/')
+        .replace(/\.mp4$/, '.jpg')
+    : undefined;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -218,12 +281,132 @@ function LazyVideo({ src }) {
   );
 }
 
+function VideoEmbed({ video }) {
+  const src = video.url || '';
+  if (!src) return null;
+
+  // Trust the URL pattern over the stored provider field — this way a
+  // video still renders correctly even if the wrong provider was picked
+  // (or left on the default) when it was added in the admin panel.
+  const provider = detectProvider(src) || (video.provider || '').toLowerCase();
+
+  if (provider === 'youtube') {
+    const id = getYouTubeId(src);
+    if (id) {
+      return (
+        <iframe
+          src={`https://www.youtube.com/embed/${id}`}
+          title={video.title || 'YouTube video'}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    }
+  }
+
+  if (provider === 'vimeo') {
+    const id = getVimeoId(src);
+    if (id) {
+      return (
+        <iframe
+          src={`https://player.vimeo.com/video/${id}`}
+          title={video.title || 'Vimeo video'}
+          loading="lazy"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    }
+  }
+
+  if (provider === 'streamable') {
+    const id = getStreamableId(src);
+    if (id) {
+      return (
+        <iframe
+          src={`https://streamable.com/e/${id}`}
+          title={video.title || 'Streamable video'}
+          loading="lazy"
+          allow="autoplay; fullscreen"
+          allowFullScreen
+        />
+      );
+    }
+  }
+
+  if (provider === 'google_drive') {
+    const id = getGoogleDriveId(src);
+    if (id) {
+      return (
+        <iframe
+          src={`https://drive.google.com/file/d/${id}/preview`}
+          title={video.title || 'Google Drive video'}
+          loading="lazy"
+          allow="autoplay; fullscreen"
+          allowFullScreen
+        />
+      );
+    }
+  }
+
+  if (provider === 'cloudinary' || provider === 'mp4') {
+    return <LazyVideo src={src} />;
+  }
+
+  // Last resort: try to pull an ID out of the raw URL regardless of what
+  // the provider field said.
+  const fallbackYouTubeId = getYouTubeId(src);
+  if (fallbackYouTubeId) {
+    return (
+      <iframe
+        src={`https://www.youtube.com/embed/${fallbackYouTubeId}`}
+        title={video.title || 'YouTube video'}
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+
+  const fallbackVimeoId = getVimeoId(src);
+  if (fallbackVimeoId) {
+    return (
+      <iframe
+        src={`https://player.vimeo.com/video/${fallbackVimeoId}`}
+        title={video.title || 'Vimeo video'}
+        loading="lazy"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+
+  // A direct video file link (mp4/webm/mov...) with no matching platform.
+  if (/\.(mp4|webm|mov|m4v|ogg)(\?|#|$)/i.test(src)) {
+    return <LazyVideo src={src} />;
+  }
+
+  // Anything else (Jumpshare or any other host that supports iframe embeds).
+  return (
+    <iframe
+      src={src}
+      title={video.title || 'Embedded video'}
+      loading="lazy"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowFullScreen
+      style={{ border: 0 }}
+    />
+  );
+}
+
 export default function Partners() {
   const sectionRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [brands, setBrands] = useState([]);
   const [projectSamples, setProjectSamples] = useState([]);
+  const [projectVideos, setProjectVideos] = useState([]);
 
 
   useEffect(() => {
@@ -256,6 +439,11 @@ export default function Partners() {
     fetch(`${API}/project-samples`)
       .then(r => r.json())
       .then(data => Array.isArray(data) && data.length > 0 && setProjectSamples(data.map(d => d.img)))
+      .catch(() => { });
+
+    fetch(`${API}/project-videos`)
+      .then(r => r.json())
+      .then(data => Array.isArray(data) && setProjectVideos(data))
       .catch(() => { });
 
     return () => {
@@ -309,19 +497,21 @@ export default function Partners() {
         </div>
 
 
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: isMobile ? '15px' : '30px',
-          marginTop: '20px'
-        }}>
-          {projectVideos.map((src, i) => (
-            <div key={`video-${i}`} className="project-video-item">
-              <LazyVideo src={src} />
-            </div>
-          ))}
-        </div>
+        {projectVideos.length > 0 && (
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: isMobile ? '15px' : '30px',
+            marginTop: '20px'
+          }}>
+            {projectVideos.map((video) => (
+              <div key={`video-${video.id}`} className="project-video-item">
+                <VideoEmbed video={video} />
+              </div>
+            ))}
+          </div>
+        )}
 
 
         <h2 style={{ ...headingStyle, marginTop: '80px' }}>شركاؤنا</h2>
