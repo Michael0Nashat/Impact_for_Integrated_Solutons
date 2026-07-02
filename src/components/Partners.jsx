@@ -206,6 +206,15 @@ function getGoogleDriveId(url) {
   return openMatch ? openMatch[1] : null;
 }
 
+// Facebook refuses to be embedded in a plain iframe (it sends
+// X-Frame-Options/CSP headers that block it), so it needs its own
+// official embed plugin URL instead of the generic iframe fallback.
+function getFacebookEmbedSrc(url) {
+  if (!url) return null;
+  if (!/facebook\.com|fb\.watch/.test(url)) return null;
+  return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+}
+
 // Detect the real provider from the URL itself, so a video still plays
 // correctly even if the wrong provider was picked when it was added.
 function detectProvider(url) {
@@ -214,6 +223,7 @@ function detectProvider(url) {
   if (/vimeo\.com/.test(url)) return 'vimeo';
   if (/streamable\.com/.test(url)) return 'streamable';
   if (/drive\.google\.com/.test(url)) return 'google_drive';
+  if (/facebook\.com|fb\.watch/.test(url)) return 'facebook';
   if (/res\.cloudinary\.com/.test(url)) return 'cloudinary';
   if (/\.(mp4|webm|mov|m4v|ogg)(\?|#|$)/i.test(url)) return 'mp4';
   return null;
@@ -345,6 +355,22 @@ function VideoEmbed({ video }) {
           loading="lazy"
           allow="autoplay; fullscreen"
           allowFullScreen
+        />
+      );
+    }
+  }
+
+  if (provider === 'facebook') {
+    const embedSrc = getFacebookEmbedSrc(src);
+    if (embedSrc) {
+      return (
+        <iframe
+          src={embedSrc}
+          title={video.title || 'Facebook video'}
+          loading="lazy"
+          allow="autoplay; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+          style={{ border: 0, overflow: 'hidden' }}
         />
       );
     }
