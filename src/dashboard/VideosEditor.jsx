@@ -211,14 +211,12 @@ export default function VideosEditor({ token }) {
           onChange={(e) => setProvider(e.target.value)}
         >
           <option value="youtube">YouTube</option>
-          <option value="vimeo">Vimeo</option>
           <option value="streamable">Streamable</option>
           <option value="google_drive">Google Drive</option>
           <option value="facebook">Facebook</option>
           <option value="jumpshare">Jumpshare</option>
           <option value="cloudinary">Cloudinary</option>
-          <option value="mp4">MP4 (رابط مباشر)</option>
-          <option value="other">أخرى (Jumpshare وغيرها)</option>
+          <option value="other">أخرى</option>
         </select>
 
         {error && <div style={styles.error}>{error}</div>}
