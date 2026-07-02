@@ -215,6 +215,17 @@ function getFacebookEmbedSrc(url) {
   return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
 }
 
+// Jumpshare's normal share links (jumpshare.com/s/ID or /v/ID) also
+// refuse to load in a plain iframe — only the dedicated /embed/ID path
+// is allowed to be embedded.
+function getJumpshareEmbedSrc(url) {
+  if (!url) return null;
+  if (!/jumpshare\.com/.test(url)) return null;
+  if (/jumpshare\.com\/embed\//.test(url)) return url;
+  const match = url.match(/jumpshare\.com\/(?:s|v)\/([\w-]+)/);
+  return match ? `https://jumpshare.com/embed/${match[1]}` : null;
+}
+
 // Detect the real provider from the URL itself, so a video still plays
 // correctly even if the wrong provider was picked when it was added.
 function detectProvider(url) {
@@ -223,6 +234,7 @@ function detectProvider(url) {
   if (/vimeo\.com/.test(url)) return 'vimeo';
   if (/streamable\.com/.test(url)) return 'streamable';
   if (/drive\.google\.com/.test(url)) return 'google_drive';
+  if (/jumpshare\.com/.test(url)) return 'jumpshare';
   if (/facebook\.com|fb\.watch/.test(url)) return 'facebook';
   if (/res\.cloudinary\.com/.test(url)) return 'cloudinary';
   if (/\.(mp4|webm|mov|m4v|ogg)(\?|#|$)/i.test(url)) return 'mp4';
@@ -371,6 +383,22 @@ function VideoEmbed({ video }) {
           allow="autoplay; encrypted-media; picture-in-picture; web-share"
           allowFullScreen
           style={{ border: 0, overflow: 'hidden' }}
+        />
+      );
+    }
+  }
+
+  if (provider === 'jumpshare') {
+    const embedSrc = getJumpshareEmbedSrc(src);
+    if (embedSrc) {
+      return (
+        <iframe
+          src={embedSrc}
+          title={video.title || 'Jumpshare video'}
+          loading="lazy"
+          allow="encrypted-media; fullscreen"
+          allowFullScreen
+          style={{ border: 0 }}
         />
       );
     }
